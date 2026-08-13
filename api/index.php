@@ -10,6 +10,26 @@ $uri = urldecode(
     parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '',
 );
 
+if ($uri === '/__diag') {
+    header('Content-Type: text/plain; charset=utf-8');
+    echo 'REQUEST_URI='.$_SERVER['REQUEST_URI']."\n\n";
+    echo "--- getenv (relevant) ---\n";
+    foreach (['APP_ENV','APP_DEBUG','APP_KEY','APP_CONFIG_CACHE','LOG_CHANNEL','SESSION_DRIVER','CACHE_DRIVER','VIEW_COMPILED_PATH','ASSET_URL','DB_CONNECTION'] as $k) {
+        echo $k.'='.var_export(getenv($k), true)."\n";
+    }
+    echo "\n--- _ENV keys (relevant) ---\n";
+    foreach (['APP_ENV','APP_DEBUG','APP_KEY','LOG_CHANNEL','SESSION_DRIVER'] as $k) {
+        echo $k.'='.var_export($_ENV[$k] ?? null, true)."\n";
+    }
+    echo "\n--- file checks ---\n";
+    echo 'public/build/manifest.json='.(file_exists(__DIR__.'/../public/build/manifest.json') ? 'yes' : 'no')."\n";
+    echo 'bootstrap/cache/config.php='.(file_exists(__DIR__.'/../bootstrap/cache/config.php') ? 'yes' : 'no')."\n";
+    echo 'bootstrap/cache/packages.php='.(file_exists(__DIR__.'/../bootstrap/cache/packages.php') ? 'yes' : 'no')."\n";
+    echo 'vendor/autoload.php='.(file_exists(__DIR__.'/../vendor/autoload.php') ? 'yes' : 'no')."\n";
+    echo '/tmp writable='.(is_writable('/tmp') ? 'yes' : 'no')."\n";
+    exit;
+}
+
 if ($uri !== '/' && file_exists($file = __DIR__.'/../public'.$uri)) {
     header('Content-type: '.get_mime_type($file).'; charset: UTF-8;');
     echo require $file;
