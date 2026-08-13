@@ -8,9 +8,11 @@ import {
     LayoutDashboard,
     LogIn,
     LogOut,
+    HeartHandshake,
     Sparkles,
     UserPlus,
     Users,
+    Wallet,
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
@@ -67,14 +69,7 @@ const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
  * Each module gets its own sidebar — no other module appears in it.
  * The active module is derived from the current URL.
  */
-const soonModules = [
-    'payroll',
-    'benefits',
-    'performance',
-    'training',
-    'disciplinary',
-    'offboarding',
-];
+const soonModules = ['performance', 'training', 'disciplinary', 'offboarding'];
 
 type ModuleNavItem = {
     slug: string;
@@ -170,6 +165,46 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
             icon: FileText,
         },
     ],
+    payroll: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/payroll/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'payslips',
+            title: 'Payslips',
+            href: '/demo/payroll/payslips',
+            icon: Wallet,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/payroll/reports',
+            icon: FileText,
+        },
+    ],
+    benefits: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/benefits/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'plans',
+            title: 'Benefit Plans',
+            href: '/demo/benefits/plans',
+            icon: HeartHandshake,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/benefits/reports',
+            icon: FileText,
+        },
+    ],
 };
 
 const currentModule = computed<string | null>(() => {
@@ -189,6 +224,14 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/leave')) {
         return 'leave';
+    }
+
+    if (path.startsWith('/demo/payroll')) {
+        return 'payroll';
+    }
+
+    if (path.startsWith('/demo/benefits')) {
+        return 'benefits';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -294,6 +337,42 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/leave') &&
                 !currentUrl.value.startsWith('/demo/leave/dashboard') &&
                 !currentUrl.value.startsWith('/demo/leave/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'payroll') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/payroll URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/payroll'))
+            );
+        }
+
+        if (item.slug === 'payslips') {
+            return (
+                currentUrl.value.startsWith('/demo/payroll') &&
+                !currentUrl.value.startsWith('/demo/payroll/dashboard') &&
+                !currentUrl.value.startsWith('/demo/payroll/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'benefits') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/benefits URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/benefits'))
+            );
+        }
+
+        if (item.slug === 'plans') {
+            return (
+                currentUrl.value.startsWith('/demo/benefits') &&
+                !currentUrl.value.startsWith('/demo/benefits/dashboard') &&
+                !currentUrl.value.startsWith('/demo/benefits/reports')
             );
         }
     }

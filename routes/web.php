@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Hris\AttendanceController;
+use App\Http\Controllers\Hris\BenefitsController;
 use App\Http\Controllers\Hris\ComingSoonController;
 use App\Http\Controllers\Hris\EmployeeController;
 use App\Http\Controllers\Hris\HubController;
 use App\Http\Controllers\Hris\LeaveController;
+use App\Http\Controllers\Hris\PayrollController;
 use App\Http\Controllers\Hris\RecruitmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +47,18 @@ Route::prefix('demo')->name('demo.')->group(function () {
     Route::get('/leave/requests', [LeaveController::class, 'requests'])->name('leave.requests');
     Route::get('/leave/records/{employee}', [LeaveController::class, 'record'])->whereNumber('employee')->name('leave.records');
     Route::get('/leave/reports', [LeaveController::class, 'reports'])->name('leave.reports');
+
+    // Module 5 - Payroll Management
+    Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
+    Route::get('/payroll/dashboard', [PayrollController::class, 'dashboard'])->name('payroll.dashboard');
+    Route::get('/payroll/payslips', [PayrollController::class, 'payslips'])->name('payroll.payslips');
+    Route::get('/payroll/reports', [PayrollController::class, 'reports'])->name('payroll.reports');
+
+    // Module 6 - Benefits Administration
+    Route::get('/benefits', [BenefitsController::class, 'index'])->name('benefits.index');
+    Route::get('/benefits/dashboard', [BenefitsController::class, 'dashboard'])->name('benefits.dashboard');
+    Route::get('/benefits/plans', [BenefitsController::class, 'plans'])->name('benefits.plans');
+    Route::get('/benefits/reports', [BenefitsController::class, 'reports'])->name('benefits.reports');
 
     // Modules 4-10 (coming soon)
     Route::get('/modules/{module}', [ComingSoonController::class, 'show'])->name('modules.show');

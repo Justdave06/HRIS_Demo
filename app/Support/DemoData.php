@@ -251,6 +251,89 @@ class DemoData
         ];
     }
 
+    /**
+     * Payroll periods (Module 5). The last three calendar months: past
+     * months are Paid, the current month is Pending (mid-run).
+     */
+    public static function payrollPeriods(): array
+    {
+        $now = new \DateTimeImmutable();
+        $periods = [];
+
+        for ($i = 2; $i >= 0; $i--) {
+            $month = $now->modify("-{$i} months");
+            $periods[] = [
+                'value' => $month->format('Y-m'),
+                'label' => $month->format('F Y'),
+                'status' => $i === 0 ? 'Pending' : 'Paid',
+            ];
+        }
+
+        return $periods;
+    }
+
+    /**
+     * Benefit plans (Module 6). Government plans are statutory contributions
+     * (SSS, PhilHealth, Pag-IBIG); company plans are provided benefits and
+     * allowances. Contribution amounts are derived per employee in the client
+     * engine so they stay in sync with payroll deductions.
+     */
+    public static function benefitPlans(): array
+    {
+        return [
+            ['id' => 1, 'name' => 'SSS', 'type' => 'Government', 'description' => 'Social Security System — retirement, disability, sickness and death benefits.'],
+            ['id' => 2, 'name' => 'PhilHealth', 'type' => 'Government', 'description' => 'National health insurance covering hospitalization and medical care.'],
+            ['id' => 3, 'name' => 'Pag-IBIG', 'type' => 'Government', 'description' => 'Home Development Mutual Fund — savings and housing loan fund.'],
+            ['id' => 4, 'name' => 'HMO Health Insurance', 'type' => 'Company', 'description' => 'Private health maintenance organization coverage for employees.'],
+            ['id' => 5, 'name' => 'Rice Allowance', 'type' => 'Allowance', 'description' => 'Monthly rice allowance provided to regular employees.'],
+            ['id' => 6, 'name' => 'Transportation Allowance', 'type' => 'Allowance', 'description' => 'Monthly transportation allowance for commuter employees.'],
+        ];
+    }
+
+    /**
+     * Benefit enrollments (Module 6). Every employee is covered by the
+     * statutory government plans; company plans and allowances are assigned
+     * deterministically so the demo always shows a plausible, consistent
+     * picture across the module.
+     */
+    public static function benefitEnrollments(): array
+    {
+        $byName = collect(self::benefitPlans())->keyBy('name');
+        $enrollments = [];
+        $id = 1;
+
+        foreach (self::employees() as $employee) {
+            $eid = $employee['id'];
+            $assignments = [
+                'SSS' => true,
+                'PhilHealth' => true,
+                'Pag-IBIG' => true,
+                'HMO Health Insurance' => $eid % 5 !== 0,
+                'Rice Allowance' => $eid % 3 !== 1,
+                'Transportation Allowance' => $eid % 4 !== 2,
+            ];
+
+            foreach ($assignments as $name => $assigned) {
+                if (! $assigned) {
+                    continue;
+                }
+
+                $enrollments[] = [
+                    'id' => $id++,
+                    'employee_id' => $eid,
+                    'plan_id' => $byName[$name]['id'],
+                    'coverage' => $name === 'HMO Health Insurance' && $eid % 3 === 0
+                        ? 'Employee + dependents'
+                        : 'Employee',
+                    'effective' => '2026-0'.(1 + ($eid % 6)).'-01',
+                    'status' => $eid % 11 === 0 ? 'Pending' : 'Enrolled',
+                ];
+            }
+        }
+
+        return $enrollments;
+    }
+
     /** All 10 modules. Status is 'available' for the ones already built. */
     public static function modules(): array
     {
@@ -259,8 +342,8 @@ class DemoData
             ['slug' => 'recruitment', 'name' => 'Recruitment & Onboarding', 'short' => 'Recruitment', 'status' => 'available', 'description' => 'Job postings, applicant tracking, and onboarding checklists — from hiring to the first day.', 'features' => ['Open positions board', 'Candidate pipeline: Applied → Hired', 'Move candidates between steps', 'Onboarding checklists']],
             ['slug' => 'attendance', 'name' => 'Time & Attendance', 'short' => 'Time & Attendance', 'status' => 'available', 'description' => 'DTR monitoring with biometric clock-in, plus tardiness and absence tracking — the hours that feed payroll.', 'features' => ['Daily attendance roster', 'Demo clock in / clock out', 'Late, absent and on-leave tracking', 'Weekly hours summary for payroll']],
             ['slug' => 'leave', 'name' => 'Leave Management', 'short' => 'Leave', 'status' => 'available', 'description' => 'Request, approve, and track leave. Employees apply for vacation, sick, or emergency leave and managers approve it in a few clicks.', 'features' => ['Leave requests and approvals', 'Leave balances per employee', 'Auto-sync with attendance', 'Paid / unpaid leave for payroll']],
-            ['slug' => 'payroll', 'name' => 'Payroll Management', 'short' => 'Payroll', 'status' => 'soon', 'description' => 'Turn attendance hours, leave days, and benefits into a correct monthly payslip, every single time.', 'features' => ['Monthly payroll run', 'Payslips for every employee', 'Pulls hours from attendance', 'Deductions from leave and benefits']],
-            ['slug' => 'benefits', 'name' => 'Benefits Administration', 'short' => 'Benefits', 'status' => 'soon', 'description' => 'Manage health plans, allowances, and other perks — enroll employees and send the right deductions to payroll.', 'features' => ['Benefit plans and enrollment', 'Allowance tracking', 'Deductions sent to payroll', 'Government contributions summary']],
+            ['slug' => 'payroll', 'name' => 'Payroll Management', 'short' => 'Payroll', 'status' => 'available', 'description' => 'Turn attendance hours, leave days, and benefits into a correct monthly payslip, every single time.', 'features' => ['Monthly payroll run', 'Payslips for every employee', 'Pulls hours from attendance', 'Deductions from leave and benefits']],
+            ['slug' => 'benefits', 'name' => 'Benefits Administration', 'short' => 'Benefits', 'status' => 'available', 'description' => 'Manage health plans, allowances, and other perks — enroll employees and send the right deductions to payroll.', 'features' => ['Benefit plans and enrollment', 'Allowance tracking', 'Deductions sent to payroll', 'Government contributions summary']],
             ['slug' => 'performance', 'name' => 'Performance Management', 'short' => 'Performance', 'status' => 'soon', 'description' => 'Set goals, review progress, and record ratings. Performance results guide raises and training needs.', 'features' => ['Goals and reviews', 'Performance ratings', 'Raise recommendations for payroll', 'Skill gaps for training']],
             ['slug' => 'training', 'name' => 'Training & Development', 'short' => 'Training', 'status' => 'soon', 'description' => 'Plan courses and track who has completed them. Completed trainings are recorded on each employee profile.', 'features' => ['Training calendar', 'Course enrollments', 'Certificates on employee records', 'Training history per employee']],
             ['slug' => 'disciplinary', 'name' => 'Disciplinary Management', 'short' => 'Disciplinary', 'status' => 'soon', 'description' => 'Record warnings and incidents fairly. Repeat issues flag into offboarding when needed.', 'features' => ['Incident and warning log', 'Tracks repeated tardiness', 'Escalation to offboarding', 'Fair and consistent records']],

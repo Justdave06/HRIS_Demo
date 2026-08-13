@@ -138,6 +138,69 @@ export type DemoCandidate = {
     email: string;
 };
 
+/** Status of a computed payslip: Paid, or Pending while the run is open. */
+export type DemoPayslipStatus = 'Paid' | 'Pending';
+
+/** One employee's computed payslip for a pay period (module 5). */
+export type DemoPayslip = {
+    /** Pay period, e.g. '2026-08'. */
+    period: string;
+    /** Human label, e.g. 'August 2026'. */
+    periodLabel: string;
+    employee_id: number;
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+    /** Monthly base salary. */
+    basic: number;
+    otHours: number;
+    otPay: number;
+    /** Unpaid days: absences + no-work-no-pay declared holidays. */
+    unpaidDays: number;
+    unpaidDeduction: number;
+    gross: number;
+    sss: number;
+    philhealth: number;
+    pagibig: number;
+    tax: number;
+    deductions: number;
+    net: number;
+    status: DemoPayslipStatus;
+};
+
+/** Benefit plan offered by the company (module 6). */
+export type DemoBenefitPlan = {
+    id: number;
+    name: string;
+    type: 'Government' | 'Company' | 'Allowance';
+    description: string;
+};
+
+export type DemoEnrollmentStatus = 'Enrolled' | 'Pending';
+
+/** One employee's enrollment in a benefit plan (module 6). */
+export type DemoEnrollment = {
+    id: number;
+    employee_id: number;
+    plan_id: number;
+    coverage: 'Employee' | 'Employee + dependents';
+    effective: string;
+    status: DemoEnrollmentStatus;
+};
+
+/** Enrollment enriched with the employee's record, plan and costs (module 6). */
+export type DemoEnrollmentRow = DemoEnrollment & {
+    employee_no: string;
+    employee_name: string;
+    department: string;
+    position: string;
+    plan: string;
+    plan_type: DemoBenefitPlan['type'];
+    employee_cost: number;
+    employer_cost: number;
+};
+
 export type DemoOnboardingTask = {
     label: string;
     done: boolean;
