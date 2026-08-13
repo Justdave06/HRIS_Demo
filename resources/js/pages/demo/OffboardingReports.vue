@@ -15,20 +15,20 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useDemoDisciplinary } from '@/composables/useDemoDisciplinary';
-import type { DisciplinaryEmployee } from '@/composables/useDemoDisciplinary';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
-import type { DemoDisciplinaryRecord } from '@/types';
+import { useDemoOffboarding } from '@/composables/useDemoOffboarding';
+import type { OffboardingEmployee } from '@/composables/useDemoOffboarding';
+import type { DemoDisciplinaryRecord, DemoOffboardingCase } from '@/types';
 
 const props = defineProps<{
-    employees: DisciplinaryEmployee[];
-    records: DemoDisciplinaryRecord[];
+    employees: OffboardingEmployee[];
+    cases: DemoOffboardingCase[];
+    disciplinary: DemoDisciplinaryRecord[];
 }>();
 
-// Session-added employees (Employee Management module) join the directory so
-// cases logged for them appear in the reports too.
 const { addedEmployees } = useDemoEmployees();
 
-const allEmployees = computed<DisciplinaryEmployee[]>(() => [
+const allEmployees = computed<OffboardingEmployee[]>(() => [
     ...props.employees,
     ...addedEmployees.value.map((employee) => ({
         id: employee.id,
@@ -36,12 +36,22 @@ const allEmployees = computed<DisciplinaryEmployee[]>(() => [
         name: employee.name,
         department: employee.department,
         position: employee.position,
+        employment_type: employee.employment_type,
+        salary: employee.salary,
+        leave_balance: employee.leave_balance,
     })),
 ]);
 
-const { rows, repeatOffenders } = useDemoDisciplinary(
+// Live Disciplinary handoff (Module 9) — seeded + session-escalated cases.
+const { escalatedEmployeeIds } = useDemoDisciplinary(
     allEmployees.value,
-    props.records,
+    props.disciplinary,
+);
+
+const { rows } = useDemoOffboarding(
+    allEmployees.value,
+    props.cases,
+    escalatedEmployeeIds.value.map((employee_id) => ({ employee_id })),
 );
 
 /* ------------------------------------------------------------------ */
@@ -49,15 +59,15 @@ const { rows, repeatOffenders } = useDemoDisciplinary(
 /* ------------------------------------------------------------------ */
 
 const reportTypes = [
-    { value: 'log', label: 'Disciplinary Log' },
-    { value: 'open', label: 'Open Cases Report' },
-    { value: 'escalations', label: 'Escalation Handoff Report' },
-    { value: 'offenders', label: 'Repeat Offenders Report' },
+    { value: 'register', label: 'Separation Register' },
+    { value: 'active', label: 'Active Separations Report' },
+    { value: 'final-pay', label: 'Final Pay Summary' },
+    { value: 'archived', label: 'Archived Cases Report' },
 ] as const;
 
 type ReportType = (typeof reportTypes)[number]['value'];
 
-const reportType = ref<ReportType>('log');
+const reportType = ref<ReportType>('register');
 const search = ref('');
 
 const term = computed(() => search.value.trim().toLowerCase());
@@ -65,40 +75,69 @@ const term = computed(() => search.value.trim().toLowerCase());
 const match = (name: string): boolean =>
     term.value === '' || name.toLowerCase().includes(term.value);
 
-const severityTone: Record<string, string> = {
-    Serious: 'bg-red-50 text-red-700 border-red-200',
-    Moderate: 'bg-amber-50 text-amber-700 border-amber-200',
-    Minor: 'bg-blue-50 text-blue-700 border-blue-200',
-};
-
 const statusTone: Record<string, string> = {
-    Logged: 'bg-blue-50 text-blue-700 border-blue-200',
-    'Under Review': 'bg-amber-50 text-amber-700 border-amber-200',
-    Resolved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    Escalated: 'bg-red-50 text-red-700 border-red-200',
+    Requested: 'bg-blue-50 text-blue-700 border-blue-200',
+    'In Clearance': 'bg-amber-50 text-amber-700 border-amber-200',
+    'Final Pay': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    Completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
 };
 
-const logRows = computed(() =>
+function formatMoney(value: number): string {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(value);
+}
+
+function finalPayOf(row: (typeof rows.value)[number]): number | string {
+    if (row.status === 'Final Pay' || row.status === 'Completed') {
+        return row.finalPay.net;
+    }
+
+    return 'Pending';
+}
+
+const registerRows = computed(() =>
     rows.value
-        .filter((row) => match(row.name) || match(row.category))
+        .filter(
+            (row) =>
+                match(row.name) || match(row.department) || match(row.type),
+        )
         .map((row, index) => ({
             no: index + 1,
             name: row.name,
             department: row.department,
             type: row.type,
-            severity: row.severity,
-            category: row.category,
-            date: row.date,
+            requester: row.requested_by,
+            requested: row.requested_on,
+            exit: row.exit_date,
+            progress: `${row.progress}%`,
             status: row.status,
-            action: row.action,
+            finalPay: finalPayOf(row),
         })),
 );
 
-const openRows = computed(() =>
+const activeRows = computed(() =>
+    rows.value
+        .filter((row) => row.status !== 'Completed' && match(row.name))
+        .map((row, index) => ({
+            no: index + 1,
+            name: row.name,
+            department: row.department,
+            type: row.type,
+            exit: row.exit_date,
+            progress: `${row.progress}%`,
+            status: row.status,
+        })),
+);
+
+const finalPayRows = computed(() =>
     rows.value
         .filter(
             (row) =>
-                (row.status === 'Logged' || row.status === 'Under Review') &&
+                (row.status === 'Final Pay' || row.status === 'Completed') &&
                 match(row.name),
         )
         .map((row, index) => ({
@@ -106,39 +145,25 @@ const openRows = computed(() =>
             name: row.name,
             department: row.department,
             type: row.type,
-            severity: row.severity,
-            category: row.category,
-            date: row.date,
-            status: row.status,
-            action: row.action,
+            exit: row.exit_date,
+            finalPay: row.finalPay.net,
         })),
 );
 
-const escalationRows = computed(() =>
+const archivedRows = computed(() =>
     rows.value
-        .filter((row) => row.status === 'Escalated' && match(row.name))
+        .filter((row) => row.status === 'Completed' && match(row.name))
         .map((row, index) => ({
             no: index + 1,
             name: row.name,
             department: row.department,
-            severity: row.severity,
-            category: row.category,
-            date: row.date,
-            action: row.action,
-        })),
-);
-
-const offenderRows = computed(() =>
-    repeatOffenders.value
-        .filter((offender) => match(offender.name))
-        .map((offender, index) => ({
-            no: index + 1,
-            name: offender.name,
-            department: offender.department,
-            records: offender.recordCount,
-            serious: offender.seriousCount,
-            open: offender.openCount,
-            flagged: offender.flagged ? 'Flagged' : 'On file',
+            type: row.type,
+            requester: row.requested_by,
+            requested: row.requested_on,
+            exit: row.exit_date,
+            progress: `${row.progress}%`,
+            status: row.status,
+            finalPay: row.finalPay.net,
         })),
 );
 
@@ -168,27 +193,26 @@ const showPreview = ref(false);
 const documentColumns = computed<
     { key: string; label: string; numeric?: boolean }[]
 >(() => {
-    if (reportType.value === 'escalations') {
+    if (reportType.value === 'final-pay') {
         return [
             { key: 'no', label: 'No.' },
             { key: 'name', label: 'Employee' },
             { key: 'department', label: 'Department' },
-            { key: 'severity', label: 'Severity' },
-            { key: 'category', label: 'Category' },
-            { key: 'date', label: 'Date' },
-            { key: 'action', label: 'Action Taken' },
+            { key: 'type', label: 'Type' },
+            { key: 'exit', label: 'Exit Date' },
+            { key: 'finalPay', label: 'Final Pay', numeric: true },
         ];
     }
 
-    if (reportType.value === 'offenders') {
+    if (reportType.value === 'active') {
         return [
             { key: 'no', label: 'No.' },
             { key: 'name', label: 'Employee' },
             { key: 'department', label: 'Department' },
-            { key: 'records', label: 'Records', numeric: true },
-            { key: 'serious', label: 'Serious', numeric: true },
-            { key: 'open', label: 'Open Cases', numeric: true },
-            { key: 'flagged', label: 'Status' },
+            { key: 'type', label: 'Type' },
+            { key: 'exit', label: 'Exit Date' },
+            { key: 'progress', label: 'Clearance' },
+            { key: 'status', label: 'Status' },
         ];
     }
 
@@ -197,50 +221,51 @@ const documentColumns = computed<
         { key: 'name', label: 'Employee' },
         { key: 'department', label: 'Department' },
         { key: 'type', label: 'Type' },
-        { key: 'severity', label: 'Severity' },
-        { key: 'category', label: 'Category' },
-        { key: 'date', label: 'Date' },
+        { key: 'requester', label: 'Requested By' },
+        { key: 'requested', label: 'Requested' },
+        { key: 'exit', label: 'Exit Date' },
+        { key: 'progress', label: 'Clearance' },
         { key: 'status', label: 'Status' },
-        { key: 'action', label: 'Action Taken' },
+        { key: 'finalPay', label: 'Final Pay' },
     ];
 });
 
 const documentRows = computed<Record<string, string | number>[]>(() => {
-    if (reportType.value === 'log') {
-        return logRows.value;
+    if (reportType.value === 'register') {
+        return registerRows.value;
     }
 
-    if (reportType.value === 'open') {
-        return openRows.value;
+    if (reportType.value === 'active') {
+        return activeRows.value;
     }
 
-    if (reportType.value === 'escalations') {
-        return escalationRows.value;
+    if (reportType.value === 'final-pay') {
+        return finalPayRows.value;
     }
 
-    return offenderRows.value;
+    return archivedRows.value;
 });
 
 const documentTitle = computed(
     () =>
         reportTypes.find((type) => type.value === reportType.value)?.label ??
-        'Disciplinary Report',
+        'Separation Report',
 );
 
 const documentNote = computed(() => {
-    if (reportType.value === 'open') {
-        return 'Open cases are records still Logged or Under Review that need a decision — resolve or escalate.';
+    if (reportType.value === 'active') {
+        return 'Active separations are cases still moving through clearance or awaiting final pay release.';
     }
 
-    if (reportType.value === 'escalations') {
-        return 'Escalated cases are handed to Separation & Offboarding for the next step in the process.';
+    if (reportType.value === 'final-pay') {
+        return 'Final pay is computed from the employee record — basic pay, unused leave conversion, prorated 13th month, minus statutory deductions and advances.';
     }
 
-    if (reportType.value === 'offenders') {
-        return 'Employees are flagged when they have repeated cases, serious offenses, or an escalation on file.';
+    if (reportType.value === 'archived') {
+        return 'Completed separations are archived safely — the employee record is closed but kept for records.';
     }
 
-    return 'Cases move Logged → Under Review → Resolved; escalated cases are handed to Separation & Offboarding.';
+    return 'Cases move Requested → In Clearance → Final Pay → Completed; final pay is settled with Payroll and completed records are archived safely.';
 });
 
 function generate(): void {
@@ -267,7 +292,7 @@ function exportExcel(): void {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = `disciplinary-${reportType.value}.csv`;
+    link.download = `offboarding-${reportType.value}.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -277,7 +302,7 @@ function exportExcel(): void {
 </script>
 
 <template>
-    <Head title="Reports — Disciplinary Management" />
+    <Head title="Reports — Separation & Offboarding" />
 
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <!-- Header -->
@@ -327,29 +352,39 @@ function exportExcel(): void {
                 />
                 <Input
                     v-model="search"
-                    placeholder="Search employee or category…"
+                    placeholder="Search employee or department…"
                     class="pl-9"
                 />
             </div>
         </div>
 
-        <!-- ================= LOG / OPEN CASES ================= -->
+        <!-- ================= REGISTER / ARCHIVED ================= -->
         <div
-            v-if="reportType === 'log' || reportType === 'open'"
+            v-if="reportType === 'register' || reportType === 'archived'"
             class="rounded-xl border border-slate-200 bg-white shadow-sm"
         >
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">
                     {{
-                        reportType === 'log' ? 'Disciplinary log' : 'Open cases'
+                        reportType === 'register'
+                            ? 'Separation register'
+                            : 'Archived cases'
                     }}
                 </h2>
                 <span
                     class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                 >
-                    {{ (reportType === 'log' ? logRows : openRows).length }}
-                    record{{
-                        (reportType === 'log' ? logRows : openRows).length === 1
+                    {{
+                        (reportType === 'register'
+                            ? registerRows
+                            : archivedRows
+                        ).length
+                    }}
+                    case{{
+                        (reportType === 'register'
+                            ? registerRows
+                            : archivedRows
+                        ).length === 1
                             ? ''
                             : 's'
                     }}
@@ -365,17 +400,20 @@ function exportExcel(): void {
                             <th class="px-4 py-3 font-medium">Employee</th>
                             <th class="px-4 py-3 font-medium">Department</th>
                             <th class="px-4 py-3 font-medium">Type</th>
-                            <th class="px-4 py-3 font-medium">Severity</th>
-                            <th class="px-4 py-3 font-medium">Category</th>
-                            <th class="px-4 py-3 font-medium">Date</th>
+                            <th class="px-4 py-3 font-medium">Requested By</th>
+                            <th class="px-4 py-3 font-medium">Requested</th>
+                            <th class="px-4 py-3 font-medium">Exit Date</th>
+                            <th class="px-4 py-3 font-medium">Clearance</th>
                             <th class="px-4 py-3 font-medium">Status</th>
-                            <th class="px-4 py-3 font-medium">Action</th>
+                            <th class="px-4 py-3 font-medium">Final Pay</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             v-for="row in paged(
-                                reportType === 'log' ? logRows : openRows,
+                                reportType === 'register'
+                                    ? registerRows
+                                    : archivedRows,
                             )"
                             :key="row.no"
                             class="border-b transition-colors last:border-0 hover:bg-muted/40"
@@ -394,21 +432,21 @@ function exportExcel(): void {
                             <td class="px-4 py-3 text-muted-foreground">
                                 {{ row.type }}
                             </td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                                    :class="severityTone[row.severity]"
-                                >
-                                    {{ row.severity }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-slate-700">
-                                {{ row.category }}
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ row.requester }}
                             </td>
                             <td
                                 class="px-4 py-3 text-muted-foreground tabular-nums"
                             >
-                                {{ row.date }}
+                                {{ row.requested }}
+                            </td>
+                            <td
+                                class="px-4 py-3 text-muted-foreground tabular-nums"
+                            >
+                                {{ row.exit }}
+                            </td>
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ row.progress }}
                             </td>
                             <td class="px-4 py-3">
                                 <span
@@ -418,21 +456,25 @@ function exportExcel(): void {
                                     {{ row.status }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-muted-foreground">
-                                {{ row.action }}
+                            <td
+                                class="px-4 py-3 text-muted-foreground tabular-nums"
+                            >
+                                {{ row.finalPay }}
                             </td>
                         </tr>
                         <tr
                             v-if="
-                                (reportType === 'log' ? logRows : openRows)
-                                    .length === 0
+                                (reportType === 'register'
+                                    ? registerRows
+                                    : archivedRows
+                                ).length === 0
                             "
                         >
                             <td
                                 colspan="9"
                                 class="px-4 py-10 text-center text-sm text-muted-foreground"
                             >
-                                No records match the selected filters.
+                                No cases match the selected filters.
                             </td>
                         </tr>
                     </tbody>
@@ -440,25 +482,26 @@ function exportExcel(): void {
             </div>
 
             <PaginationBar
-                :total="(reportType === 'log' ? logRows : openRows).length"
+                :total="
+                    (reportType === 'register' ? registerRows : archivedRows)
+                        .length
+                "
                 :page-size="PAGE_SIZE"
                 v-model:page="reportPage"
             />
         </div>
 
-        <!-- ================= ESCALATION HANDOFF ================= -->
+        <!-- ================= ACTIVE SEPARATIONS ================= -->
         <div
-            v-else-if="reportType === 'escalations'"
+            v-else-if="reportType === 'active'"
             class="rounded-xl border border-slate-200 bg-white shadow-sm"
         >
             <div class="flex items-center justify-between border-b px-5 py-4">
-                <h2 class="font-semibold text-slate-900">
-                    Escalation handoff report
-                </h2>
+                <h2 class="font-semibold text-slate-900">Active separations</h2>
                 <span
                     class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                 >
-                    {{ escalationRows.length }} escalations
+                    {{ activeRows.length }} cases
                 </span>
             </div>
             <div class="overflow-x-auto">
@@ -470,15 +513,15 @@ function exportExcel(): void {
                             <th class="px-4 py-3 font-medium">No.</th>
                             <th class="px-4 py-3 font-medium">Employee</th>
                             <th class="px-4 py-3 font-medium">Department</th>
-                            <th class="px-4 py-3 font-medium">Severity</th>
-                            <th class="px-4 py-3 font-medium">Category</th>
-                            <th class="px-4 py-3 font-medium">Date</th>
-                            <th class="px-4 py-3 font-medium">Action</th>
+                            <th class="px-4 py-3 font-medium">Type</th>
+                            <th class="px-4 py-3 font-medium">Exit Date</th>
+                            <th class="px-4 py-3 font-medium">Clearance</th>
+                            <th class="px-4 py-3 font-medium">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
-                            v-for="row in paged(escalationRows)"
+                            v-for="row in paged(activeRows)"
                             :key="row.no"
                             class="border-b transition-colors last:border-0 hover:bg-muted/40"
                         >
@@ -493,32 +536,32 @@ function exportExcel(): void {
                             <td class="px-4 py-3 text-muted-foreground">
                                 {{ row.department }}
                             </td>
-                            <td class="px-4 py-3">
-                                <span
-                                    class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
-                                    :class="severityTone[row.severity]"
-                                >
-                                    {{ row.severity }}
-                                </span>
-                            </td>
-                            <td class="px-4 py-3 text-slate-700">
-                                {{ row.category }}
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ row.type }}
                             </td>
                             <td
                                 class="px-4 py-3 text-muted-foreground tabular-nums"
                             >
-                                {{ row.date }}
+                                {{ row.exit }}
                             </td>
                             <td class="px-4 py-3 text-muted-foreground">
-                                {{ row.action }}
+                                {{ row.progress }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium"
+                                    :class="statusTone[row.status]"
+                                >
+                                    {{ row.status }}
+                                </span>
                             </td>
                         </tr>
-                        <tr v-if="escalationRows.length === 0">
+                        <tr v-if="activeRows.length === 0">
                             <td
                                 colspan="7"
                                 class="px-4 py-10 text-center text-sm text-muted-foreground"
                             >
-                                No escalations to offboarding right now.
+                                No active separations right now.
                             </td>
                         </tr>
                     </tbody>
@@ -526,25 +569,23 @@ function exportExcel(): void {
             </div>
 
             <PaginationBar
-                :total="escalationRows.length"
+                :total="activeRows.length"
                 :page-size="PAGE_SIZE"
                 v-model:page="reportPage"
             />
         </div>
 
-        <!-- ================= REPEAT OFFENDERS ================= -->
+        <!-- ================= FINAL PAY SUMMARY ================= -->
         <div
             v-else
             class="rounded-xl border border-slate-200 bg-white shadow-sm"
         >
             <div class="flex items-center justify-between border-b px-5 py-4">
-                <h2 class="font-semibold text-slate-900">
-                    Repeat offenders report
-                </h2>
+                <h2 class="font-semibold text-slate-900">Final pay summary</h2>
                 <span
                     class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                 >
-                    {{ offenderRows.length }} employees
+                    {{ finalPayRows.length }} cases
                 </span>
             </div>
             <div class="overflow-x-auto">
@@ -556,21 +597,16 @@ function exportExcel(): void {
                             <th class="px-4 py-3 font-medium">No.</th>
                             <th class="px-4 py-3 font-medium">Employee</th>
                             <th class="px-4 py-3 font-medium">Department</th>
+                            <th class="px-4 py-3 font-medium">Type</th>
+                            <th class="px-4 py-3 font-medium">Exit Date</th>
                             <th class="px-4 py-3 text-right font-medium">
-                                Records
+                                Final Pay
                             </th>
-                            <th class="px-4 py-3 text-right font-medium">
-                                Serious
-                            </th>
-                            <th class="px-4 py-3 text-right font-medium">
-                                Open cases
-                            </th>
-                            <th class="px-4 py-3 font-medium">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
-                            v-for="row in paged(offenderRows)"
+                            v-for="row in paged(finalPayRows)"
                             :key="row.no"
                             class="border-b transition-colors last:border-0 hover:bg-muted/40"
                         >
@@ -585,52 +621,26 @@ function exportExcel(): void {
                             <td class="px-4 py-3 text-muted-foreground">
                                 {{ row.department }}
                             </td>
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ row.type }}
+                            </td>
+                            <td
+                                class="px-4 py-3 text-muted-foreground tabular-nums"
+                            >
+                                {{ row.exit }}
+                            </td>
                             <td
                                 class="px-4 py-3 text-right font-semibold text-slate-900 tabular-nums"
                             >
-                                {{ row.records }}
-                            </td>
-                            <td
-                                class="px-4 py-3 text-right tabular-nums"
-                                :class="
-                                    row.serious > 0
-                                        ? 'font-semibold text-red-600'
-                                        : 'text-muted-foreground'
-                                "
-                            >
-                                {{ row.serious }}
-                            </td>
-                            <td
-                                class="px-4 py-3 text-right tabular-nums"
-                                :class="
-                                    row.open > 0
-                                        ? 'font-medium text-amber-600'
-                                        : 'text-muted-foreground'
-                                "
-                            >
-                                {{ row.open }}
-                            </td>
-                            <td class="px-4 py-3">
-                                <span
-                                    v-if="row.flagged === 'Flagged'"
-                                    class="inline-flex rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700"
-                                >
-                                    {{ row.flagged }}
-                                </span>
-                                <span
-                                    v-else
-                                    class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-600"
-                                >
-                                    {{ row.flagged }}
-                                </span>
+                                {{ formatMoney(row.finalPay) }}
                             </td>
                         </tr>
-                        <tr v-if="offenderRows.length === 0">
+                        <tr v-if="finalPayRows.length === 0">
                             <td
-                                colspan="7"
+                                colspan="6"
                                 class="px-4 py-10 text-center text-sm text-muted-foreground"
                             >
-                                No employees with records match the search.
+                                No final pay computed yet.
                             </td>
                         </tr>
                     </tbody>
@@ -638,7 +648,7 @@ function exportExcel(): void {
             </div>
 
             <PaginationBar
-                :total="offenderRows.length"
+                :total="finalPayRows.length"
                 :page-size="PAGE_SIZE"
                 v-model:page="reportPage"
             />
@@ -648,14 +658,14 @@ function exportExcel(): void {
     <!-- Official report preview -->
     <RecordPrintModal
         v-if="showPreview"
-        :heading="`${documentTitle} — ${documentRows.length} record${documentRows.length === 1 ? '' : 's'}`"
-        subtitle="Official disciplinary document · ready to print"
+        :heading="`${documentTitle} — ${documentRows.length} case${documentRows.length === 1 ? '' : 's'}`"
+        subtitle="Official separation & offboarding document · ready to print"
         @close="showPreview = false"
     >
         <AttendanceReportDocument
             :title="documentTitle"
             :period="`As of ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`"
-            system="Disciplinary Management System"
+            system="Separation & Offboarding System"
             :columns="documentColumns"
             :rows="documentRows"
             :note="documentNote"

@@ -171,16 +171,23 @@ function emptyText(rows: unknown[]): string {
                 >
                     {{ emptyText(record.dependents) }}
                 </p>
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-400 text-left text-xs text-slate-500 uppercase"
+                            class="border-b-2 border-slate-400 text-left text-[10px] text-slate-500 uppercase"
                         >
-                            <th class="py-1.5 pr-4 font-semibold">Full name</th>
-                            <th class="py-1.5 pr-4 font-semibold">
+                            <th class="py-1.5 pr-2 font-semibold break-words">
+                                Full name
+                            </th>
+                            <th class="py-1.5 pr-2 font-semibold break-words">
                                 Relationship
                             </th>
-                            <th class="py-1.5 font-semibold">Birth date</th>
+                            <th class="py-1 font-semibold break-words">
+                                Birth date
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -189,13 +196,13 @@ function emptyText(rows: unknown[]): string {
                             :key="dependent.id"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-4 font-medium">
+                            <td class="py-1 pr-2 font-medium break-words">
                                 {{ dependent.fullName }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 break-words text-slate-600">
                                 {{ dependent.relation ?? 'Dependent' }}
                             </td>
-                            <td class="py-1.5 text-slate-600">
+                            <td class="py-1 text-slate-600">
                                 {{ value(dependent.birthDate) }}
                             </td>
                         </tr>
@@ -216,15 +223,18 @@ function emptyText(rows: unknown[]): string {
                 >
                     {{ emptyText(record.education) }}
                 </p>
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-400 text-left text-xs text-slate-500 uppercase"
+                            class="border-b-2 border-slate-400 text-left text-[10px] text-slate-500 uppercase"
                         >
-                            <th class="py-1.5 pr-4 font-semibold">Level</th>
-                            <th class="py-1.5 pr-4 font-semibold">School</th>
-                            <th class="py-1.5 pr-4 font-semibold">Degree</th>
-                            <th class="py-1.5 font-semibold">Year graduated</th>
+                            <th class="py-1 pr-2 font-semibold">Level</th>
+                            <th class="py-1 pr-2 font-semibold">School</th>
+                            <th class="py-1 pr-2 font-semibold">Degree</th>
+                            <th class="py-1 font-semibold">Year graduated</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -233,16 +243,16 @@ function emptyText(rows: unknown[]): string {
                             :key="row.id ?? row.level + row.school"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-4 font-medium">
+                            <td class="py-1 pr-2 font-medium">
                                 {{ row.level }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ row.school }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ value(row.degree) }}
                             </td>
-                            <td class="py-1.5 text-slate-600">
+                            <td class="py-1 text-slate-600">
                                 {{ value(row.yearGraduated) }}
                             </td>
                         </tr>
@@ -263,15 +273,18 @@ function emptyText(rows: unknown[]): string {
                 >
                     {{ emptyText(record.employment) }}
                 </p>
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-400 text-left text-xs text-slate-500 uppercase"
+                            class="border-b-2 border-slate-400 text-left text-[10px] text-slate-500 uppercase"
                         >
-                            <th class="py-1.5 pr-4 font-semibold">Company</th>
-                            <th class="py-1.5 pr-4 font-semibold">Position</th>
-                            <th class="py-1.5 pr-4 font-semibold">From</th>
-                            <th class="py-1.5 font-semibold">To</th>
+                            <th class="py-1 pr-2 font-semibold">Company</th>
+                            <th class="py-1 pr-2 font-semibold">Position</th>
+                            <th class="py-1 pr-2 font-semibold">From</th>
+                            <th class="py-1 font-semibold">To</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -280,16 +293,16 @@ function emptyText(rows: unknown[]): string {
                             :key="row.id ?? row.company + row.position"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-4 font-medium">
+                            <td class="py-1 pr-2 font-medium">
                                 {{ row.company }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ row.position }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ row.from }}
                             </td>
-                            <td class="py-1.5 text-slate-600">
+                            <td class="py-1 text-slate-600">
                                 {{ value(row.to) }}
                             </td>
                         </tr>
@@ -310,15 +323,18 @@ function emptyText(rows: unknown[]): string {
                 >
                     {{ emptyText(record.characterRefs) }}
                 </p>
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-400 text-left text-xs text-slate-500 uppercase"
+                            class="border-b-2 border-slate-400 text-left text-[10px] text-slate-500 uppercase"
                         >
-                            <th class="py-1.5 pr-4 font-semibold">Company</th>
-                            <th class="py-1.5 pr-4 font-semibold">Position</th>
-                            <th class="py-1.5 pr-4 font-semibold">From</th>
-                            <th class="py-1.5 font-semibold">To</th>
+                            <th class="py-1 pr-2 font-semibold">Company</th>
+                            <th class="py-1 pr-2 font-semibold">Position</th>
+                            <th class="py-1 pr-2 font-semibold">From</th>
+                            <th class="py-1 font-semibold">To</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -327,16 +343,16 @@ function emptyText(rows: unknown[]): string {
                             :key="row.id ?? row.company + row.position"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-4 font-medium">
+                            <td class="py-1 pr-2 font-medium">
                                 {{ row.company }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ row.position }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ row.from }}
                             </td>
-                            <td class="py-1.5 text-slate-600">
+                            <td class="py-1 text-slate-600">
                                 {{ value(row.to) }}
                             </td>
                         </tr>
@@ -357,16 +373,19 @@ function emptyText(rows: unknown[]): string {
                 >
                     {{ emptyText(record.trainings) }}
                 </p>
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-400 text-left text-xs text-slate-500 uppercase"
+                            class="border-b-2 border-slate-400 text-left text-[10px] text-slate-500 uppercase"
                         >
-                            <th class="py-1.5 pr-4 font-semibold">Training</th>
-                            <th class="py-1.5 pr-4 font-semibold">
+                            <th class="py-1 pr-2 font-semibold">Training</th>
+                            <th class="py-1 pr-2 font-semibold">
                                 Venue / provider
                             </th>
-                            <th class="py-1.5 font-semibold">Date</th>
+                            <th class="py-1 font-semibold">Date</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -375,13 +394,13 @@ function emptyText(rows: unknown[]): string {
                             :key="row.id ?? row.name"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-4 font-medium">
+                            <td class="py-1 pr-2 font-medium">
                                 {{ row.name }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ value(row.venue) }}
                             </td>
-                            <td class="py-1.5 text-slate-600">
+                            <td class="py-1 text-slate-600">
                                 {{ value(row.from) }}
                             </td>
                         </tr>
@@ -459,14 +478,17 @@ function emptyText(rows: unknown[]): string {
                 >
                     {{ emptyText(record.licenses) }}
                 </p>
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-400 text-left text-xs text-slate-500 uppercase"
+                            class="border-b-2 border-slate-400 text-left text-[10px] text-slate-500 uppercase"
                         >
-                            <th class="py-1.5 pr-4 font-semibold">License</th>
-                            <th class="py-1.5 pr-4 font-semibold">Number</th>
-                            <th class="py-1.5 font-semibold">Date taken</th>
+                            <th class="py-1 pr-2 font-semibold">License</th>
+                            <th class="py-1 pr-2 font-semibold">Number</th>
+                            <th class="py-1 font-semibold">Date taken</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -475,13 +497,13 @@ function emptyText(rows: unknown[]): string {
                             :key="row.id ?? row.name"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-4 font-medium">
+                            <td class="py-1 pr-2 font-medium">
                                 {{ row.name }}
                             </td>
-                            <td class="py-1.5 pr-4 text-slate-600">
+                            <td class="py-1 pr-2 text-slate-600">
                                 {{ value(row.number) }}
                             </td>
-                            <td class="py-1.5 text-slate-600">
+                            <td class="py-1 text-slate-600">
                                 {{ value(row.dateTaken) }}
                             </td>
                         </tr>

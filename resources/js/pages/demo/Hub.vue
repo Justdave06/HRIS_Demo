@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { Head, router, usePage } from '@inertiajs/vue3';
-import { ArrowRight, LogIn, Sparkles } from '@lucide/vue';
-import { computed } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { ArrowRight, IdCard, LogIn, RefreshCcw, Sparkles } from '@lucide/vue';
+import { computed, ref } from 'vue';
 import { toast } from 'vue-sonner';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useDemoAccount } from '@/composables/useDemoAccount';
 import { useDemoLight } from '@/composables/useDemoLight';
 import { useInitials } from '@/composables/useInitials';
 import { moduleIcons } from '@/lib/demoModuleIcons';
+import { resetDemoData } from '@/lib/demoReset';
 import type { DemoAccount, DemoModule } from '@/types';
 
 // The demo always renders light so every page shares the same white canvas,
@@ -19,6 +21,9 @@ useDemoLight();
 const page = usePage();
 const accounts = computed(() => (page.props.accounts as DemoAccount[]) ?? []);
 const modules = computed(() => (page.props.modules as DemoModule[]) ?? []);
+const mode = computed<'blank' | 'sample'>(
+    () => (page.props.mode as 'blank' | 'sample') ?? 'blank',
+);
 const { account, selectAccount } = useDemoAccount();
 const { getInitials } = useInitials();
 
@@ -66,6 +71,10 @@ const moduleHref = (slug: string): string => {
         return '/demo/disciplinary/dashboard';
     }
 
+    if (slug === 'offboarding') {
+        return '/demo/offboarding/dashboard';
+    }
+
     return `/demo/modules/${slug}`;
 };
 
@@ -88,6 +97,15 @@ function openModule(module: DemoModule): void {
     }
 
     router.visit(moduleHref(module.slug));
+}
+
+/* Start fresh — wipe every record created during testing and reload. */
+const confirmingReset = ref(false);
+
+function startFresh(): void {
+    resetDemoData();
+    toast.success('Demo data wiped — starting fresh');
+    window.location.reload();
 }
 </script>
 
@@ -203,12 +221,42 @@ function openModule(module: DemoModule): void {
                 </button>
             </div>
 
+            <!-- Employee Portal -->
+            <section
+                class="mt-10 flex flex-col items-start justify-between gap-4 rounded-xl border border-blue-200 bg-blue-50/60 p-5 sm:flex-row sm:items-center"
+            >
+                <div class="flex items-start gap-3">
+                    <span
+                        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm"
+                    >
+                        <IdCard class="size-5" />
+                    </span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-900">
+                            Employee Portal
+                        </h2>
+                        <p class="mt-0.5 text-xs text-slate-600">
+                            Employees log in with the email and temporary
+                            password HR created when they were hired — profile,
+                            leave, payslips, goals and more, self-service.
+                        </p>
+                    </div>
+                </div>
+                <Link
+                    href="/demo/portal"
+                    class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+                >
+                    Open employee portal
+                    <ArrowRight class="size-3.5" />
+                </Link>
+            </section>
+
             <!-- All modules reference -->
             <section class="mt-12 rounded-xl border bg-muted/40 p-5">
                 <h2 class="text-sm font-semibold">All 10 modules</h2>
                 <p class="mt-1 text-xs text-muted-foreground">
-                    Modules 1–9 are ready to explore. The rest show a preview of
-                    what's coming — click any chip to take a look.
+                    All 10 modules are ready to explore — click any chip to jump
+                    straight in.
                 </p>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button
@@ -238,6 +286,96 @@ function openModule(module: DemoModule): void {
                             }}
                         </span>
                     </button>
+                </div>
+            </section>
+            <!-- System data mode + start fresh -->
+            <section
+                class="mt-10 flex flex-col items-start justify-between gap-4 rounded-xl border border-red-200 bg-red-50/40 p-5 sm:flex-row sm:items-center"
+            >
+                <div class="flex items-start gap-3">
+                    <span
+                        class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white shadow-sm"
+                    >
+                        <RefreshCcw class="size-5" />
+                    </span>
+                    <div>
+                        <h2 class="text-sm font-semibold text-slate-900">
+                            Test run — start from scratch
+                        </h2>
+                        <p class="mt-0.5 text-xs text-slate-600">
+                            The system starts with
+                            <span class="font-semibold"
+                                >5 sample employees</span
+                            >
+                            and no records — add more employees in Employee
+                            Management and they flow into every module (leave,
+                            payroll, benefits, performance, training,
+                            disciplinary, offboarding, portal). "Start fresh"
+                            wipes the records you created during testing.
+                        </p>
+                        <p class="mt-2 text-xs font-medium">
+                            System data now:
+                            <span
+                                class="rounded bg-white px-1.5 py-0.5 font-semibold"
+                                :class="
+                                    mode === 'blank'
+                                        ? 'text-blue-700'
+                                        : 'text-emerald-700'
+                                "
+                            >
+                                {{
+                                    mode === 'blank'
+                                        ? 'Starter (5 employees)'
+                                        : 'Full sample data loaded'
+                                }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex shrink-0 flex-wrap gap-2">
+                    <template v-if="mode === 'blank'">
+                        <Link
+                            href="/demo/mode/sample"
+                            class="inline-flex items-center rounded-lg border border-emerald-200 bg-white px-3.5 py-2 text-xs font-medium text-emerald-700 shadow-sm transition-colors hover:bg-emerald-50"
+                        >
+                            Load full sample data
+                        </Link>
+                    </template>
+                    <template v-else>
+                        <Link
+                            href="/demo/mode/blank"
+                            class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50"
+                        >
+                            Back to starter (5)
+                        </Link>
+                    </template>
+                    <template v-if="confirmingReset">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
+                            @click="confirmingReset = false"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            size="sm"
+                            class="bg-red-600 hover:bg-red-700"
+                            @click="startFresh"
+                        >
+                            Yes, wipe demo data
+                        </Button>
+                    </template>
+                    <Button
+                        v-else
+                        variant="outline"
+                        size="sm"
+                        class="border-red-200 text-red-700 shadow-none hover:bg-red-50"
+                        @click="confirmingReset = true"
+                    >
+                        <RefreshCcw class="size-3.5" />
+                        Start fresh
+                    </Button>
                 </div>
             </section>
 

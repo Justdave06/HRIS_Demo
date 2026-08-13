@@ -13,6 +13,7 @@ import { computed, ref } from 'vue';
 import AttendanceReportDocument from '@/components/demo/AttendanceReportDocument.vue';
 import RecordPrintModal from '@/components/demo/RecordPrintModal.vue';
 import { Button } from '@/components/ui/button';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoTraining } from '@/composables/useDemoTraining';
 import type { TrainingEmployee } from '@/composables/useDemoTraining';
 import type { DemoTrainingCourse, DemoTrainingEnrollment } from '@/types';
@@ -30,10 +31,29 @@ const props = defineProps<{
     enrollments: DemoTrainingEnrollment[];
 }>();
 
+// Employees added in Employee Management can be enrolled too.
+const { addedEmployees, employeeFor } = useDemoEmployees();
+
+const allEmployees = computed<TrainingEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+    })),
+]);
+
 const { rows } = useDemoTraining(
-    props.employees,
+    allEmployees.value,
     props.courses,
     props.enrollments,
+);
+
+// Session-added employees (no server record) hydrate from sessionStorage.
+const displayEmployee = computed(
+    () => employeeFor(props.employee.id) ?? props.employee,
 );
 
 /* ------------------------------------------------------------------ */
@@ -130,7 +150,7 @@ function exportExcel(): void {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = `${props.employee.name.replaceAll(' ', '-').toLowerCase()}-training-history.csv`;
+    link.download = `${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-training-history.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -140,7 +160,7 @@ function exportExcel(): void {
 </script>
 
 <template>
-    <Head :title="`${employee.name} — Training History`" />
+    <Head :title="`${displayEmployee.name} — Training History`" />
 
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <!-- Header -->
@@ -158,11 +178,12 @@ function exportExcel(): void {
                 <h1
                     class="mt-2 text-2xl font-bold tracking-tight text-slate-900"
                 >
-                    {{ employee.name }}
+                    {{ displayEmployee.name }}
                 </h1>
                 <p class="mt-1 text-sm text-slate-500">
-                    {{ employee.no }} · {{ employee.position }} ·
-                    {{ employee.department }}
+                    {{ displayEmployee.no }} ·
+                    {{ displayEmployee.position }} ·
+                    {{ displayEmployee.department }}
                 </p>
                 <p class="mt-0.5 text-xs text-slate-400">
                     Training history · Q3 2026 calendar
@@ -401,7 +422,7 @@ function exportExcel(): void {
     <!-- Generate report preview -->
     <RecordPrintModal
         v-if="showPreview"
-        :heading="`Training History — ${employee.name}`"
+        :heading="`Training History — ${displayEmployee.name}`"
         subtitle="Official training document · ready to print"
         @close="showPreview = false"
     >
@@ -420,7 +441,7 @@ function exportExcel(): void {
                 { key: 'certificate', label: 'Certificate' },
             ]"
             :rows="reportRows"
-            :note="`${employee.name} — ${employee.position}, ${employee.department}. Completed courses issue a certificate number recorded on the employee record; scores are out of 100.`"
+            :note="`${displayEmployee.name} — ${displayEmployee.position}, ${displayEmployee.department}. Completed courses issue a certificate number recorded on the employee record; scores are out of 100.`"
         />
     </RecordPrintModal>
 </template>

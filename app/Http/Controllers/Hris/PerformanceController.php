@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class PerformanceController extends Controller
@@ -74,6 +75,32 @@ class PerformanceController extends Controller
     }
 
     /**
+     * Performance record for a session-added demo employee. The server has
+     * no record for them — the page hydrates the employee from sessionStorage.
+     */
+    public function sessionRecord(int $employeeId)
+    {
+        $employee = collect(DemoData::employees())->firstWhere('id', $employeeId);
+
+        if (! $employee) {
+            return Inertia::render('demo/PerformanceRecord', array_merge(
+                $this->payload(),
+                ['employee' => [
+                    'id' => $employeeId,
+                    'no' => 'EMP-'.str_pad((string) $employeeId, 4, '0', STR_PAD_LEFT),
+                    'name' => 'Employee',
+                    'department' => '',
+                    'position' => '',
+                    'salary' => 0,
+                    'manager' => '',
+                ]],
+            ));
+        }
+
+        return redirect()->route('demo.performance.reviews');
+    }
+
+    /**
      * Shared payload for the performance pages. Ratings, raise amounts and
      * skill gaps are derived on the client (deterministic engine) so they
      * stay in sync everywhere.
@@ -81,7 +108,7 @@ class PerformanceController extends Controller
     private function payload(): array
     {
         return [
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
@@ -90,8 +117,8 @@ class PerformanceController extends Controller
                 'salary' => $e['salary'],
             ])->values()->all(),
             'periods' => DemoData::performancePeriods(),
-            'reviews' => DemoData::performanceReviews(),
-            'goals' => DemoData::performanceGoals(),
+            'reviews' => DemoMode::blank() ? [] : DemoData::performanceReviews(),
+            'goals' => DemoMode::blank() ? [] : DemoData::performanceGoals(),
         ];
     }
 }

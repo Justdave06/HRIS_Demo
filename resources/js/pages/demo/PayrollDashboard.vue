@@ -10,6 +10,7 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoPayroll } from '@/composables/useDemoPayroll';
 import type {
     PayrollEmployee,
@@ -21,8 +22,23 @@ const props = defineProps<{
     periods: PayrollPeriod[];
 }>();
 
+// Employees added in Employee Management join payroll too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<PayrollEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { payslipsFor, formatMoney } = useDemoPayroll(
-    props.employees,
+    allEmployees.value,
     props.periods,
 );
 
@@ -63,7 +79,7 @@ type StatCard = {
 const statCards: StatCard[] = [
     {
         label: 'Employees on payroll',
-        value: String(props.employees.length),
+        value: String(allEmployees.value.length),
         icon: Users,
         iconClass: 'bg-blue-50 text-blue-700',
         href: '/demo/payroll/payslips',

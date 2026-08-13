@@ -83,7 +83,14 @@ export function useDemoEmployees() {
         return highest + 1;
     }
 
-    function addEmployee(state: EmployeeFormState): DemoEmployee {
+    function addEmployee(
+        state: EmployeeFormState,
+        options: {
+            email?: string;
+            salary?: number;
+            leave_balance?: number;
+        } = {},
+    ): DemoEmployee {
         const id = nextId();
 
         const employee: DemoEmployee = {
@@ -95,7 +102,7 @@ export function useDemoEmployees() {
             status: 'Active',
             employment_type: employmentType(state),
             file_status: 'Incomplete',
-            email: state.personal.email,
+            email: options.email?.trim() || state.personal.email,
             phone: state.personal.phone,
             hire_date: state.personal.dateHired || todayIso(),
             birth_date: state.personal.birthDate,
@@ -107,9 +114,12 @@ export function useDemoEmployees() {
                 phone: state.personal.emergencyPhone,
             },
             manager: '',
-            salary: 0,
-            leave_balance: 0,
+            salary: Math.max(0, options.salary ?? 0),
+            leave_balance: Math.max(0, options.leave_balance ?? 0),
             trainings: 0,
+            // Uploaded profile photo (data URL), shown instead of the
+            // initials avatar wherever this employee appears.
+            photo: state.personal.photo || undefined,
         };
 
         addedEmployees.value.push(employee);

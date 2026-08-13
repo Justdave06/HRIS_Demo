@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoPayroll } from '@/composables/useDemoPayroll';
 import type {
     PayrollEmployee,
@@ -25,8 +26,23 @@ const props = defineProps<{
     periods: PayrollPeriod[];
 }>();
 
+// Employees added in Employee Management join payroll too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<PayrollEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { payslipsFor, formatMoney } = useDemoPayroll(
-    props.employees,
+    allEmployees.value,
     props.periods,
 );
 
@@ -144,10 +160,10 @@ const documentColumns = computed<
             { key: 'no', label: 'No.' },
             { key: 'name', label: 'Employee' },
             { key: 'department', label: 'Department' },
-            { key: 'basic', label: 'Basic Pay', numeric: true },
-            { key: 'ot', label: 'Overtime Pay', numeric: true },
+            { key: 'basic', label: 'Basic', numeric: true },
+            { key: 'ot', label: 'OT Pay', numeric: true },
             { key: 'deductions', label: 'Deductions', numeric: true },
-            { key: 'net', label: 'Net Pay', numeric: true },
+            { key: 'net', label: 'Net', numeric: true },
             { key: 'status', label: 'Status' },
         ];
     }
@@ -158,8 +174,8 @@ const documentColumns = computed<
             { key: 'name', label: 'Employee' },
             { key: 'position', label: 'Position' },
             { key: 'department', label: 'Department' },
-            { key: 'gross', label: 'Gross Pay', numeric: true },
-            { key: 'net', label: 'Net Pay', numeric: true },
+            { key: 'gross', label: 'Gross', numeric: true },
+            { key: 'net', label: 'Net', numeric: true },
             { key: 'status', label: 'Status' },
         ];
     }
@@ -171,7 +187,7 @@ const documentColumns = computed<
             { key: 'sss', label: 'SSS', numeric: true },
             { key: 'philhealth', label: 'PhilHealth', numeric: true },
             { key: 'pagibig', label: 'Pag-IBIG', numeric: true },
-            { key: 'tax', label: 'Withholding Tax', numeric: true },
+            { key: 'tax', label: 'W/H Tax', numeric: true },
             { key: 'total', label: 'Total', numeric: true },
         ];
     }
@@ -180,9 +196,9 @@ const documentColumns = computed<
         { key: 'no', label: 'No.' },
         { key: 'department', label: 'Department' },
         { key: 'employees', label: 'Employees', numeric: true },
-        { key: 'gross', label: 'Gross Pay', numeric: true },
-        { key: 'net', label: 'Net Pay', numeric: true },
-        { key: 'average', label: 'Average Net', numeric: true },
+        { key: 'gross', label: 'Gross', numeric: true },
+        { key: 'net', label: 'Net', numeric: true },
+        { key: 'average', label: 'Avg Net', numeric: true },
     ];
 });
 

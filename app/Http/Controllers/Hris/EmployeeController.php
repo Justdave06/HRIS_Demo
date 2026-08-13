@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
@@ -58,12 +59,14 @@ class EmployeeController extends Controller
     public function create()
     {
         return Inertia::render('demo/AddEmployee', [
-            'departments' => collect(DemoData::employees())
-                ->pluck('department')
-                ->unique()
-                ->sort()
-                ->values()
-                ->all(),
+            'departments' => DemoMode::blank()
+                ? DemoMode::defaultDepartments()
+                : collect(DemoData::employees())
+                    ->pluck('department')
+                    ->unique()
+                    ->sort()
+                    ->values()
+                    ->all(),
         ]);
     }
 
@@ -140,8 +143,11 @@ class EmployeeController extends Controller
      */
     private function employeeRows(): array
     {
-        $employees = DemoData::employees();
-        $attendance = collect(DemoData::attendance());
+        // The starter roster (5 employees) or the full sample set. Attendance
+        // stays empty in starter mode so everyone reads "Not Yet In" until
+        // the user runs the attendance workflow.
+        $employees = DemoMode::employees();
+        $attendance = collect(DemoMode::blank() ? [] : DemoData::attendance());
         $employmentTypes = DemoData::employmentTypes();
         $now = Carbon::now();
 
@@ -156,6 +162,10 @@ class EmployeeController extends Controller
         });
 
         $departments = $rows->pluck('department')->unique()->sort()->values()->all();
+
+        if ($departments === []) {
+            $departments = DemoMode::defaultDepartments();
+        }
 
         $stats = [
             'total' => $rows->count(),

@@ -26,9 +26,16 @@ const props = defineProps<{
 }>();
 
 // Session-added vacancies are merged in so they show up here too.
-const { addedVacancies } = useDemoVacancies();
+const { addedVacancies, statusFor } = useDemoVacancies();
 
 const allJobs = computed(() => [...props.jobs, ...addedVacancies.value]);
+
+// Recompute the vacant count from the merged list (added vacancies are
+// Open by default and start with 0 applicants), keeping the applicant
+// stats from the server since candidates aren't session-created.
+const vacantCount = computed(
+    () => allJobs.value.filter((job) => statusFor(job) === 'Open').length,
+);
 
 const departmentCounts = computed(() =>
     props.departments
@@ -58,7 +65,7 @@ type StatCard = {
 const statCards: StatCard[] = [
     {
         label: 'Vacant positions',
-        value: props.stats.vacant,
+        value: vacantCount.value,
         icon: Briefcase,
         iconClass: 'bg-blue-50 text-blue-700',
         href: '/demo/recruitment/vacancies?status=Open',

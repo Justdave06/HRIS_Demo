@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3';
 import {
     AlertTriangle,
+    Check,
     FileBarChart2,
     FileSpreadsheet,
     FileX,
@@ -9,6 +10,7 @@ import {
     Pencil,
     Plus,
     Search,
+    Send,
     ShieldAlert,
     UserX,
     Users,
@@ -36,6 +38,7 @@ import {
     useDemoDisciplinary,
 } from '@/composables/useDemoDisciplinary';
 import type { DisciplinaryEmployee } from '@/composables/useDemoDisciplinary';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { cn } from '@/lib/utils';
 import type { DemoDisciplinaryRecord } from '@/types';
 
@@ -44,8 +47,44 @@ const props = defineProps<{
     records: DemoDisciplinaryRecord[];
 }>();
 
-const { rows, repeatOffenders, addRecord, updateRecord, remove } =
-    useDemoDisciplinary(props.employees, props.records);
+// Demo employees added from the Employee Management module (in-memory only)
+// join the directory here too, so a case can be logged for anyone.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<DisciplinaryEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+    })),
+]);
+
+const {
+    rows,
+    handedOffIds,
+    repeatOffenders,
+    addRecord,
+    updateRecord,
+    remove,
+    handoff,
+} = useDemoDisciplinary(allEmployees.value, props.records);
+
+/** True once the employee's dismissal has been sent to Offboarding. */
+function isHandedOff(employeeId: number): boolean {
+    return handedOffIds.value.includes(employeeId);
+}
+
+/** Send the dismissal to Separation & Offboarding — no redirect, the
+ *  termination case lands in the register for the offboarding staff. */
+function sendHandoff(employeeId: number, name: string): void {
+    handoff(employeeId);
+    toast.success(
+        `${name} handed off to Separation & Offboarding — the termination case is in the register for the offboarding staff to process`,
+    );
+}
 
 /* ------------------------------------------------------------------ */
 /* Query-param pre-fill so dashboard stat cards can deep-link into a   */
@@ -217,7 +256,7 @@ const draft = reactive({
 });
 
 const draftEmployee = computed(() =>
-    props.employees.find((row) => row.id === Number(draft.employee_id)),
+    allEmployees.value.find((row) => row.id === Number(draft.employee_id)),
 );
 
 function openModal(): void {
@@ -437,13 +476,13 @@ function exportExcel(): void {
 
         <!-- Tabs: sticky, full-width single row, each tab flexes equally -->
         <div
-            class="sticky top-2 z-20 flex w-full rounded-xl border bg-card p-1.5 shadow-sm"
+            class="sticky top-2 z-20 inline-flex w-fit rounded-xl border bg-card p-1 shadow-sm"
         >
             <button
                 v-for="tab in tabs"
                 :key="tab.key"
                 type="button"
-                class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors"
+                class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
                 :class="
                     cn(
                         activeTab === tab.key
@@ -621,15 +660,19 @@ function exportExcel(): void {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            class="text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
+                                            class="shrink-0 text-slate-600 shadow-none whitespace-nowrap hover:bg-slate-50 hover:text-slate-900"
                                             @click="openEdit(row)"
                                         >
                                             <Pencil class="size-3.5" />
                                             Update
                                         </Button>
                                         <Link
-                                            :href="`/demo/disciplinary/records/${row.employee_id}`"
-                                            class="inline-flex items-center rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                                            :href="
+                                                row.employee_id >= 1001
+                                                    ? `/demo/disciplinary/records/session/${row.employee_id}`
+                                                    : `/demo/disciplinary/records/${row.employee_id}`
+                                            "
+                                            class="inline-flex shrink-0 items-center rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                                         >
                                             View
                                         </Link>
@@ -640,10 +683,48 @@ function exportExcel(): void {
                                             "
                                             variant="outline"
                                             size="sm"
-                                            class="text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
+                                            class="shrink-0 text-slate-600 shadow-none whitespace-nowrap hover:bg-slate-50 hover:text-slate-900"
                                             @click="removeRow(row.id)"
                                         >
                                             Remove
+                                        </Button>
+                                        <Button
+                                            v-if="
+                                                row.status === 'Escalated' ||
+                                                row.action ===
+                                                    'Dismissal recommendation'
+                                            "
+                                            size="sm"
+                                            variant="outline"
+                                            :disabled="isHandedOff(row.employee_id)"
+                                            class="shrink-0 shadow-none whitespace-nowrap"
+                                            :class="
+                                                isHandedOff(row.employee_id)
+                                                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50'
+                                                    : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
+                                            "
+                                            :title="
+                                                isHandedOff(row.employee_id)
+                                                    ? 'Sent to Separation & Offboarding — the offboarding staff processes this case'
+                                                    : 'Send the dismissal to Separation & Offboarding for processing'
+                                            "
+                                            @click="
+                                                sendHandoff(
+                                                    row.employee_id,
+                                                    row.name,
+                                                )
+                                            "
+                                        >
+                                            <Check
+                                                v-if="isHandedOff(row.employee_id)"
+                                                class="size-3.5"
+                                            />
+                                            <Send v-else class="size-3.5" />
+                                            {{
+                                                isHandedOff(row.employee_id)
+                                                    ? 'Sent'
+                                                    : 'Hand off'
+                                            }}
                                         </Button>
                                     </div>
                                 </td>
@@ -787,7 +868,11 @@ function exportExcel(): void {
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     <Link
-                                        :href="`/demo/disciplinary/records/${offender.employee_id}`"
+                                        :href="
+                                            offender.employee_id >= 1001
+                                                ? `/demo/disciplinary/records/session/${offender.employee_id}`
+                                                : `/demo/disciplinary/records/${offender.employee_id}`
+                                        "
                                         class="inline-flex items-center rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                                     >
                                         View
@@ -897,7 +982,7 @@ function exportExcel(): void {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem
-                                        v-for="employee in employees"
+                                        v-for="employee in allEmployees"
                                         :key="employee.id"
                                         :value="String(employee.id)"
                                     >

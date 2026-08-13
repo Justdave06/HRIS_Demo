@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
@@ -60,7 +61,7 @@ class RecruitmentController extends Controller
         return Inertia::render('demo/RecruitmentReports', [
             'jobs' => $jobs,
             'candidates' => $candidates,
-            'onboarding' => DemoData::onboarding(),
+            'onboarding' => DemoMode::blank() ? [] : DemoData::onboarding(),
             'departments' => $departments,
             'positions' => collect($jobs)->pluck('position')->unique()->sort()->values()->all(),
             'stats' => $stats,
@@ -74,6 +75,15 @@ class RecruitmentController extends Controller
      */
     private function recruitmentData(): array
     {
+        if (DemoMode::blank()) {
+            return [
+                [],
+                [],
+                DemoMode::defaultDepartments(),
+                ['vacant' => 0, 'totalApplicants' => 0, 'shortlisted' => 0, 'hiredThisMonth' => 0],
+            ];
+        }
+
         $jobs = DemoData::openJobs();
         $candidates = DemoData::candidates();
         $now = Carbon::now();

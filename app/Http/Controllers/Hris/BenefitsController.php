@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class BenefitsController extends Controller
@@ -36,6 +37,55 @@ class BenefitsController extends Controller
     }
 
     /**
+     * One employee's full benefits record — every enrollment and loan
+     * application on file, in a dedicated read-only page.
+     */
+    public function employee(int $employeeId)
+    {
+        $employee = collect(DemoData::employees())->firstWhere('id', $employeeId);
+
+        if (! $employee) {
+            return redirect()->route('demo.benefits.plans');
+        }
+
+        return Inertia::render('demo/BenefitsEmployee', array_merge(
+            $this->payload(),
+            ['employee' => [
+                'id' => $employee['id'],
+                'no' => $employee['no'],
+                'name' => $employee['name'],
+                'department' => $employee['department'],
+                'position' => $employee['position'],
+            ]],
+        ));
+    }
+
+    /**
+     * Benefits record page for a session-added demo employee (id 1001+). The
+     * server has no record for them — the client hydrates the employee and
+     * their session enrollments / loans from the browser's sessionStorage.
+     */
+    public function sessionEmployee(int $employeeId)
+    {
+        $employee = collect(DemoData::employees())->firstWhere('id', $employeeId);
+
+        if (! $employee) {
+            return Inertia::render('demo/BenefitsEmployee', array_merge(
+                $this->payload(),
+                ['employee' => [
+                    'id' => $employeeId,
+                    'no' => 'EMP-'.str_pad((string) $employeeId, 4, '0', STR_PAD_LEFT),
+                    'name' => 'Employee',
+                    'department' => '',
+                    'position' => '',
+                ]],
+            ));
+        }
+
+        return redirect()->route('demo.benefits.plans');
+    }
+
+    /**
      * Benefits reports — enrollment summary, contributions, plan cost, and
      * allowances, with search, generate (official letterhead) and export.
      */
@@ -51,7 +101,7 @@ class BenefitsController extends Controller
     private function payload(): array
     {
         return [
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
@@ -60,7 +110,7 @@ class BenefitsController extends Controller
                 'salary' => $e['salary'],
             ])->values()->all(),
             'plans' => DemoData::benefitPlans(),
-            'enrollments' => DemoData::benefitEnrollments(),
+            'enrollments' => DemoMode::blank() ? [] : DemoData::benefitEnrollments(),
         ];
     }
 }

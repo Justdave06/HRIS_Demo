@@ -25,6 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import {
     PERFORMANCE_CRITERIA,
     useDemoPerformance,
@@ -44,8 +45,23 @@ const props = defineProps<{
     goals: DemoPerformanceGoal[];
 }>();
 
+// Employees added in Employee Management can be reviewed too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<PerformanceEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { rows, goalRows, addReview, submit, finalize, remove, formatMoney } =
-    useDemoPerformance(props.employees, props.reviews, props.goals);
+    useDemoPerformance(allEmployees.value, props.reviews, props.goals);
 
 const periodLabel = (value: string): string =>
     props.periods.find((period) => period.value === value)?.label ?? value;
@@ -218,7 +234,7 @@ const draftRatings = ref<Record<string, string>>(
 const draftComments = ref('');
 
 const draftEmployeeOption = computed(() =>
-    props.employees.find((row) => row.id === Number(draftEmployee.value)),
+    allEmployees.value.find((row) => row.id === Number(draftEmployee.value)),
 );
 
 const ratingOptions = ['1', '2', '3', '4', '5'];
@@ -406,15 +422,15 @@ function exportExcel(): void {
             </div>
         </div>
 
-        <!-- Tabs: sticky, full-width single row, each tab flexes equally -->
+        <!-- Tabs: sticky, compact, left-aligned -->
         <div
-            class="sticky top-2 z-20 flex w-full rounded-xl border bg-card p-1.5 shadow-sm"
+            class="sticky top-2 z-20 inline-flex w-fit rounded-xl border bg-card p-1 shadow-sm"
         >
             <button
                 v-for="tab in tabs"
                 :key="tab.key"
                 type="button"
-                class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors"
+                class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
                 :class="
                     cn(
                         activeTab === tab.key
@@ -670,7 +686,11 @@ function exportExcel(): void {
                                 <td class="px-4 py-3 text-right">
                                     <div class="flex justify-end gap-2">
                                         <Link
-                                            :href="`/demo/performance/records/${row.employee_id}`"
+                                            :href="
+                                                row.employee_id >= 1001
+                                                    ? `/demo/performance/records/session/${row.employee_id}`
+                                                    : `/demo/performance/records/${row.employee_id}`
+                                            "
                                             class="inline-flex items-center rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                                         >
                                             View
@@ -878,7 +898,7 @@ function exportExcel(): void {
                 { key: 'overall', label: 'Overall', numeric: true },
                 { key: 'rating', label: 'Rating' },
                 { key: 'raise', label: 'Raise Rec' },
-                { key: 'gaps', label: 'Skill Gaps', numeric: true },
+                { key: 'gaps', label: 'Gaps', numeric: true },
                 { key: 'status', label: 'Status' },
             ]"
             :rows="reportRows"
@@ -935,7 +955,7 @@ function exportExcel(): void {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem
-                                        v-for="employee in employees"
+                                        v-for="employee in allEmployees"
                                         :key="employee.id"
                                         :value="String(employee.id)"
                                     >

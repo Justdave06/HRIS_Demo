@@ -10,6 +10,7 @@ import type { DemoLeaveRequest, DemoLeaveStatus } from '@/types';
  */
 const STORAGE_KEY = 'hris-demo-added-leave';
 const STATUS_KEY = 'hris-demo-leave-statuses';
+const BALANCE_KEY = 'hris-demo-leave-balances';
 
 function loadStored<T>(key: string, fallback: T): T {
     if (typeof window === 'undefined') {
@@ -40,6 +41,12 @@ const addedRequests = ref<DemoLeaveRequest[]>(
 // interconnection map) and feeds Payroll as paid/unpaid leave.
 const statusOverrides = ref<Record<number, DemoLeaveStatus>>(
     loadStored<Record<number, DemoLeaveStatus>>(STATUS_KEY, {}),
+);
+
+// Leave balance overrides per employee id — set from the Leave Requests page
+// ("Leave Balances" section). Effective balance = override ?? server value.
+const balanceOverrides = ref<Record<number, number>>(
+    loadStored<Record<number, number>>(BALANCE_KEY, {}),
 );
 
 export type LeaveDraft = {
@@ -90,5 +97,23 @@ export function useDemoLeave() {
         return statusOverrides.value[request.id] ?? request.status;
     }
 
-    return { addedRequests, addRequest, setStatus, statusFor };
+    /** Set an employee's leave balance (session-persisted). */
+    function setBalance(employeeId: number, balance: number): void {
+        balanceOverrides.value[employeeId] = Math.max(0, Math.round(balance));
+        saveStored(BALANCE_KEY, balanceOverrides.value);
+    }
+
+    /** Effective balance: override wins over the server value. */
+    function balanceFor(employeeId: number, fallback: number): number {
+        return balanceOverrides.value[employeeId] ?? fallback;
+    }
+
+    return {
+        addedRequests,
+        addRequest,
+        setStatus,
+        statusFor,
+        setBalance,
+        balanceFor,
+    };
 }

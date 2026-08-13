@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class PayrollController extends Controller
@@ -52,7 +53,7 @@ class PayrollController extends Controller
     private function payload(): array
     {
         return [
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],

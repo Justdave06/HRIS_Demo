@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoPerformance } from '@/composables/useDemoPerformance';
 import type { PerformanceEmployee } from '@/composables/useDemoPerformance';
 import type {
@@ -29,8 +30,23 @@ const props = defineProps<{
     goals: DemoPerformanceGoal[];
 }>();
 
+// Employees added in Employee Management can be reviewed too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<PerformanceEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { rows, goalRows, formatMoney } = useDemoPerformance(
-    props.employees,
+    allEmployees.value,
     props.reviews,
     props.goals,
 );
@@ -201,7 +217,7 @@ const documentColumns = computed<
             { key: 'name', label: 'Employee' },
             { key: 'department', label: 'Department' },
             { key: 'period', label: 'Period' },
-            { key: 'job_knowledge', label: 'Job Knowledge', numeric: true },
+            { key: 'job_knowledge', label: 'Job Know.', numeric: true },
             { key: 'quality', label: 'Quality', numeric: true },
             { key: 'productivity', label: 'Productivity', numeric: true },
             { key: 'teamwork', label: 'Teamwork', numeric: true },
@@ -218,7 +234,7 @@ const documentColumns = computed<
             { key: 'department', label: 'Department' },
             { key: 'period', label: 'Period' },
             { key: 'overall', label: 'Overall', numeric: true },
-            { key: 'salary', label: 'Current Salary', numeric: true },
+            { key: 'salary', label: 'Cur. Salary', numeric: true },
             { key: 'raise', label: 'Raise %' },
             { key: 'amount', label: 'Increase', numeric: true },
             { key: 'new_salary', label: 'New Salary', numeric: true },
@@ -232,7 +248,7 @@ const documentColumns = computed<
             { key: 'department', label: 'Department' },
             { key: 'period', label: 'Period' },
             { key: 'criterion', label: 'Skill Gap' },
-            { key: 'training', label: 'Suggested Training' },
+            { key: 'training', label: 'Training' },
             { key: 'overall', label: 'Overall', numeric: true },
         ];
     }

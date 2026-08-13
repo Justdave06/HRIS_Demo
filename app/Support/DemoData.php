@@ -606,6 +606,114 @@ class DemoData
         return $records;
     }
 
+    /**
+     * Clearance checklist items (Module 10). Which tasks are already done is
+     * set per case so each separation shows a realistic, partial progress.
+     */
+    private static function clearance(array $done): array
+    {
+        $tasks = [
+            ['label' => 'Return company laptop and peripherals', 'done' => false],
+            ['label' => 'Clear desk and locker', 'done' => false],
+            ['label' => 'Turn over documents and files', 'done' => false],
+            ['label' => 'Exit interview with HR', 'done' => false],
+            ['label' => 'Settle outstanding advances or loans', 'done' => false],
+            ['label' => 'Deactivate system and email access', 'done' => false],
+            ['label' => 'Return company ID and access cards', 'done' => false],
+        ];
+
+        foreach ($done as $label) {
+            foreach ($tasks as &$task) {
+                if ($task['label'] === $label) {
+                    $task['done'] = true;
+                }
+            }
+        }
+        unset($task);
+
+        return $tasks;
+    }
+
+    /**
+     * Separation & Offboarding cases (Module 10).
+     *
+     * Statuses follow the offboarding pipeline:
+     *   Requested → In Clearance → Final Pay → Completed (archived).
+     *
+     * The cases interlock with the other modules on purpose: terminations
+     * come from escalated Disciplinary cases (employees 14 and 21 have
+     * serious escalated records on file), end-of-contract comes from
+     * employment type, and final pay is computed from the employee record
+     * (salary, leave balance) in the client engine.
+     */
+    public static function offboardingCases(): array
+    {
+        return [
+            [
+                'id' => 1,
+                'employee_id' => 14,
+                'type' => 'Termination',
+                'requested_by' => 'HR / Management',
+                'requested_on' => '2026-08-10',
+                'exit_date' => '2026-08-28',
+                'reason' => 'Escalated disciplinary case — insubordination with a final written warning.',
+                'status' => 'In Clearance',
+                'tasks' => self::clearance([
+                    'Return company laptop and peripherals',
+                    'Turn over documents and files',
+                    'Exit interview with HR',
+                ]),
+            ],
+            [
+                'id' => 2,
+                'employee_id' => 21,
+                'type' => 'Termination',
+                'requested_by' => 'HR / Management',
+                'requested_on' => '2026-08-12',
+                'exit_date' => '2026-09-15',
+                'reason' => 'Escalated disciplinary case — insubordination with a final written warning.',
+                'status' => 'Requested',
+                'tasks' => self::clearance([]),
+            ],
+            [
+                'id' => 3,
+                'employee_id' => 15,
+                'type' => 'End of Contract',
+                'requested_by' => 'HR / Management',
+                'requested_on' => '2026-07-20',
+                'exit_date' => '2026-08-31',
+                'reason' => 'Contract ends August 31, 2026 — not renewed.',
+                'status' => 'Final Pay',
+                'tasks' => self::clearance([
+                    'Return company laptop and peripherals',
+                    'Clear desk and locker',
+                    'Turn over documents and files',
+                    'Exit interview with HR',
+                    'Deactivate system and email access',
+                ]),
+            ],
+            [
+                'id' => 4,
+                'employee_id' => 19,
+                'type' => 'Resignation',
+                'requested_by' => 'Employee',
+                'requested_on' => '2026-07-10',
+                'exit_date' => '2026-07-31',
+                'reason' => 'Resigned during the probationary period.',
+                'status' => 'Completed',
+                'tasks' => self::clearance([
+                    'Return company laptop and peripherals',
+                    'Clear desk and locker',
+                    'Turn over documents and files',
+                    'Exit interview with HR',
+                    'Settle outstanding advances or loans',
+                    'Deactivate system and email access',
+                    'Return company ID and access cards',
+                ]),
+            ],
+        ];
+    }
+
     /** All 10 modules. Status is 'available' for the ones already built. */
     public static function modules(): array
     {
@@ -619,7 +727,7 @@ class DemoData
             ['slug' => 'performance', 'name' => 'Performance Management', 'short' => 'Performance', 'status' => 'available', 'description' => 'Set goals, review progress, and record ratings. Performance results guide raises and training needs.', 'features' => ['Goals and reviews', 'Performance ratings', 'Raise recommendations for payroll', 'Skill gaps for training']],
             ['slug' => 'training', 'name' => 'Training & Development', 'short' => 'Training', 'status' => 'available', 'description' => 'Plan courses and track who has completed them. Completed trainings are recorded on each employee profile.', 'features' => ['Training calendar', 'Course enrollments', 'Certificates on employee records', 'Training history per employee']],
             ['slug' => 'disciplinary', 'name' => 'Disciplinary Management', 'short' => 'Disciplinary', 'status' => 'available', 'description' => 'Record warnings and incidents fairly. Repeat issues flag into offboarding when needed.', 'features' => ['Incident and warning log', 'Tracks repeated tardiness', 'Escalation to offboarding', 'Fair and consistent records']],
-            ['slug' => 'offboarding', 'name' => 'Separation & Offboarding', 'short' => 'Offboarding', 'status' => 'soon', 'description' => 'A smooth goodbye — clearance tasks, final pay, and safe archiving of employee records.', 'features' => ['Exit checklist and clearance', 'Resignation and termination tracking', 'Final pay calculation with payroll', 'Records archived safely']],
+            ['slug' => 'offboarding', 'name' => 'Separation & Offboarding', 'short' => 'Offboarding', 'status' => 'available', 'description' => 'A smooth goodbye — clearance tasks, final pay, and safe archiving of employee records.', 'features' => ['Exit checklist and clearance', 'Resignation and termination tracking', 'Final pay calculation with payroll', 'Records archived safely']],
         ];
     }
 

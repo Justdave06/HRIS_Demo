@@ -4,6 +4,7 @@ import {
     CalendarCheck2,
     FileBarChart2,
     FileSpreadsheet,
+    Pencil,
     Plus,
     Search,
     X,
@@ -21,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLeave } from '@/composables/useDemoLeave';
 import type { DemoLeaveRequest, DemoLeaveRow } from '@/types';
 
@@ -45,7 +47,30 @@ const props = defineProps<{
     };
 }>();
 
-const { addedRequests, addRequest, setStatus, statusFor } = useDemoLeave();
+const {
+    addedRequests,
+    addRequest,
+    setStatus,
+    statusFor,
+    setBalance,
+    balanceFor,
+} = useDemoLeave();
+
+// Employees added in Employee Management join the dropdowns and balance
+// table too, so a leave workflow can start for anyone in the directory.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<EmployeeOption[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        balance: employee.leave_balance,
+    })),
+]);
 
 /* ------------------------------------------------------------------ */
 /* Merged list + filters                                               */
@@ -57,7 +82,7 @@ const allRequests = computed<DemoLeaveRow[]>(() => {
         status: statusFor(row),
     }));
     const added: DemoLeaveRow[] = addedRequests.value.map((request) => {
-        const employee = props.employees.find(
+        const employee = allEmployees.value.find(
             (row) => row.id === request.employee_id,
         );
 
@@ -104,11 +129,52 @@ const filtered = computed(() => {
     );
 });
 
+/* ------------------------------------------------------------------ */
+/* Leave balances — set / adjust each employee's balance               */
+/* ------------------------------------------------------------------ */
+
+const showBalanceModal = ref(false);
+const balanceEmployee = ref<EmployeeOption | null>(null);
+const balanceDraft = ref(0);
+
+function openBalance(employee: EmployeeOption): void {
+    balanceEmployee.value = employee;
+    balanceDraft.value = balanceFor(employee.id, employee.balance);
+    showBalanceModal.value = true;
+}
+
+function saveBalance(): void {
+    if (!balanceEmployee.value) {
+        return;
+    }
+
+    const days = Math.round(balanceDraft.value);
+
+    if (Number.isNaN(days) || days < 0) {
+        toast.error('Enter a valid number of days (0 or more)');
+
+        return;
+    }
+
+    setBalance(balanceEmployee.value.id, days);
+    toast.success(
+        `${balanceEmployee.value.name}'s leave balance set to ${days} day${days === 1 ? '' : 's'} (demo)`,
+    );
+    showBalanceModal.value = false;
+    balanceEmployee.value = null;
+}
+
 const statusTone: Record<string, string> = {
     Pending: 'bg-amber-50 text-amber-700 border-amber-200',
     Approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     Declined: 'bg-red-50 text-red-700 border-red-200',
 };
+
+function recordHref(employeeId: number): string {
+    return employeeId >= 1001
+        ? `/demo/leave/records/session/${employeeId}`
+        : `/demo/leave/records/${employeeId}`;
+}
 
 /* ------------------------------------------------------------------ */
 /* Approve / Decline                                                   */
@@ -138,7 +204,7 @@ const draftTo = ref('');
 const draftReason = ref('');
 
 const draftEmployeeOption = computed(() =>
-    props.employees.find((row) => row.id === Number(draftEmployee.value)),
+    allEmployees.value.find((row) => row.id === Number(draftEmployee.value)),
 );
 
 const draftDays = computed(() => {
@@ -374,6 +440,112 @@ function exportExcel(): void {
             </div>
         </div>
 
+        <!-- Leave balances -->
+        <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div
+                class="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4"
+            >
+                <div>
+                    <h2 class="font-semibold text-slate-900">Leave balances</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">
+                        Set or adjust each employee's leave credits — approved
+                        leave is deducted from the balance automatically.
+                    </p>
+                </div>
+                <span
+                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                >
+                    {{ allEmployees.length }} employees
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[700px] text-sm">
+                    <thead>
+                        <tr
+                            class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+                        >
+                            <th class="px-4 py-3 font-medium">Employee</th>
+                            <th class="px-4 py-3 font-medium">Department</th>
+                            <th class="px-4 py-3 font-medium">Position</th>
+                            <th class="px-4 py-3 font-medium">Balance</th>
+                            <th class="px-4 py-3 text-right font-medium">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="employee in allEmployees"
+                            :key="employee.id"
+                            class="border-b transition-colors last:border-0 hover:bg-muted/40"
+                        >
+                            <td class="px-4 py-3">
+                                <p class="font-medium text-slate-900">
+                                    {{ employee.name }}
+                                </p>
+                                <p
+                                    class="text-xs text-muted-foreground tabular-nums"
+                                >
+                                    {{ employee.no }}
+                                </p>
+                            </td>
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ employee.department }}
+                            </td>
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ employee.position }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <span
+                                    class="inline-flex rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 tabular-nums"
+                                >
+                                    {{
+                                        balanceFor(
+                                            employee.id,
+                                            employee.balance,
+                                        )
+                                    }}
+                                    day{{
+                                        balanceFor(
+                                            employee.id,
+                                            employee.balance,
+                                        ) === 1
+                                            ? ''
+                                            : 's'
+                                    }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <Link
+                                        :href="recordHref(employee.id)"
+                                        class="inline-flex items-center rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+                                    >
+                                        View
+                                    </Link>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        class="text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
+                                        @click="openBalance(employee)"
+                                    >
+                                        <Pencil class="size-3.5" />
+                                        Set balance
+                                    </Button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="border-t px-5 py-3 text-[11px] text-slate-400">
+                Balances are kept in this browser tab only (demo) — approved
+                leave shown in the requests table is not auto-deducted.
+            </p>
+        </div>
+
         <!-- Requests table -->
         <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center justify-between border-b px-5 py-4">
@@ -421,8 +593,16 @@ function exportExcel(): void {
                                 </p>
                                 <p class="text-xs text-muted-foreground">
                                     {{ row.position }} · balance
-                                    {{ row.balance }} day{{
-                                        row.balance === 1 ? '' : 's'
+                                    {{
+                                        balanceFor(row.employee_id, row.balance)
+                                    }}
+                                    day{{
+                                        balanceFor(
+                                            row.employee_id,
+                                            row.balance,
+                                        ) === 1
+                                            ? ''
+                                            : 's'
                                     }}
                                 </p>
                             </td>
@@ -448,7 +628,7 @@ function exportExcel(): void {
                             <td class="px-4 py-3 text-right">
                                 <div class="flex justify-end gap-2">
                                     <Link
-                                        :href="`/demo/leave/records/${row.employee_id}`"
+                                        :href="recordHref(row.employee_id)"
                                         class="inline-flex items-center rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                                     >
                                         View
@@ -557,7 +737,7 @@ function exportExcel(): void {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem
-                                    v-for="employee in employees"
+                                    v-for="employee in allEmployees"
                                     :key="employee.id"
                                     :value="String(employee.id)"
                                 >
@@ -571,8 +751,19 @@ function exportExcel(): void {
                         >
                             {{ draftEmployeeOption.position }} ·
                             {{ draftEmployeeOption.department }} · balance
-                            {{ draftEmployeeOption.balance }} day{{
-                                draftEmployeeOption.balance === 1 ? '' : 's'
+                            {{
+                                balanceFor(
+                                    draftEmployeeOption.id,
+                                    draftEmployeeOption.balance,
+                                )
+                            }}
+                            day{{
+                                balanceFor(
+                                    draftEmployeeOption.id,
+                                    draftEmployeeOption.balance,
+                                ) === 1
+                                    ? ''
+                                    : 's'
                             }}
                         </p>
                     </div>
@@ -651,6 +842,91 @@ function exportExcel(): void {
                     >
                         <CalendarCheck2 class="size-4" />
                         Save request
+                    </Button>
+                </div>
+            </div>
+        </div>
+    </Teleport>
+
+    <!-- Set leave balance modal -->
+    <Teleport to="body">
+        <div
+            v-if="showBalanceModal"
+            class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/60 p-4 backdrop-blur-sm sm:p-8"
+            @click.self="showBalanceModal = false"
+        >
+            <div
+                class="flex max-h-[90vh] w-full max-w-md flex-col rounded-2xl bg-white shadow-2xl"
+            >
+                <div
+                    class="flex items-center justify-between border-b px-6 py-4"
+                >
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">
+                            Set leave balance
+                        </h3>
+                        <p class="text-xs text-muted-foreground">
+                            {{ balanceEmployee?.name }} ·
+                            {{ balanceEmployee?.no }}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        class="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        aria-label="Close"
+                        @click="showBalanceModal = false"
+                    >
+                        <X class="size-5" />
+                    </button>
+                </div>
+
+                <div class="space-y-4 overflow-y-auto px-6 py-5">
+                    <div class="flex flex-col gap-1.5">
+                        <label
+                            class="text-[11px] font-medium tracking-wide text-slate-500 uppercase"
+                        >
+                            Leave balance (days)
+                        </label>
+                        <Input
+                            v-model.number="balanceDraft"
+                            type="number"
+                            min="0"
+                            max="365"
+                            placeholder="e.g. 15"
+                        />
+                        <p class="text-xs text-slate-500">
+                            Current balance on file:
+                            {{
+                                balanceEmployee
+                                    ? balanceFor(
+                                          balanceEmployee.id,
+                                          balanceEmployee.balance,
+                                      )
+                                    : 0
+                            }}
+                            day{{
+                                balanceEmployee &&
+                                balanceFor(
+                                    balanceEmployee.id,
+                                    balanceEmployee.balance,
+                                ) === 1
+                                    ? ''
+                                    : 's'
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 border-t px-6 py-4">
+                    <Button variant="ghost" @click="showBalanceModal = false">
+                        Cancel
+                    </Button>
+                    <Button
+                        class="bg-blue-600 hover:bg-blue-700"
+                        @click="saveBalance"
+                    >
+                        <Pencil class="size-4" />
+                        Save balance
                     </Button>
                 </div>
             </div>

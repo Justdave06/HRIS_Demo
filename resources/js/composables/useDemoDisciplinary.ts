@@ -22,6 +22,7 @@ const ADDED_KEY = 'hris-demo-added-records';
 const STATUS_KEY = 'hris-demo-record-statuses';
 const UPDATE_KEY = 'hris-demo-record-updates';
 const REMOVED_KEY = 'hris-demo-removed-records';
+const HANDOFF_KEY = 'hris-demo-handoffs';
 
 export const DISCIPLINARY_CATEGORIES = [
     'Tardiness',
@@ -154,6 +155,26 @@ export function useDemoDisciplinary(
 
     rebuild();
 
+    /**
+     * Employee ids handed off to Separation & Offboarding (Module 10) — the
+     * live set that flags terminations there. A handoff happens two ways:
+     * the case status is Escalated, or the action taken is a Dismissal
+     * recommendation (the dismissal path). Session-aware: a case escalated
+     * or marked for dismissal here shows up in Offboarding instantly.
+     */
+    const escalatedEmployeeIds = computed<number[]>(
+        () =>
+            [...new Set(
+                rows.value
+                    .filter(
+                        (row) =>
+                            row.status === 'Escalated' ||
+                            row.action === 'Dismissal recommendation',
+                    )
+                    .map((row) => row.employee_id),
+            )],
+    );
+
     /** Employees with cases — used for the repeat-offender directory. */
     const repeatOffenders = computed<DemoRepeatOffender[]>(() => {
         const byEmployee = new Map<
@@ -285,6 +306,24 @@ export function useDemoDisciplinary(
         rebuild();
     }
 
+    /**
+     * Employee ids explicitly sent to Separation & Offboarding (Module 10)
+     * via the "Hand off" action. Sending does not navigate anywhere — the
+     * termination case lands in the offboarding register automatically, and
+     * the offboarding staff reviews and processes it from there.
+     */
+    const handedOffIds = ref<number[]>(
+        loadStored<number[]>(HANDOFF_KEY, []),
+    );
+
+    /** Mark an employee as handed off to Separation & Offboarding. */
+    function handoff(employeeId: number): void {
+        if (!handedOffIds.value.includes(employeeId)) {
+            handedOffIds.value = [...handedOffIds.value, employeeId];
+            saveStored(HANDOFF_KEY, handedOffIds.value);
+        }
+    }
+
     /** Withdraw a record (session-persisted). */
     function remove(id: number): void {
         if (seeded.some((item) => item.id === id)) {
@@ -300,12 +339,15 @@ export function useDemoDisciplinary(
 
     return {
         rows,
+        escalatedEmployeeIds,
+        handedOffIds,
         repeatOffenders,
         addRecord,
         updateRecord,
         review,
         resolve,
         escalate,
+        handoff,
         remove,
     };
 }

@@ -15,12 +15,13 @@ import {
     UserCheck,
     Users,
 } from '@lucide/vue';
+import type { Component } from 'vue';
 import { computed, reactive, ref, watch } from 'vue';
 import { onMounted } from 'vue';
 import { toast } from 'vue-sonner';
 import RecordFormModal from '@/components/demo/RecordFormModal.vue';
 import RecordTable from '@/components/demo/RecordTable.vue';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,6 +53,11 @@ const props = withDefaults(
         initial?: EmployeeFormState;
         /** localStorage key to auto-save drafts, or null to disable. */
         persistKey?: string | null;
+        /**
+         * Optional trailing tab rendered last (e.g. Hiring details on the
+         * Add Employee page). Its content goes in the #extra slot.
+         */
+        extraTab?: { label: string; icon?: Component } | null;
     }>(),
     {
         description: '',
@@ -60,6 +66,7 @@ const props = withDefaults(
         backHref: '',
         initial: undefined,
         persistKey: null,
+        extraTab: null,
     },
 );
 
@@ -155,9 +162,11 @@ const tabs = [
     { key: 'licenses', label: 'Licenses', icon: Award },
 ] as const;
 
-type TabKey = (typeof tabs)[number]['key'];
+type BaseTabKey = (typeof tabs)[number]['key'];
 
-type RecordTabKey = Exclude<TabKey, 'personal' | 'gov'>;
+type TabKey = BaseTabKey | 'extra';
+
+type RecordTabKey = Exclude<BaseTabKey, 'personal' | 'gov'>;
 
 const activeTab = ref<TabKey>('personal');
 
@@ -457,15 +466,15 @@ const emergencyFields: {
             </div>
         </div>
 
-        <!-- Tabs: sticky, full-width single row, each tab flexes equally -->
+        <!-- Tabs: sticky, compact, left-aligned -->
         <div
-            class="sticky top-2 z-20 flex w-full rounded-xl border bg-card p-1.5 shadow-sm"
+            class="sticky top-2 z-20 inline-flex w-fit rounded-xl border bg-card p-1 shadow-sm"
         >
             <button
                 v-for="tab in tabs"
                 :key="tab.key"
                 type="button"
-                class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors"
+                class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
                 :class="
                     cn(
                         activeTab === tab.key
@@ -478,6 +487,28 @@ const emergencyFields: {
                 <component :is="tab.icon" class="size-4" />
                 {{ tab.label }}
             </button>
+
+            <!-- Optional trailing tab (e.g. Hiring details) -->
+            <button
+                v-if="extraTab"
+                type="button"
+                class="inline-flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-colors"
+                :class="
+                    cn(
+                        activeTab === 'extra'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                    )
+                "
+                @click="activeTab = 'extra'"
+            >
+                <component
+                    v-if="extraTab.icon"
+                    :is="extraTab.icon"
+                    class="size-4"
+                />
+                {{ extraTab.label }}
+            </button>
         </div>
 
         <!-- ============ 1. PERSONAL DATA ============ -->
@@ -487,7 +518,14 @@ const emergencyFields: {
                 <h2 class="font-semibold">Profile picture</h2>
                 <div class="mt-4 flex items-center gap-5">
                     <Avatar class="size-24 overflow-hidden rounded-2xl">
+                        <AvatarImage
+                            v-if="state.personal.photo"
+                            :src="state.personal.photo"
+                            :alt="fullName()"
+                            class="object-cover"
+                        />
                         <AvatarFallback
+                            v-else
                             class="rounded-2xl bg-blue-600 text-2xl font-bold text-white"
                         >
                             {{ getInitials(fullName()) }}
@@ -519,12 +557,6 @@ const emergencyFields: {
                         </Button>
                     </div>
                 </div>
-                <img
-                    v-if="state.personal.photo"
-                    :src="state.personal.photo"
-                    alt="Profile preview"
-                    class="mt-4 max-h-48 rounded-xl border object-contain"
-                />
             </div>
 
             <!-- Personal information -->
@@ -816,13 +848,25 @@ const emergencyFields: {
             />
         </section>
 
+        <!-- ============ EXTRA TAB (e.g. Hiring details) ============ -->
+        <section v-if="activeTab === 'extra' && extraTab" class="grid gap-6">
+            <slot name="extra" />
+        </section>
+
         <!-- Sticky save bar (single set of Save / Clear actions) -->
         <div
             class="sticky bottom-4 z-10 flex flex-col gap-3 rounded-xl border bg-card/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between"
         >
             <div class="flex items-center gap-3">
                 <Avatar class="size-10 overflow-hidden rounded-xl">
+                    <AvatarImage
+                        v-if="state.personal.photo"
+                        :src="state.personal.photo"
+                        :alt="fullName()"
+                        class="object-cover"
+                    />
                     <AvatarFallback
+                        v-else
                         class="rounded-xl bg-blue-600 text-xs font-bold text-white"
                     >
                         {{ getInitials(fullName()) }}

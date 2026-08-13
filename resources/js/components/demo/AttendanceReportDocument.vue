@@ -43,7 +43,9 @@ const totals = computed(() => {
 </script>
 
 <template>
-    <article class="bg-white text-slate-900 shadow-xl print:shadow-none">
+    <article
+        class="w-full max-w-full min-w-0 bg-white break-words text-slate-900 shadow-xl print:shadow-none"
+    >
         <!-- Official letterhead (Philippine certification format) -->
         <header class="px-8 pt-10 pb-6 text-center">
             <p
@@ -89,16 +91,18 @@ const totals = computed(() => {
             </div>
         </header>
 
-        <div class="px-8 pb-10">
-            <table class="w-full border-collapse text-sm">
+        <div class="px-6 pb-8">
+            <table
+                class="w-full min-w-0 table-fixed border-collapse text-[11px] break-words"
+            >
                 <thead>
                     <tr
-                        class="border-b-2 border-slate-800 text-left text-xs text-slate-700 uppercase"
+                        class="border-b-2 border-slate-800 text-left text-[10px] text-slate-700 uppercase"
                     >
                         <th
                             v-for="column in columns"
                             :key="column.key"
-                            class="py-2 pr-3 font-bold last:pr-0"
+                            class="py-1.5 pr-2 font-bold break-words last:pr-0"
                         >
                             {{ column.label }}
                         </th>
@@ -113,7 +117,7 @@ const totals = computed(() => {
                         <td
                             v-for="column in columns"
                             :key="column.key"
-                            class="py-1.5 pr-3 text-slate-600 last:pr-0"
+                            class="py-1 pr-2 align-top break-words text-slate-600 last:pr-0"
                             :class="
                                 column.numeric
                                     ? 'tabular-nums'
@@ -128,7 +132,7 @@ const totals = computed(() => {
                     <tr v-if="rows.length === 0">
                         <td
                             :colspan="columns.length"
-                            class="py-6 text-center text-sm text-slate-400 italic"
+                            class="py-5 text-center text-xs text-slate-400 italic"
                         >
                             No records in this period.
                         </td>
@@ -139,7 +143,7 @@ const totals = computed(() => {
                         <td
                             v-for="column in columns"
                             :key="column.key"
-                            class="border-t-2 border-slate-800 py-2 pr-3 text-xs font-black tracking-wide uppercase last:pr-0"
+                            class="border-t-2 border-slate-800 py-1.5 pr-2 text-[10px] font-black tracking-wide uppercase last:pr-0"
                             :class="
                                 column.numeric ? 'text-right tabular-nums' : ''
                             "
@@ -155,22 +159,25 @@ const totals = computed(() => {
                 </tfoot>
             </table>
 
-            <p v-if="note" class="mt-4 text-xs text-slate-500 italic">
+            <p
+                v-if="note"
+                class="mt-4 text-[10px] break-words text-slate-500 italic"
+            >
                 {{ note }}
             </p>
 
             <!-- Signature block -->
-            <section class="mt-14 grid grid-cols-2 gap-x-12 gap-y-8 text-sm">
+            <section class="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 text-xs">
                 <div>
                     <div
-                        class="border-t border-slate-400 pt-2 text-xs font-semibold text-slate-600"
+                        class="border-t border-slate-400 pt-1.5 text-[10px] font-semibold text-slate-600"
                     >
                         Prepared by: Timekeeper
                     </div>
                 </div>
                 <div>
                     <div
-                        class="border-t border-slate-400 pt-2 text-xs font-semibold text-slate-600"
+                        class="border-t border-slate-400 pt-1.5 text-[10px] font-semibold text-slate-600"
                     >
                         Noted by: HR Manager
                     </div>

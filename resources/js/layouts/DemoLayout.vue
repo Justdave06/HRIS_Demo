@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import {
     BookOpen,
     CalendarCheck2,
@@ -25,10 +25,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -43,7 +40,6 @@ import {
     SidebarMenuItem,
     SidebarProvider,
     SidebarRail,
-    SidebarSeparator,
     SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
@@ -51,20 +47,14 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { useDemoAccount } from '@/composables/useDemoAccount';
 import { useDemoLight } from '@/composables/useDemoLight';
 import { useInitials } from '@/composables/useInitials';
-import { cn } from '@/lib/utils';
 import { hub } from '@/routes/demo';
 import modules from '@/routes/demo/modules';
-import type { DemoAccount } from '@/types';
 
 // The demo always renders light so every module page shares the same white
 // canvas, regardless of the user's appearance preference.
 useDemoLight();
 
-const page = usePage();
-const demoAccounts = computed(
-    () => (page.props.demoAccounts as DemoAccount[]) ?? [],
-);
-const { account, selectAccount, clearAccount } = useDemoAccount();
+const { account, clearAccount } = useDemoAccount();
 const { getInitials } = useInitials();
 const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
 
@@ -72,7 +62,7 @@ const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
  * Each module gets its own sidebar — no other module appears in it.
  * The active module is derived from the current URL.
  */
-const soonModules = ['offboarding'];
+const soonModules: string[] = [];
 
 type ModuleNavItem = {
     slug: string;
@@ -268,6 +258,26 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
             icon: FileText,
         },
     ],
+    offboarding: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/offboarding/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'cases',
+            title: 'Offboarding Register',
+            href: '/demo/offboarding/cases',
+            icon: LogOut,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/offboarding/reports',
+            icon: FileText,
+        },
+    ],
 };
 
 const currentModule = computed<string | null>(() => {
@@ -307,6 +317,10 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/disciplinary')) {
         return 'disciplinary';
+    }
+
+    if (path.startsWith('/demo/offboarding')) {
+        return 'offboarding';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -507,12 +521,25 @@ function isItemActive(item: ModuleNavItem): boolean {
         }
     }
 
-    return isCurrentOrParentUrl(item.href);
-}
+    if (currentModule.value === 'offboarding') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/offboarding URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/offboarding'))
+            );
+        }
 
-function switchAccount(selected: DemoAccount): void {
-    selectAccount(selected);
-    toast.success(`Signed in as ${selected.name} (demo)`);
+        if (item.slug === 'cases') {
+            return (
+                currentUrl.value.startsWith('/demo/offboarding') &&
+                !currentUrl.value.startsWith('/demo/offboarding/dashboard') &&
+                !currentUrl.value.startsWith('/demo/offboarding/reports')
+            );
+        }
+    }
+
+    return isCurrentOrParentUrl(item.href);
 }
 
 function exitDemo(): void {
@@ -556,21 +583,6 @@ function exitDemo(): void {
 
             <SidebarContent>
                 <SidebarGroup class="px-2 py-0">
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                as-child
-                                :is-active="isCurrentUrl(hub())"
-                                tooltip="Accounts & Log in"
-                            >
-                                <Link :href="hub()">
-                                    <LogIn />
-                                    <span>Accounts & Log in</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                    <SidebarSeparator class="mx-2 my-2" />
                     <SidebarMenu>
                         <SidebarMenuItem
                             v-for="item in navItems"
@@ -632,60 +644,6 @@ function exitDemo(): void {
                                 align="end"
                                 :side-offset="4"
                             >
-                                <DropdownMenuLabel class="p-0 font-normal">
-                                    <div
-                                        class="flex items-center gap-2 px-1 py-1.5 text-left text-sm"
-                                    >
-                                        <Users class="size-4" />
-                                        Switch demo account
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup
-                                    class="max-h-64 overflow-y-auto"
-                                >
-                                    <DropdownMenuItem
-                                        v-for="demoAccount in demoAccounts"
-                                        :key="demoAccount.id"
-                                        :class="
-                                            cn(
-                                                'cursor-pointer',
-                                                demoAccount.id ===
-                                                    account?.id && 'bg-accent',
-                                            )
-                                        "
-                                        @select="switchAccount(demoAccount)"
-                                    >
-                                        <Avatar
-                                            class="size-6 overflow-hidden rounded-md"
-                                        >
-                                            <AvatarFallback
-                                                class="rounded-md text-[10px] font-semibold text-white"
-                                                :style="{
-                                                    backgroundColor:
-                                                        demoAccount.color,
-                                                }"
-                                            >
-                                                {{
-                                                    getInitials(
-                                                        demoAccount.name,
-                                                    )
-                                                }}
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div class="grid flex-1 leading-tight">
-                                            <span class="text-sm font-medium">
-                                                {{ demoAccount.name }}
-                                            </span>
-                                            <span
-                                                class="text-xs text-muted-foreground"
-                                            >
-                                                {{ demoAccount.role }}
-                                            </span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
                                     class="cursor-pointer"
                                     @select="exitDemo"

@@ -5,6 +5,7 @@ import { computed, ref } from 'vue';
 import AttendanceReportDocument from '@/components/demo/AttendanceReportDocument.vue';
 import RecordPrintModal from '@/components/demo/RecordPrintModal.vue';
 import { Button } from '@/components/ui/button';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLeave } from '@/composables/useDemoLeave';
 import type { DemoLeaveRow } from '@/types';
 
@@ -20,7 +21,15 @@ const props = defineProps<{
     requests: DemoLeaveRow[];
 }>();
 
-const { addedRequests, statusFor } = useDemoLeave();
+const { addedRequests, statusFor, balanceFor } = useDemoLeave();
+
+// Session-added employees (no server record) hydrate from sessionStorage,
+// so the name and record shown here match the Employee Management module.
+const { employeeFor } = useDemoEmployees();
+
+const displayEmployee = computed(
+    () => employeeFor(props.employee.id) ?? props.employee,
+);
 
 /* ------------------------------------------------------------------ */
 /* History: seeded + session-added requests for this employee only     */
@@ -34,11 +43,11 @@ const history = computed<DemoLeaveRow[]>(() => {
         .filter((row) => row.employee_id === props.employee.id)
         .map((row) => ({
             ...row,
-            no: props.employee.no,
-            name: props.employee.name,
-            department: props.employee.department,
-            position: props.employee.position,
-            balance: props.employee.balance,
+            no: displayEmployee.value.no,
+            name: displayEmployee.value.name,
+            department: displayEmployee.value.department,
+            position: displayEmployee.value.position,
+            balance: balanceFor(props.employee.id, props.employee.balance),
             status: statusFor(row),
         }));
 
@@ -57,16 +66,18 @@ const usedDays = computed(() =>
         .reduce((sum, row) => sum + row.days, 0),
 );
 
-const remaining = computed(() =>
-    Math.max(0, props.employee.balance - usedDays.value),
+const balance = computed(() =>
+    balanceFor(props.employee.id, props.employee.balance),
 );
+
+const remaining = computed(() => Math.max(0, balance.value - usedDays.value));
 
 // Per-type credits are derived deterministically from the total balance so
 // the demo shows a realistic Vacation / Sick / Emergency split.
 const typeBalances = computed(() => {
-    const vacation = Math.ceil(props.employee.balance * 0.5);
-    const sick = Math.ceil(props.employee.balance * 0.3);
-    const emergency = Math.max(1, props.employee.balance - vacation - sick);
+    const vacation = Math.ceil(balance.value * 0.5);
+    const sick = Math.ceil(balance.value * 0.3);
+    const emergency = Math.max(1, balance.value - vacation - sick);
     const credits = [
         { type: 'Vacation', credit: vacation },
         { type: 'Sick', credit: sick },
@@ -142,7 +153,7 @@ function exportExcel(): void {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = `${props.employee.name.replaceAll(' ', '-').toLowerCase()}-leave-record.csv`;
+    link.download = `${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-leave-record.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -152,7 +163,7 @@ function exportExcel(): void {
 </script>
 
 <template>
-    <Head :title="`${employee.name} — Leave Record`" />
+    <Head :title="`${displayEmployee.name} — Leave Record`" />
 
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <!-- Header -->
@@ -170,11 +181,11 @@ function exportExcel(): void {
                 <h1
                     class="mt-2 text-2xl font-bold tracking-tight text-slate-900"
                 >
-                    {{ employee.name }}
+                    {{ displayEmployee.name }}
                 </h1>
                 <p class="mt-1 text-sm text-slate-500">
-                    {{ employee.no }} · {{ employee.position }} ·
-                    {{ employee.department }}
+                    {{ displayEmployee.no }} · {{ displayEmployee.position }} ·
+                    {{ displayEmployee.department }}
                 </p>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -203,7 +214,7 @@ function exportExcel(): void {
                     Leave balance
                 </p>
                 <p class="mt-1 text-3xl font-bold text-slate-900 tabular-nums">
-                    {{ employee.balance }}
+                    {{ balance }}
                     <span class="text-sm font-medium text-slate-500">
                         days
                     </span>
@@ -333,7 +344,7 @@ function exportExcel(): void {
     <!-- Generate report preview -->
     <RecordPrintModal
         v-if="showPreview"
-        :heading="`Leave Record — ${employee.name}`"
+        :heading="`Leave Record — ${displayEmployee.name}`"
         subtitle="Official leave document · ready to print"
         @close="showPreview = false"
     >
@@ -351,7 +362,7 @@ function exportExcel(): void {
                 { key: 'reason', label: 'Reason' },
             ]"
             :rows="reportRows"
-            :note="`${employee.name} — ${employee.position}, ${employee.department}. Leave balance: ${employee.balance} days, ${usedDays} used (approved), ${remaining} remaining.`"
+            :note="`${displayEmployee.name} — ${displayEmployee.position}, ${displayEmployee.department}. Leave balance: ${balance} days, ${usedDays} used (approved), ${remaining} remaining.`"
         />
     </RecordPrintModal>
 </template>

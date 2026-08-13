@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoTraining } from '@/composables/useDemoTraining';
 import type { TrainingEmployee } from '@/composables/useDemoTraining';
 import type { DemoTrainingCourse, DemoTrainingEnrollment } from '@/types';
@@ -24,8 +25,22 @@ const props = defineProps<{
     enrollments: DemoTrainingEnrollment[];
 }>();
 
+// Employees added in Employee Management can be enrolled too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<TrainingEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+    })),
+]);
+
 const { rows, courseRows } = useDemoTraining(
-    props.employees,
+    allEmployees.value,
     props.courses,
     props.enrollments,
 );
@@ -171,7 +186,7 @@ const documentColumns = computed<
             { key: 'department', label: 'Department' },
             { key: 'course', label: 'Course' },
             { key: 'score', label: 'Score', numeric: true },
-            { key: 'completed_on', label: 'Completed On' },
+            { key: 'completed_on', label: 'Completed' },
             { key: 'certificate', label: 'Certificate' },
         ];
     }
@@ -179,11 +194,11 @@ const documentColumns = computed<
     if (reportType.value === 'certificates') {
         return [
             { key: 'no', label: 'No.' },
-            { key: 'certificate', label: 'Certificate No.' },
+            { key: 'certificate', label: 'Cert. No.' },
             { key: 'name', label: 'Employee' },
             { key: 'department', label: 'Department' },
             { key: 'course', label: 'Course' },
-            { key: 'completed_on', label: 'Completed On' },
+            { key: 'completed_on', label: 'Completed' },
         ];
     }
 
@@ -195,7 +210,7 @@ const documentColumns = computed<
         { key: 'schedule', label: 'Schedule' },
         { key: 'enrolled', label: 'Enrolled', numeric: true },
         { key: 'completed', label: 'Completed', numeric: true },
-        { key: 'rate', label: 'Completion %', numeric: true },
+        { key: 'rate', label: 'Rate %', numeric: true },
     ];
 });
 

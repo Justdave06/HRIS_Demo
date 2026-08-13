@@ -10,6 +10,7 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoTraining } from '@/composables/useDemoTraining';
 import type { TrainingEmployee } from '@/composables/useDemoTraining';
 import type { DemoTrainingCourse, DemoTrainingEnrollment } from '@/types';
@@ -20,8 +21,22 @@ const props = defineProps<{
     enrollments: DemoTrainingEnrollment[];
 }>();
 
+// Employees added in Employee Management can be enrolled too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<TrainingEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+    })),
+]);
+
 const { rows, courseRows } = useDemoTraining(
-    props.employees,
+    allEmployees.value,
     props.courses,
     props.enrollments,
 );

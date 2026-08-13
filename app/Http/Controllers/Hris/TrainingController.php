@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class TrainingController extends Controller
@@ -62,6 +63,30 @@ class TrainingController extends Controller
     }
 
     /**
+     * Training record for a session-added demo employee. The server has no
+     * record for them — the page hydrates the employee from sessionStorage.
+     */
+    public function sessionRecord(int $employeeId)
+    {
+        $employee = collect(DemoData::employees())->firstWhere('id', $employeeId);
+
+        if (! $employee) {
+            return Inertia::render('demo/TrainingRecord', array_merge(
+                $this->payload(),
+                ['employee' => [
+                    'id' => $employeeId,
+                    'no' => 'EMP-'.str_pad((string) $employeeId, 4, '0', STR_PAD_LEFT),
+                    'name' => 'Employee',
+                    'department' => '',
+                    'position' => '',
+                ]],
+            ));
+        }
+
+        return redirect()->route('demo.training.enrollments');
+    }
+
+    /**
      * Training reports — enrollment, completion & scores, certificate
      * register and course summary, with generate + export.
      */
@@ -77,7 +102,7 @@ class TrainingController extends Controller
     private function payload(): array
     {
         return [
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
@@ -85,7 +110,7 @@ class TrainingController extends Controller
                 'position' => $e['position'],
             ])->values()->all(),
             'courses' => DemoData::trainingCourses(),
-            'enrollments' => DemoData::trainingEnrollments(),
+            'enrollments' => DemoMode::blank() ? [] : DemoData::trainingEnrollments(),
         ];
     }
 }

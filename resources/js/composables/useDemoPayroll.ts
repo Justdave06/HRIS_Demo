@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { useDemoDtr } from '@/composables/useDemoDtr';
 import { useDemoHolidays } from '@/composables/useDemoHolidays';
+import { useDemoLoans } from '@/composables/useDemoLoans';
 import type { DemoPayslip, DemoPayslipStatus } from '@/types';
 
 /*
@@ -10,7 +11,8 @@ import type { DemoPayslip, DemoPayslipStatus } from '@/types';
  *   gross = monthly salary + overtime pay (Attendance) − unpaid days
  *   unpaid days = absences (Attendance DTR) + no-work-no-pay declared
  *                 holidays (Holiday Picker)
- *   deductions = SSS + PhilHealth + Pag-IBIG + withholding tax
+ *   deductions = SSS + PhilHealth + Pag-IBIG + withholding tax + loan
+ *                 amortization (approved Benefits loans)
  *   net = gross − deductions
  *
  * Session-backed like every other demo store: marking a payslip Paid (or
@@ -66,6 +68,8 @@ export function useDemoPayroll(
     const paid = ref<Record<string, boolean>>(loadPaid());
     const { rangeStats } = useDemoDtr();
     const { declaredHolidays } = useDemoHolidays();
+    // Approved Benefits loans deduct their monthly amortization from payslips.
+    const { monthlyDeductionFor } = useDemoLoans();
 
     function daysInMonth(period: string): number {
         const [year, month] = period.split('-').map(Number);
@@ -140,7 +144,8 @@ export function useDemoPayroll(
         const philhealth = round2(Math.min(2500, Math.max(250, gross * 0.025)));
         const pagibig = round2(Math.min(200, Math.max(100, gross * 0.02)));
         const tax = round2(withholdingTax(gross - sss - philhealth - pagibig));
-        const deductions = round2(sss + philhealth + pagibig + tax);
+        const loan = round2(monthlyDeductionFor(employee.id));
+        const deductions = round2(sss + philhealth + pagibig + tax + loan);
         const net = round2(gross - deductions);
         const isPaid = paid.value[`${period.value}:${employee.id}`];
 
@@ -162,6 +167,7 @@ export function useDemoPayroll(
             philhealth,
             pagibig,
             tax,
+            loan,
             deductions,
             net,
             status: isPaid ? 'Paid' : period.status,

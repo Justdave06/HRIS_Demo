@@ -104,17 +104,32 @@ const printedOn = new Date().toLocaleDateString('en-US', {
                     No employees under this employment status.
                 </p>
 
-                <table v-else class="mt-3 w-full border-collapse text-sm">
+                <table
+                    v-else
+                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
+                >
                     <thead>
                         <tr
-                            class="border-b-2 border-slate-800 text-left text-xs text-slate-700 uppercase"
+                            class="border-b-2 border-slate-800 text-left text-[10px] text-slate-700 uppercase"
                         >
-                            <th class="py-2 pr-3 font-bold">No.</th>
-                            <th class="py-2 pr-3 font-bold">Employee ID</th>
-                            <th class="py-2 pr-3 font-bold">Name</th>
-                            <th class="py-2 pr-3 font-bold">Position</th>
-                            <th class="py-2 pr-3 font-bold">Department</th>
-                            <th class="py-2 font-bold">Date Hired</th>
+                            <th class="py-1.5 pr-2 font-bold break-words">
+                                No.
+                            </th>
+                            <th class="py-1.5 pr-2 font-bold break-words">
+                                Employee ID
+                            </th>
+                            <th class="py-1.5 pr-2 font-bold break-words">
+                                Name
+                            </th>
+                            <th class="py-1.5 pr-2 font-bold break-words">
+                                Position
+                            </th>
+                            <th class="py-1.5 pr-2 font-bold break-words">
+                                Department
+                            </th>
+                            <th class="py-1.5 font-bold break-words">
+                                Date Hired
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,29 +138,29 @@ const printedOn = new Date().toLocaleDateString('en-US', {
                             :key="employee.id"
                             class="border-b border-slate-200"
                         >
-                            <td class="py-1.5 pr-3 text-slate-600 tabular-nums">
+                            <td class="py-1 pr-2 text-slate-600 tabular-nums">
                                 {{ rowIndex + 1 }}
                             </td>
-                            <td class="py-1.5 pr-3 font-medium">
+                            <td class="py-1 pr-2 font-medium">
                                 {{ employee.no }}
                             </td>
-                            <td class="py-1.5 pr-3 font-medium">
+                            <td class="py-1 pr-2 font-medium break-words">
                                 {{ employee.name }}
                             </td>
-                            <td class="py-1.5 pr-3 text-slate-600">
+                            <td class="py-1 pr-2 break-words text-slate-600">
                                 {{ employee.position }}
                             </td>
-                            <td class="py-1.5 pr-3 text-slate-600">
+                            <td class="py-1 pr-2 break-words text-slate-600">
                                 {{ employee.department }}
                             </td>
-                            <td class="py-1.5 text-slate-600 tabular-nums">
+                            <td class="py-1 text-slate-600 tabular-nums">
                                 {{ employee.hire_date }}
                             </td>
                         </tr>
                         <tr>
                             <td
                                 colspan="6"
-                                class="border-b-2 border-slate-800 py-2 pr-3 text-right text-xs font-bold tracking-wide uppercase"
+                                class="border-b-2 border-slate-800 py-1.5 pr-2 text-right text-[10px] font-bold tracking-wide uppercase"
                             >
                                 Total: {{ group.rows.length }} employee{{
                                     group.rows.length === 1 ? '' : 's'

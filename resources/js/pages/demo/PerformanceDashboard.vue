@@ -10,6 +10,7 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoPerformance } from '@/composables/useDemoPerformance';
 import type { PerformanceEmployee } from '@/composables/useDemoPerformance';
 import type {
@@ -25,8 +26,23 @@ const props = defineProps<{
     goals: DemoPerformanceGoal[];
 }>();
 
+// Employees added in Employee Management can be reviewed too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<PerformanceEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { rows, goalRows } = useDemoPerformance(
-    props.employees,
+    allEmployees.value,
     props.reviews,
     props.goals,
 );

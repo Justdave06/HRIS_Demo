@@ -11,6 +11,7 @@ import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
 import { useDemoDisciplinary } from '@/composables/useDemoDisciplinary';
 import type { DisciplinaryEmployee } from '@/composables/useDemoDisciplinary';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import type { DemoDisciplinaryRecord } from '@/types';
 
 const props = defineProps<{
@@ -18,8 +19,23 @@ const props = defineProps<{
     records: DemoDisciplinaryRecord[];
 }>();
 
+// Session-added employees (Employee Management module) join the directory so
+// cases logged for them count in the dashboard too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<DisciplinaryEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+    })),
+]);
+
 const { rows, repeatOffenders } = useDemoDisciplinary(
-    props.employees,
+    allEmployees.value,
     props.records,
 );
 
@@ -38,8 +54,15 @@ const incidents = computed(
     () => rows.value.filter((row) => row.type === 'Incident').length,
 );
 
+// Handed off to Offboarding: escalated cases plus dismissal recommendations
+// (the action that starts a termination) — matches the offboarding flag.
 const escalated = computed(
-    () => rows.value.filter((row) => row.status === 'Escalated').length,
+    () =>
+        rows.value.filter(
+            (row) =>
+                row.status === 'Escalated' ||
+                row.action === 'Dismissal recommendation',
+        ).length,
 );
 
 type StatCard = {

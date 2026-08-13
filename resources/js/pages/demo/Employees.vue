@@ -7,7 +7,7 @@ import StatusBadge from '@/components/demo/StatusBadge.vue';
 const statusOptions = ['Regular', 'Probationary', 'Contractual'] as const;
 
 type StatusOption = (typeof statusOptions)[number];
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -201,7 +201,14 @@ const filtered = computed(() => {
                                     <Avatar
                                         class="size-9 overflow-hidden rounded-lg"
                                     >
+                                        <AvatarImage
+                                            v-if="employee.photo"
+                                            :src="employee.photo"
+                                            :alt="employee.name"
+                                            class="object-cover"
+                                        />
                                         <AvatarFallback
+                                            v-else
                                             class="rounded-lg bg-blue-600 font-semibold text-white"
                                         >
                                             {{ getInitials(employee.name) }}

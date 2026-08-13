@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class DisciplinaryController extends Controller
@@ -62,6 +63,31 @@ class DisciplinaryController extends Controller
     }
 
     /**
+     * Disciplinary record for a session-added demo employee (id 1001+). The
+     * server has no record for them — the page hydrates the employee and
+     * their session cases from sessionStorage, staying inside this module.
+     */
+    public function sessionRecord(int $employeeId)
+    {
+        $employee = collect(DemoData::employees())->firstWhere('id', $employeeId);
+
+        if (! $employee) {
+            return Inertia::render('demo/DisciplinaryRecord', array_merge(
+                $this->payload(),
+                ['employee' => [
+                    'id' => $employeeId,
+                    'no' => 'EMP-'.str_pad((string) $employeeId, 4, '0', STR_PAD_LEFT),
+                    'name' => 'Employee',
+                    'department' => '',
+                    'position' => '',
+                ]],
+            ));
+        }
+
+        return redirect()->route('demo.disciplinary.records');
+    }
+
+    /**
      * Disciplinary reports — case log, open cases, escalation handoff and
      * repeat offenders, with generate + export.
      */
@@ -77,14 +103,14 @@ class DisciplinaryController extends Controller
     private function payload(): array
     {
         return [
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
                 'department' => $e['department'],
                 'position' => $e['position'],
             ])->values()->all(),
-            'records' => DemoData::disciplinaryRecords(),
+            'records' => DemoMode::blank() ? [] : DemoData::disciplinaryRecords(),
         ];
     }
 }

@@ -196,9 +196,16 @@ export function useDemoBenefits(
         return enrollment;
     }
 
-    /** Confirm a Pending enrollment (session-persisted). */
+    /** Approve a Pending enrollment — benefits are now active (session). */
     function confirm(id: number): void {
         statusOverrides.value[id] = 'Enrolled';
+        saveStored(STATUS_KEY, statusOverrides.value);
+        rebuild();
+    }
+
+    /** Decline a Pending enrollment (session-persisted). */
+    function decline(id: number): void {
+        statusOverrides.value[id] = 'Declined';
         saveStored(STATUS_KEY, statusOverrides.value);
         rebuild();
     }
@@ -248,6 +255,7 @@ export function useDemoBenefits(
         rows,
         addEnrollment,
         confirm,
+        decline,
         remove,
         planSummary,
         formatMoney,

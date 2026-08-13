@@ -21,6 +21,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoPayroll } from '@/composables/useDemoPayroll';
 import type {
     PayrollEmployee,
@@ -33,8 +34,24 @@ const props = defineProps<{
     periods: PayrollPeriod[];
 }>();
 
+// Employees added in Employee Management join payroll too (their salary was
+// set at hire), so a payslip run covers the whole directory.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<PayrollEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { payslipsFor, markPaid, runPayroll, formatMoney } = useDemoPayroll(
-    props.employees,
+    allEmployees.value,
     props.periods,
 );
 
@@ -607,6 +624,15 @@ function exportExcel(): void {
                                     <span>Withholding tax</span>
                                     <span class="tabular-nums">
                                         {{ formatMoney(selected.tax) }}
+                                    </span>
+                                </div>
+                                <div
+                                    v-if="selected.loan > 0"
+                                    class="flex items-center justify-between"
+                                >
+                                    <span>Loan amortization (Benefits)</span>
+                                    <span class="tabular-nums">
+                                        {{ formatMoney(selected.loan) }}
                                     </span>
                                 </div>
                                 <div

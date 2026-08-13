@@ -4,18 +4,22 @@ import {
     AlertTriangle,
     ArrowLeft,
     ArrowUpRight,
+    Check,
     FileBarChart2,
     FileSpreadsheet,
     FileX,
+    Send,
     ShieldAlert,
     UserX,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
+import { toast } from 'vue-sonner';
 import AttendanceReportDocument from '@/components/demo/AttendanceReportDocument.vue';
 import RecordPrintModal from '@/components/demo/RecordPrintModal.vue';
 import { Button } from '@/components/ui/button';
 import { useDemoDisciplinary } from '@/composables/useDemoDisciplinary';
 import type { DisciplinaryEmployee } from '@/composables/useDemoDisciplinary';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import type { DemoDisciplinaryRecord } from '@/types';
 
 const props = defineProps<{
@@ -30,10 +34,21 @@ const props = defineProps<{
     records: DemoDisciplinaryRecord[];
 }>();
 
-const { rows, repeatOffenders } = useDemoDisciplinary(
-    props.employees,
-    props.records,
+// Session-added employees (no server record) hydrate from sessionStorage, so
+// the name and record shown here match the Employee Management module.
+const { employeeFor } = useDemoEmployees();
+
+const displayEmployee = computed(
+    () => employeeFor(props.employee.id) ?? props.employee,
 );
+
+const {
+    rows,
+    escalatedEmployeeIds,
+    handedOffIds,
+    repeatOffenders,
+    handoff,
+} = useDemoDisciplinary(props.employees, props.records);
 
 /* ------------------------------------------------------------------ */
 /* This employee's disciplinary history                               */
@@ -41,7 +56,7 @@ const { rows, repeatOffenders } = useDemoDisciplinary(
 
 const history = computed(() =>
     rows.value
-        .filter((row) => row.employee_id === props.employee.id)
+        .filter((row) => row.employee_id === displayEmployee.value.id)
         .sort((a, b) => (a.date < b.date ? -1 : 1)),
 );
 
@@ -57,10 +72,25 @@ const serious = computed(
 
 const flagged = computed(
     () =>
+        escalatedEmployeeIds.value.includes(displayEmployee.value.id) ||
         repeatOffenders.value.find(
-            (offender) => offender.employee_id === props.employee.id,
+            (offender) => offender.employee_id === displayEmployee.value.id,
         )?.flagged,
 );
+
+/** True once this employee's dismissal has been sent to Offboarding. */
+const handedOff = computed(() =>
+    handedOffIds.value.includes(displayEmployee.value.id),
+);
+
+/** Send the dismissal to Separation & Offboarding — no redirect, the
+ *  termination case lands in the register for the offboarding staff. */
+function sendHandoff(): void {
+    handoff(displayEmployee.value.id);
+    toast.success(
+        `${displayEmployee.value.name} handed off to Separation & Offboarding — the termination case is in the register for the offboarding staff to process`,
+    );
+}
 
 const severityTone: Record<string, string> = {
     Serious: 'bg-red-50 text-red-700 border-red-200',
@@ -133,7 +163,7 @@ function exportExcel(): void {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = `${props.employee.name.replaceAll(' ', '-').toLowerCase()}-disciplinary-record.csv`;
+    link.download = `${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-disciplinary-record.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -143,7 +173,7 @@ function exportExcel(): void {
 </script>
 
 <template>
-    <Head :title="`${employee.name} — Disciplinary Record`" />
+    <Head :title="`${displayEmployee.name} — Disciplinary Record`" />
 
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <!-- Header -->
@@ -161,11 +191,12 @@ function exportExcel(): void {
                 <h1
                     class="mt-2 text-2xl font-bold tracking-tight text-slate-900"
                 >
-                    {{ employee.name }}
+                    {{ displayEmployee.name }}
                 </h1>
                 <p class="mt-1 text-sm text-slate-500">
-                    {{ employee.no }} · {{ employee.position }} ·
-                    {{ employee.department }}
+                    {{ displayEmployee.no }} ·
+                    {{ displayEmployee.position }} ·
+                    {{ displayEmployee.department }}
                 </p>
                 <p class="mt-0.5 text-xs text-slate-400">
                     Disciplinary history · case log on file
@@ -280,6 +311,27 @@ function exportExcel(): void {
                 <p class="mt-1 text-xs text-slate-500">
                     Escalated to Separation & Offboarding
                 </p>
+                <Button
+                    v-if="flagged"
+                    variant="outline"
+                    :disabled="handedOff"
+                    class="mt-3 w-full"
+                    :class="
+                        handedOff
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50'
+                            : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
+                    "
+                    :title="
+                        handedOff
+                            ? 'Sent to Separation & Offboarding — the offboarding staff processes this case'
+                            : 'Send the dismissal to Separation & Offboarding for processing'
+                    "
+                    @click="sendHandoff"
+                >
+                    <Check v-if="handedOff" class="size-3.5" />
+                    <Send v-else class="size-3.5" />
+                    {{ handedOff ? 'Sent to Offboarding' : 'Send to Offboarding' }}
+                </Button>
             </div>
         </div>
 
@@ -411,7 +463,7 @@ function exportExcel(): void {
     <!-- Generate report preview -->
     <RecordPrintModal
         v-if="showPreview"
-        :heading="`Disciplinary Record — ${employee.name}`"
+        :heading="`Disciplinary Record — ${displayEmployee.name}`"
         subtitle="Official disciplinary document · ready to print"
         @close="showPreview = false"
     >
@@ -429,7 +481,7 @@ function exportExcel(): void {
                 { key: 'status', label: 'Status' },
             ]"
             :rows="reportRows"
-            :note="`${employee.name} — ${employee.position}, ${employee.department}. Escalated cases and repeated serious issues are handed to Separation & Offboarding.`"
+            :note="`${displayEmployee.name} — ${displayEmployee.position}, ${displayEmployee.department}. Escalated cases and repeated serious issues are handed to Separation & Offboarding.`"
         />
     </RecordPrintModal>
 </template>

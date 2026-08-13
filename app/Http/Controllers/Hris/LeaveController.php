@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class LeaveController extends Controller
@@ -27,7 +28,7 @@ class LeaveController extends Controller
 
         return Inertia::render('demo/LeaveDashboard', [
             'requests' => $rows,
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
@@ -51,7 +52,7 @@ class LeaveController extends Controller
 
         return Inertia::render('demo/LeaveRequests', [
             'requests' => $rows,
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
@@ -93,6 +94,33 @@ class LeaveController extends Controller
     }
 
     /**
+     * Leave record for a session-added demo employee. The server has no
+     * record for them — the page hydrates the employee from sessionStorage.
+     */
+    public function sessionRecord(int $employeeId)
+    {
+        $employee = collect(DemoData::employees())->firstWhere('id', $employeeId);
+
+        if (! $employee) {
+            [$rows] = $this->leaveData();
+
+            return Inertia::render('demo/LeaveRecord', [
+                'employee' => [
+                    'id' => $employeeId,
+                    'no' => 'EMP-'.str_pad((string) $employeeId, 4, '0', STR_PAD_LEFT),
+                    'name' => 'Employee',
+                    'department' => '',
+                    'position' => '',
+                    'balance' => 0,
+                ],
+                'requests' => $rows,
+            ]);
+        }
+
+        return redirect()->route('demo.leave.requests');
+    }
+
+    /**
      * Leave reports — summary, balances, and type breakdown, with search,
      * generate (official letterhead) and export.
      */
@@ -102,7 +130,7 @@ class LeaveController extends Controller
 
         return Inertia::render('demo/LeaveReports', [
             'requests' => $rows,
-            'employees' => collect(DemoData::employees())->map(fn ($e) => [
+            'employees' => collect(DemoMode::employees())->map(fn ($e) => [
                 'id' => $e['id'],
                 'no' => $e['no'],
                 'name' => $e['name'],
@@ -123,6 +151,14 @@ class LeaveController extends Controller
      */
     private function leaveData(): array
     {
+        if (DemoMode::blank()) {
+            return [
+                [],
+                DemoData::leaveTypes(),
+                ['total' => 0, 'pending' => 0, 'approved' => 0, 'onLeaveToday' => 0],
+            ];
+        }
+
         $employees = collect(DemoData::employees())->keyBy('id');
 
         $rows = collect(DemoData::leaveRequests())->map(function ($request) use ($employees) {

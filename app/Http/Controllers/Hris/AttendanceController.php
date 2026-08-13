@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Hris;
 
 use App\Http\Controllers\Controller;
 use App\Support\DemoData;
+use App\Support\DemoMode;
 use Inertia\Inertia;
 
 class AttendanceController extends Controller
@@ -54,12 +55,14 @@ class AttendanceController extends Controller
      */
     public function holidays()
     {
-        $departments = collect(DemoData::employees())
-            ->pluck('department')
-            ->unique()
-            ->sort()
-            ->values()
-            ->all();
+        $departments = DemoMode::blank()
+            ? DemoMode::defaultDepartments()
+            : collect(DemoData::employees())
+                ->pluck('department')
+                ->unique()
+                ->sort()
+                ->values()
+                ->all();
 
         return Inertia::render('demo/HolidayPicker', [
             'departments' => $departments,
@@ -89,9 +92,13 @@ class AttendanceController extends Controller
      */
     private function attendanceData(): array
     {
-        $employees = collect(DemoData::employees())->keyBy('id');
+        // The starter roster (5 employees) or the full sample set. In starter
+        // mode no attendance has been logged yet, so every employee reads
+        // "Not Yet In" until the user runs the attendance workflow.
+        $employees = collect(DemoMode::employees());
+        $records = DemoMode::blank() ? collect() : collect(DemoData::attendance());
 
-        $roster = collect(DemoData::attendance())->map(function ($record) use ($employees) {
+        $roster = $records->map(function ($record) use ($employees) {
             $employee = $employees->get($record['employee_id']);
 
             return [
@@ -106,7 +113,27 @@ class AttendanceController extends Controller
             ];
         })->values()->all();
 
-        $departments = collect($employees)->pluck('department')->unique()->sort()->values()->all();
+        // In starter mode the roster has no attendance rows yet, so fall back
+        // to a "Not Yet In" row per starter employee to keep the manager and
+        // dashboard populated.
+        if (DemoMode::blank()) {
+            $roster = $employees->map(fn ($employee) => [
+                'employee_id' => $employee['id'],
+                'no' => $employee['no'],
+                'name' => $employee['name'],
+                'department' => $employee['department'],
+                'position' => $employee['position'],
+                'time_in' => null,
+                'time_out' => null,
+                'status' => 'Not Yet In',
+            ])->values()->all();
+        }
+
+        $departments = $employees->pluck('department')->unique()->sort()->values()->all();
+
+        if ($departments === []) {
+            $departments = DemoMode::defaultDepartments();
+        }
 
         $stats = [
             'totalEmployees' => $employees->count(),

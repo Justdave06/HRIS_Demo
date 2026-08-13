@@ -10,6 +10,7 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLeave } from '@/composables/useDemoLeave';
 import type { DemoLeaveRow } from '@/types';
 
@@ -32,8 +33,22 @@ const props = defineProps<{
     };
 }>();
 
-// Session-added requests and status overrides stay in sync with the list.
-const { addedRequests, statusFor } = useDemoLeave();
+// Session-added requests, status overrides and balance adjustments stay in
+// sync with the list. Employees added in Employee Management join the list.
+const { addedRequests, statusFor, balanceFor } = useDemoLeave();
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        balance: employee.leave_balance,
+    })),
+]);
 
 const allRequests = computed<DemoLeaveRow[]>(() => {
     const base: DemoLeaveRow[] = props.requests.map((row) => ({
@@ -41,7 +56,7 @@ const allRequests = computed<DemoLeaveRow[]>(() => {
         status: statusFor(row),
     }));
     const added: DemoLeaveRow[] = addedRequests.value.map((request) => {
-        const employee = props.employees.find(
+        const employee = allEmployees.value.find(
             (row) => row.id === request.employee_id,
         );
 
@@ -51,7 +66,7 @@ const allRequests = computed<DemoLeaveRow[]>(() => {
             name: employee?.name ?? 'New employee',
             department: employee?.department ?? '—',
             position: employee?.position ?? '—',
-            balance: employee?.balance ?? 0,
+            balance: employee ? balanceFor(employee.id, employee.balance) : 0,
             status: statusFor(request),
         };
     });

@@ -13,6 +13,7 @@ import { computed, ref } from 'vue';
 import AttendanceReportDocument from '@/components/demo/AttendanceReportDocument.vue';
 import RecordPrintModal from '@/components/demo/RecordPrintModal.vue';
 import { Button } from '@/components/ui/button';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import {
     PERFORMANCE_CRITERIA,
     useDemoPerformance,
@@ -40,10 +41,30 @@ const props = defineProps<{
     goals: DemoPerformanceGoal[];
 }>();
 
+// Employees added in Employee Management can be reviewed too.
+const { addedEmployees, employeeFor } = useDemoEmployees();
+
+const allEmployees = computed<PerformanceEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { rows, goalRows, formatMoney } = useDemoPerformance(
-    props.employees,
+    allEmployees.value,
     props.reviews,
     props.goals,
+);
+
+// Session-added employees (no server record) hydrate from sessionStorage.
+const displayEmployee = computed(
+    () => employeeFor(props.employee.id) ?? props.employee,
 );
 
 const periodLabel = (value: string): string =>
@@ -192,7 +213,7 @@ function exportExcel(): void {
     const link = document.createElement('a');
 
     link.href = url;
-    link.download = `${props.employee.name.replaceAll(' ', '-').toLowerCase()}-performance-record.csv`;
+    link.download = `${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-performance-record.csv`;
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -202,7 +223,7 @@ function exportExcel(): void {
 </script>
 
 <template>
-    <Head :title="`${employee.name} — Performance Record`" />
+    <Head :title="`${displayEmployee.name} — Performance Record`" />
 
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <!-- Header -->
@@ -220,14 +241,14 @@ function exportExcel(): void {
                 <h1
                     class="mt-2 text-2xl font-bold tracking-tight text-slate-900"
                 >
-                    {{ employee.name }}
+                    {{ displayEmployee.name }}
                 </h1>
                 <p class="mt-1 text-sm text-slate-500">
-                    {{ employee.no }} · {{ employee.position }} ·
-                    {{ employee.department }}
+                    {{ displayEmployee.no }} · {{ displayEmployee.position }} ·
+                    {{ displayEmployee.department }}
                 </p>
                 <p class="mt-0.5 text-xs text-slate-400">
-                    Reviewer: {{ employee.manager }}
+                    Reviewer: {{ displayEmployee.manager || '—' }}
                 </p>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -613,7 +634,7 @@ function exportExcel(): void {
     <!-- Generate report preview -->
     <RecordPrintModal
         v-if="showPreview"
-        :heading="`Performance Record — ${employee.name}`"
+        :heading="`Performance Record — ${displayEmployee.name}`"
         subtitle="Official performance document · ready to print"
         @close="showPreview = false"
     >
@@ -624,7 +645,7 @@ function exportExcel(): void {
             :columns="[
                 { key: 'no', label: 'No.' },
                 { key: 'period', label: 'Period' },
-                { key: 'job_knowledge', label: 'Job Knowledge', numeric: true },
+                { key: 'job_knowledge', label: 'Job Know.', numeric: true },
                 { key: 'quality', label: 'Quality', numeric: true },
                 { key: 'productivity', label: 'Productivity', numeric: true },
                 { key: 'teamwork', label: 'Teamwork', numeric: true },
@@ -635,7 +656,7 @@ function exportExcel(): void {
                 { key: 'status', label: 'Status' },
             ]"
             :rows="reportRows"
-            :note="`${employee.name} — ${employee.position}, ${employee.department}. Ratings are the average of five criteria; overall 4.0+ recommends a merit raise for Payroll, criteria rated 2 or below become training suggestions.`"
+            :note="`${displayEmployee.name} — ${displayEmployee.position}, ${displayEmployee.department}. Ratings are the average of five criteria; overall 4.0+ recommends a merit raise for Payroll, criteria rated 2 or below become training suggestions.`"
         />
     </RecordPrintModal>
 </template>

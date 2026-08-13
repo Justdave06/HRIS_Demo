@@ -51,6 +51,8 @@ export type DemoEmployee = {
     salary: number;
     leave_balance: number;
     trainings: number;
+    /** Profile photo (data URL) uploaded on the 201 file — added employees only. */
+    photo?: string;
 };
 
 export type DemoAttendance = {
@@ -164,6 +166,8 @@ export type DemoPayslip = {
     philhealth: number;
     pagibig: number;
     tax: number;
+    /** Monthly loan amortization (approved Benefits loans) — 0 when none. */
+    loan: number;
     deductions: number;
     net: number;
     status: DemoPayslipStatus;
@@ -177,7 +181,7 @@ export type DemoBenefitPlan = {
     description: string;
 };
 
-export type DemoEnrollmentStatus = 'Enrolled' | 'Pending';
+export type DemoEnrollmentStatus = 'Enrolled' | 'Pending' | 'Declined';
 
 /** One employee's enrollment in a benefit plan (module 6). */
 export type DemoEnrollment = {
@@ -359,4 +363,117 @@ export type DemoOnboarding = {
     start_date: string;
     progress: number;
     tasks: DemoOnboardingTask[];
+};
+
+/** Pipeline stage of a separation case (Module 10). */
+export type DemoOffboardingStatus =
+    'Requested' | 'In Clearance' | 'Final Pay' | 'Completed';
+
+/** Why the employee is leaving (Module 10). */
+export type DemoOffboardingType =
+    'Resignation' | 'Termination' | 'End of Contract' | 'Retirement';
+
+/** Who filed the separation: the employee, or HR / Management. */
+export type DemoOffboardingRequester = 'Employee' | 'HR / Management';
+
+/** One item on the exit clearance checklist (Module 10). */
+export type DemoClearanceTask = {
+    label: string;
+    done: boolean;
+};
+
+/**
+ * Computed final-pay breakdown for a separation (Module 10). Mirrors the
+ * payroll engine so the numbers add up: gross = basic + leave conversion +
+ * prorated 13th month; net = gross − statutory deductions − advances.
+ */
+export type DemoFinalPay = {
+    /** Basic pay for the days worked up to the exit date. */
+    basic: number;
+    /** Unused leave balance converted to cash. */
+    leave_conversion: number;
+    /** Prorated 13th-month pay for the current year. */
+    thirteenth_month: number;
+    gross: number;
+    sss: number;
+    philhealth: number;
+    pagibig: number;
+    tax: number;
+    deductions: number;
+    /** Outstanding cash advances / company loans to recover. */
+    advances: number;
+    net: number;
+};
+
+/** What the employee is borrowing (Benefits module loan programs). */
+export type DemoLoanType =
+    | 'SSS Salary Loan'
+    | 'Pag-IBIG Multi-Purpose'
+    | 'Company Loan'
+    | 'Cash Advance';
+
+export type DemoLoanStatus = 'Pending' | 'Approved' | 'Declined';
+
+/**
+ * A loan application — filed by the employee in the portal, reviewed by HR
+ * in the Benefits module. Approved loans deduct monthly from payslips and
+ * the unpaid balance is recovered from offboarding final pay.
+ */
+export type DemoLoanApplication = {
+    id: number;
+    employee_id: number;
+    type: DemoLoanType;
+    /** Principal amount borrowed. */
+    amount: number;
+    purpose: string;
+    /** Repayment term in months. */
+    terms: number;
+    /** Straight-line monthly amortization = amount / terms. */
+    monthly: number;
+    applied_on: string;
+    status: DemoLoanStatus;
+    /** When HR approved or declined the application. */
+    decided_on: string | null;
+};
+
+/** One separation case on the offboarding register (Module 10). */
+export type DemoOffboardingCase = {
+    id: number;
+    employee_id: number;
+    type: DemoOffboardingType;
+    /** Who filed the separation — employee resignation vs. HR / Management. */
+    requested_by: DemoOffboardingRequester;
+    requested_on: string;
+    exit_date: string;
+    reason: string;
+    status: DemoOffboardingStatus;
+    tasks: DemoClearanceTask[];
+};
+
+/** Draft captured by the New separation modal (Module 10). */
+export type DemoOffboardingDraft = {
+    employee_id: number;
+    type: DemoOffboardingType;
+    requested_by: DemoOffboardingRequester;
+    requested_on: string;
+    exit_date: string;
+    reason: string;
+};
+
+/** Case enriched with the employee record, progress and final pay (Module 10). */
+export type DemoOffboardingRow = DemoOffboardingCase & {
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+    employment_type: DemoEmployee['employment_type'];
+    salary: number;
+    leave_balance: number;
+    /** Percent of clearance tasks completed. */
+    progress: number;
+    finalPay: DemoFinalPay;
+    /** True when the employee has an escalated disciplinary case (Module 9). */
+    flagged: boolean;
+    /** Completed cases are archived in the register. */
+    archived: boolean;
 };

@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLeave } from '@/composables/useDemoLeave';
 import type { DemoLeaveRow } from '@/types';
 
@@ -35,7 +36,20 @@ const props = defineProps<{
     };
 }>();
 
-const { addedRequests, statusFor } = useDemoLeave();
+const { addedRequests, statusFor, balanceFor } = useDemoLeave();
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        balance: employee.leave_balance,
+    })),
+]);
 
 const allRequests = computed<DemoLeaveRow[]>(() => {
     const base: DemoLeaveRow[] = props.requests.map((row) => ({
@@ -43,7 +57,7 @@ const allRequests = computed<DemoLeaveRow[]>(() => {
         status: statusFor(row),
     }));
     const added: DemoLeaveRow[] = addedRequests.value.map((request) => {
-        const employee = props.employees.find(
+        const employee = allEmployees.value.find(
             (row) => row.id === request.employee_id,
         );
 
@@ -98,7 +112,9 @@ const summaryRows = computed(() =>
         })),
 );
 
-// Balances come from the seeded requests' employee records (unique employee).
+// Balances reflect any balance set from the Leave Requests page — the
+// effective balance (override ?? server value) for each employee with a
+// leave record.
 const balanceRows = computed(() => {
     const seen = new Set<number>();
     const rows: {
@@ -118,7 +134,7 @@ const balanceRows = computed(() => {
             no: rows.length + 1,
             name: row.name,
             department: row.department,
-            balance: row.balance,
+            balance: balanceFor(row.employee_id, row.balance),
         });
     }
 

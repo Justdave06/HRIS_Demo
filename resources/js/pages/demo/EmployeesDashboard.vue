@@ -9,31 +9,82 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import type { DemoEmployee } from '@/types';
 
 type EmployeeRow = DemoEmployee & { today: string };
 
+type DashboardStats = {
+    total: number;
+    regular: number;
+    probationary: number;
+    contractual: number;
+    atWork: number;
+    onLeave: number;
+    newThisMonth: number;
+    absent: number;
+    notIn: number;
+};
+
 const props = defineProps<{
     employees: EmployeeRow[];
     departments: string[];
-    stats: {
-        total: number;
-        regular: number;
-        probationary: number;
-        contractual: number;
-        atWork: number;
-        onLeave: number;
-        newThisMonth: number;
-        absent: number;
-        notIn: number;
-    };
+    stats: DashboardStats;
 }>();
+
+// Demo employees added from the Add Employee form (in-memory only). They have
+// no attendance row yet, so they count as "Not Yet In" like the server rows.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<EmployeeRow[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((e) => ({ ...e, today: 'Not Yet In' })),
+]);
+
+// Recompute the headline stats from the merged list so session-added
+// employees are reflected (the server only knows about seeded data).
+const dashboardStats = computed<DashboardStats>(() => {
+    const now = new Date();
+
+    return {
+        total: allEmployees.value.length,
+        regular: allEmployees.value.filter(
+            (e) => e.employment_type === 'Regular',
+        ).length,
+        probationary: allEmployees.value.filter(
+            (e) => e.employment_type === 'Probationary',
+        ).length,
+        contractual: allEmployees.value.filter(
+            (e) => e.employment_type === 'Contractual',
+        ).length,
+        atWork: allEmployees.value.filter((e) =>
+            ['Present', 'Late'].includes(e.today),
+        ).length,
+        onLeave: allEmployees.value.filter((e) => e.today === 'On Leave')
+            .length,
+        newThisMonth: allEmployees.value.filter((e) => {
+            if (!e.hire_date) {
+                return false;
+            }
+
+            const hired = new Date(e.hire_date);
+
+            return (
+                hired.getFullYear() === now.getFullYear() &&
+                hired.getMonth() === now.getMonth()
+            );
+        }).length,
+        absent: allEmployees.value.filter((e) => e.today === 'Absent').length,
+        notIn: allEmployees.value.filter((e) => e.today === 'Not Yet In')
+            .length,
+    };
+});
 
 const departmentCounts = computed(() =>
     props.departments
         .map((department) => ({
             department,
-            count: props.employees.filter((e) => e.department === department)
+            count: allEmployees.value.filter((e) => e.department === department)
                 .length,
         }))
         .sort((a, b) => b.count - a.count),
@@ -47,7 +98,7 @@ const maxDepartmentCount = computed(() =>
 );
 
 function share(count: number): number {
-    return Math.round((count / props.stats.total) * 100);
+    return Math.round((count / dashboardStats.value.total) * 100);
 }
 
 // Headcount per department split by employment type, so each bar can be
@@ -55,7 +106,7 @@ function share(count: number): number {
 const departmentTypeCounts = computed(() =>
     topDepartments.value.map((row) => {
         const count = (type: DemoEmployee['employment_type']) =>
-            props.employees.filter(
+            allEmployees.value.filter(
                 (e) =>
                     e.department === row.department &&
                     e.employment_type === type,
@@ -89,28 +140,28 @@ type StatCard = {
 const statCards: StatCard[] = [
     {
         label: 'Total employees',
-        value: () => props.stats.total,
+        value: () => dashboardStats.value.total,
         icon: Users,
         iconClass: 'bg-blue-50 text-blue-700',
         status: 'all',
     },
     {
         label: 'Regular',
-        value: () => props.stats.regular,
+        value: () => dashboardStats.value.regular,
         icon: UserCheck,
         iconClass: 'bg-emerald-50 text-emerald-700',
         status: 'Regular',
     },
     {
         label: 'Probationary',
-        value: () => props.stats.probationary,
+        value: () => dashboardStats.value.probationary,
         icon: Hourglass,
         iconClass: 'bg-amber-50 text-amber-700',
         status: 'Probationary',
     },
     {
         label: 'Contractual',
-        value: () => props.stats.contractual,
+        value: () => dashboardStats.value.contractual,
         icon: Handshake,
         iconClass: 'bg-sky-50 text-sky-700',
         status: 'Contractual',

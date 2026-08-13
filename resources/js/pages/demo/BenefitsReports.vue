@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select';
 import { useDemoBenefits } from '@/composables/useDemoBenefits';
 import type { BenefitsEmployee } from '@/composables/useDemoBenefits';
+import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import type { DemoBenefitPlan, DemoEnrollment } from '@/types';
 
 const props = defineProps<{
@@ -23,8 +24,23 @@ const props = defineProps<{
     enrollments: DemoEnrollment[];
 }>();
 
+// Employees added in Employee Management can be enrolled too.
+const { addedEmployees } = useDemoEmployees();
+
+const allEmployees = computed<BenefitsEmployee[]>(() => [
+    ...props.employees,
+    ...addedEmployees.value.map((employee) => ({
+        id: employee.id,
+        no: employee.no,
+        name: employee.name,
+        department: employee.department,
+        position: employee.position,
+        salary: employee.salary,
+    })),
+]);
+
 const { rows, planSummary, formatMoney } = useDemoBenefits(
-    props.employees,
+    allEmployees.value,
     props.plans,
     props.enrollments,
 );
@@ -273,6 +289,7 @@ const typeTone: Record<string, string> = {
 const statusTone: Record<string, string> = {
     Enrolled: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     Pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    Declined: 'bg-red-50 text-red-700 border-red-200',
 };
 </script>
 
