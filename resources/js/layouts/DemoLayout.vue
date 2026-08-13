@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
 import {
+    CalendarCheck2,
     ChevronsUpDown,
     Clock,
     FileText,
@@ -67,7 +68,6 @@ const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
  * The active module is derived from the current URL.
  */
 const soonModules = [
-    'leave',
     'payroll',
     'benefits',
     'performance',
@@ -126,10 +126,48 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
     ],
     attendance: [
         {
-            slug: 'overview',
-            title: 'Overview',
-            href: '/demo/attendance',
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/attendance/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'manager',
+            title: 'Attendance Manager',
+            href: '/demo/attendance/manager',
             icon: Clock,
+        },
+        {
+            slug: 'holidays',
+            title: 'Holiday Picker',
+            href: '/demo/attendance/holidays',
+            icon: CalendarCheck2,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/attendance/reports',
+            icon: FileText,
+        },
+    ],
+    leave: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/leave/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'requests',
+            title: 'Leave Requests',
+            href: '/demo/leave/requests',
+            icon: CalendarCheck2,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/leave/reports',
+            icon: FileText,
         },
     ],
 };
@@ -147,6 +185,10 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/attendance')) {
         return 'attendance';
+    }
+
+    if (path.startsWith('/demo/leave')) {
+        return 'leave';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -211,6 +253,47 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/recruitment') &&
                 !currentUrl.value.startsWith('/demo/recruitment/dashboard') &&
                 !currentUrl.value.startsWith('/demo/recruitment/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'attendance') {
+        if (
+            item.slug === 'dashboard' ||
+            item.slug === 'holidays' ||
+            item.slug === 'reports'
+        ) {
+            // The legacy /demo/attendance URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/attendance'))
+            );
+        }
+
+        if (item.slug === 'manager') {
+            return (
+                currentUrl.value.startsWith('/demo/attendance') &&
+                !currentUrl.value.startsWith('/demo/attendance/dashboard') &&
+                !currentUrl.value.startsWith('/demo/attendance/holidays') &&
+                !currentUrl.value.startsWith('/demo/attendance/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'leave') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/leave URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/leave'))
+            );
+        }
+
+        if (item.slug === 'requests') {
+            return (
+                currentUrl.value.startsWith('/demo/leave') &&
+                !currentUrl.value.startsWith('/demo/leave/dashboard') &&
+                !currentUrl.value.startsWith('/demo/leave/reports')
             );
         }
     }

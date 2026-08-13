@@ -4,6 +4,7 @@ use App\Http\Controllers\Hris\AttendanceController;
 use App\Http\Controllers\Hris\ComingSoonController;
 use App\Http\Controllers\Hris\EmployeeController;
 use App\Http\Controllers\Hris\HubController;
+use App\Http\Controllers\Hris\LeaveController;
 use App\Http\Controllers\Hris\RecruitmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,17 @@ Route::prefix('demo')->name('demo.')->group(function () {
 
     // Module 3 - Time & Attendance
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/dashboard', [AttendanceController::class, 'dashboard'])->name('attendance.dashboard');
+    Route::get('/attendance/manager', [AttendanceController::class, 'manager'])->name('attendance.manager');
+    Route::get('/attendance/holidays', [AttendanceController::class, 'holidays'])->name('attendance.holidays');
+    Route::get('/attendance/reports', [AttendanceController::class, 'reports'])->name('attendance.reports');
+
+    // Module 4 - Leave Management
+    Route::get('/leave', [LeaveController::class, 'index'])->name('leave.index');
+    Route::get('/leave/dashboard', [LeaveController::class, 'dashboard'])->name('leave.dashboard');
+    Route::get('/leave/requests', [LeaveController::class, 'requests'])->name('leave.requests');
+    Route::get('/leave/records/{employee}', [LeaveController::class, 'record'])->whereNumber('employee')->name('leave.records');
+    Route::get('/leave/reports', [LeaveController::class, 'reports'])->name('leave.reports');
 
     // Modules 4-10 (coming soon)
     Route::get('/modules/{module}', [ComingSoonController::class, 'show'])->name('modules.show');

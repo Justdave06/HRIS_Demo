@@ -220,6 +220,37 @@ class DemoData
         ];
     }
 
+    /** The leave types employees can apply for (Module 4). */
+    public static function leaveTypes(): array
+    {
+        return ['Vacation', 'Sick', 'Emergency', 'Maternity', 'Paternity'];
+    }
+
+    /**
+     * Leave requests (Module 4).
+     *
+     * Statuses: Pending -> Approved / Declined. An approved leave marks the
+     * employee's day off in Attendance and is settled in Payroll as paid or
+     * unpaid leave.
+     */
+    public static function leaveRequests(): array
+    {
+        return [
+            ['id' => 1, 'employee_id' => 10, 'type' => 'Sick', 'from' => '2026-08-10', 'to' => '2026-08-11', 'days' => 2, 'status' => 'Approved', 'reason' => 'Flu and medical consultation'],
+            ['id' => 2, 'employee_id' => 13, 'type' => 'Vacation', 'from' => '2026-08-17', 'to' => '2026-08-21', 'days' => 5, 'status' => 'Pending', 'reason' => 'Family vacation in Baguio'],
+            ['id' => 3, 'employee_id' => 15, 'type' => 'Emergency', 'from' => '2026-08-06', 'to' => '2026-08-06', 'days' => 1, 'status' => 'Approved', 'reason' => 'Family emergency'],
+            ['id' => 4, 'employee_id' => 21, 'type' => 'Sick', 'from' => '2026-08-12', 'to' => '2026-08-12', 'days' => 1, 'status' => 'Approved', 'reason' => 'Fever and rest'],
+            ['id' => 5, 'employee_id' => 28, 'type' => 'Vacation', 'from' => '2026-08-24', 'to' => '2026-08-26', 'days' => 3, 'status' => 'Pending', 'reason' => 'Personal trip'],
+            ['id' => 6, 'employee_id' => 3, 'type' => 'Sick', 'from' => '2026-08-13', 'to' => '2026-08-14', 'days' => 2, 'status' => 'Pending', 'reason' => 'Dental appointment'],
+            ['id' => 7, 'employee_id' => 7, 'type' => 'Vacation', 'from' => '2026-08-20', 'to' => '2026-08-20', 'days' => 1, 'status' => 'Approved', 'reason' => 'Personal errand'],
+            ['id' => 8, 'employee_id' => 16, 'type' => 'Emergency', 'from' => '2026-08-07', 'to' => '2026-08-08', 'days' => 2, 'status' => 'Declined', 'reason' => 'Home emergency'],
+            ['id' => 9, 'employee_id' => 23, 'type' => 'Sick', 'from' => '2026-08-05', 'to' => '2026-08-06', 'days' => 2, 'status' => 'Approved', 'reason' => 'Mild dengue recovery'],
+            ['id' => 10, 'employee_id' => 30, 'type' => 'Vacation', 'from' => '2026-09-01', 'to' => '2026-09-04', 'days' => 4, 'status' => 'Pending', 'reason' => 'Long weekend trip'],
+            ['id' => 11, 'employee_id' => 19, 'type' => 'Paternity', 'from' => '2026-08-25', 'to' => '2026-08-28', 'days' => 4, 'status' => 'Pending', 'reason' => 'Birth of child'],
+            ['id' => 12, 'employee_id' => 5, 'type' => 'Maternity', 'from' => '2026-09-07', 'to' => '2026-09-18', 'days' => 10, 'status' => 'Pending', 'reason' => 'Maternity leave'],
+        ];
+    }
+
     /** All 10 modules. Status is 'available' for the ones already built. */
     public static function modules(): array
     {
@@ -227,7 +258,7 @@ class DemoData
             ['slug' => 'employees', 'name' => 'Employee Information Management', 'short' => 'Employee Records', 'status' => 'available', 'description' => 'The 201 file for every person — personal data, employment records, and document management all in one place.', 'features' => ['Employee list with search and filters', 'Full employee profile with tabs', 'Add new employees', 'Emergency contact details']],
             ['slug' => 'recruitment', 'name' => 'Recruitment & Onboarding', 'short' => 'Recruitment', 'status' => 'available', 'description' => 'Job postings, applicant tracking, and onboarding checklists — from hiring to the first day.', 'features' => ['Open positions board', 'Candidate pipeline: Applied → Hired', 'Move candidates between steps', 'Onboarding checklists']],
             ['slug' => 'attendance', 'name' => 'Time & Attendance', 'short' => 'Time & Attendance', 'status' => 'available', 'description' => 'DTR monitoring with biometric clock-in, plus tardiness and absence tracking — the hours that feed payroll.', 'features' => ['Daily attendance roster', 'Demo clock in / clock out', 'Late, absent and on-leave tracking', 'Weekly hours summary for payroll']],
-            ['slug' => 'leave', 'name' => 'Leave Management', 'short' => 'Leave', 'status' => 'soon', 'description' => 'Request, approve, and track leave. Employees apply for vacation, sick, or emergency leave and managers approve it in a few clicks.', 'features' => ['Leave requests and approvals', 'Leave balances per employee', 'Auto-sync with attendance', 'Paid / unpaid leave for payroll']],
+            ['slug' => 'leave', 'name' => 'Leave Management', 'short' => 'Leave', 'status' => 'available', 'description' => 'Request, approve, and track leave. Employees apply for vacation, sick, or emergency leave and managers approve it in a few clicks.', 'features' => ['Leave requests and approvals', 'Leave balances per employee', 'Auto-sync with attendance', 'Paid / unpaid leave for payroll']],
             ['slug' => 'payroll', 'name' => 'Payroll Management', 'short' => 'Payroll', 'status' => 'soon', 'description' => 'Turn attendance hours, leave days, and benefits into a correct monthly payslip, every single time.', 'features' => ['Monthly payroll run', 'Payslips for every employee', 'Pulls hours from attendance', 'Deductions from leave and benefits']],
             ['slug' => 'benefits', 'name' => 'Benefits Administration', 'short' => 'Benefits', 'status' => 'soon', 'description' => 'Manage health plans, allowances, and other perks — enroll employees and send the right deductions to payroll.', 'features' => ['Benefit plans and enrollment', 'Allowance tracking', 'Deductions sent to payroll', 'Government contributions summary']],
             ['slug' => 'performance', 'name' => 'Performance Management', 'short' => 'Performance', 'status' => 'soon', 'description' => 'Set goals, review progress, and record ratings. Performance results guide raises and training needs.', 'features' => ['Goals and reviews', 'Performance ratings', 'Raise recommendations for payroll', 'Skill gaps for training']],

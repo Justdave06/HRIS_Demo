@@ -39,7 +39,11 @@ const moduleHref = (slug: string): string => {
     }
 
     if (slug === 'attendance') {
-        return '/demo/attendance';
+        return '/demo/attendance/dashboard';
+    }
+
+    if (slug === 'leave') {
+        return '/demo/leave/dashboard';
     }
 
     return `/demo/modules/${slug}`;

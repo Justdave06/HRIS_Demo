@@ -80,6 +80,28 @@ export type DemoHoliday = {
     declared_on: string;
 };
 
+export type DemoLeaveStatus = 'Pending' | 'Approved' | 'Declined';
+
+export type DemoLeaveRequest = {
+    id: number;
+    employee_id: number;
+    type: 'Vacation' | 'Sick' | 'Emergency' | 'Maternity' | 'Paternity';
+    from: string;
+    to: string;
+    days: number;
+    status: DemoLeaveStatus;
+    reason: string;
+};
+
+/** Leave request enriched with the employee's record (module 4). */
+export type DemoLeaveRow = DemoLeaveRequest & {
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+    balance: number;
+};
+
 export type DemoJob = {
     id: number;
     title: string;
