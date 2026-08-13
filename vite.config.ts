@@ -3,6 +3,7 @@ import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
@@ -11,17 +12,18 @@ import { defineConfig } from 'vite';
  * The wayfinder plugin regenerates the typed route/action helpers
  * (resources/js/routes, resources/js/actions, resources/js/wayfinder) by
  * running `php artisan wayfinder:generate` at build start. Those helpers are
- * committed to the repo, so on PHP-less build environments (e.g. Vercel,
- * where there is no PHP or vendor/ directory) we skip regeneration and build
- * against the committed copies instead.
+ * committed to the repo, so on build environments without a bootable Laravel
+ * app (e.g. Vercel: the asset build has no PHP, and the serverless function
+ * build has PHP but no .env) we skip regeneration and build against the
+ * committed copies instead.
  */
 let phpAvailable = false;
 
 try {
     // Same resolution wayfinder uses (shell `exec`), so local builds keep
-    // regenerating the helpers while PHP-less CI builds skip them.
+    // regenerating the helpers while CI builds skip them.
     execSync('php -v', { stdio: 'ignore' });
-    phpAvailable = true;
+    phpAvailable = existsSync('.env');
 } catch {
     phpAvailable = false;
 }
