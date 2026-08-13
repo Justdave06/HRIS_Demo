@@ -13,7 +13,6 @@ import {
 } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import { toast } from 'vue-sonner';
-import { cn } from '@/lib/utils';
 import AttendanceReportDocument from '@/components/demo/AttendanceReportDocument.vue';
 import PaginationBar from '@/components/demo/PaginationBar.vue';
 import RecordPrintModal from '@/components/demo/RecordPrintModal.vue';
@@ -31,6 +30,7 @@ import {
     useDemoPerformance,
 } from '@/composables/useDemoPerformance';
 import type { PerformanceEmployee } from '@/composables/useDemoPerformance';
+import { cn } from '@/lib/utils';
 import type {
     DemoPerformanceGoal,
     DemoPerformancePeriod,

@@ -58,6 +58,10 @@ const moduleHref = (slug: string): string => {
         return '/demo/performance/dashboard';
     }
 
+    if (slug === 'training') {
+        return '/demo/training/dashboard';
+    }
+
     return `/demo/modules/${slug}`;
 };
 
@@ -199,7 +203,7 @@ function openModule(module: DemoModule): void {
             <section class="mt-12 rounded-xl border bg-muted/40 p-5">
                 <h2 class="text-sm font-semibold">All 10 modules</h2>
                 <p class="mt-1 text-xs text-muted-foreground">
-                    Modules 1–7 are ready to explore. The rest show a preview of
+                    Modules 1–8 are ready to explore. The rest show a preview of
                     what's coming — click any chip to take a look.
                 </p>
                 <div class="mt-3 flex flex-wrap gap-2">

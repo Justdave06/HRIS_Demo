@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
 import {
+    BookOpen,
     CalendarCheck2,
     ChevronsUpDown,
     ClipboardCheck,
@@ -70,7 +71,7 @@ const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
  * Each module gets its own sidebar — no other module appears in it.
  * The active module is derived from the current URL.
  */
-const soonModules = ['training', 'disciplinary', 'offboarding'];
+const soonModules = ['disciplinary', 'offboarding'];
 
 type ModuleNavItem = {
     slug: string;
@@ -226,6 +227,26 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
             icon: FileText,
         },
     ],
+    training: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/training/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'enrollments',
+            title: 'Courses & Enrollment',
+            href: '/demo/training/enrollments',
+            icon: BookOpen,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/training/reports',
+            icon: FileText,
+        },
+    ],
 };
 
 const currentModule = computed<string | null>(() => {
@@ -257,6 +278,10 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/performance')) {
         return 'performance';
+    }
+
+    if (path.startsWith('/demo/training')) {
+        return 'training';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -416,6 +441,24 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/performance') &&
                 !currentUrl.value.startsWith('/demo/performance/dashboard') &&
                 !currentUrl.value.startsWith('/demo/performance/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'training') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/training URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/training'))
+            );
+        }
+
+        if (item.slug === 'enrollments') {
+            return (
+                currentUrl.value.startsWith('/demo/training') &&
+                !currentUrl.value.startsWith('/demo/training/dashboard') &&
+                !currentUrl.value.startsWith('/demo/training/reports')
             );
         }
     }
