@@ -3,6 +3,7 @@
 use App\Http\Controllers\Hris\AttendanceController;
 use App\Http\Controllers\Hris\BenefitsController;
 use App\Http\Controllers\Hris\ComingSoonController;
+use App\Http\Controllers\Hris\DisciplinaryController;
 use App\Http\Controllers\Hris\EmployeeController;
 use App\Http\Controllers\Hris\HubController;
 use App\Http\Controllers\Hris\LeaveController;
@@ -76,7 +77,14 @@ Route::prefix('demo')->name('demo.')->group(function () {
     Route::get('/training/records/{employee}', [TrainingController::class, 'record'])->whereNumber('employee')->name('training.records');
     Route::get('/training/reports', [TrainingController::class, 'reports'])->name('training.reports');
 
-    // Modules 9-10 (coming soon)
+    // Module 9 - Disciplinary Management
+    Route::get('/disciplinary', [DisciplinaryController::class, 'index'])->name('disciplinary.index');
+    Route::get('/disciplinary/dashboard', [DisciplinaryController::class, 'dashboard'])->name('disciplinary.dashboard');
+    Route::get('/disciplinary/records', [DisciplinaryController::class, 'records'])->name('disciplinary.records');
+    Route::get('/disciplinary/records/{employee}', [DisciplinaryController::class, 'record'])->whereNumber('employee')->name('disciplinary.records.show');
+    Route::get('/disciplinary/reports', [DisciplinaryController::class, 'reports'])->name('disciplinary.reports');
+
+    // Module 10 (coming soon)
     Route::get('/modules/{module}', [ComingSoonController::class, 'show'])->name('modules.show');
 });
 

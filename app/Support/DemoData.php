@@ -545,6 +545,67 @@ class DemoData
         return $enrollments;
     }
 
+    /**
+     * Disciplinary records (Module 9). A mix of warnings and incidents,
+     * generated deterministically: most employees have a clean record, some
+     * have one case, and a few repeat offenders carry two — the second one
+     * escalated to Separation & Offboarding. Older cases are Resolved;
+     * recent ones are still Logged or Under Review.
+     */
+    public static function disciplinaryRecords(): array
+    {
+        $pool = [
+            ['type' => 'Warning', 'category' => 'Tardiness', 'severity' => 'Minor', 'action' => 'Verbal warning', 'description' => 'Arrived late without prior notice.'],
+            ['type' => 'Warning', 'category' => 'Absenteeism', 'severity' => 'Minor', 'action' => 'Verbal warning', 'description' => 'Missed a scheduled shift without prior approval.'],
+            ['type' => 'Incident', 'category' => 'Policy Violation', 'severity' => 'Moderate', 'action' => 'Written warning', 'description' => 'Used personal devices during work hours despite repeated reminders.'],
+            ['type' => 'Incident', 'category' => 'Misconduct', 'severity' => 'Moderate', 'action' => 'Counseling session', 'description' => 'Inappropriate remarks during a team meeting.'],
+            ['type' => 'Incident', 'category' => 'Negligence', 'severity' => 'Serious', 'action' => 'Final written warning', 'description' => 'Missed a client deadline due to unsubmitted work.'],
+            ['type' => 'Incident', 'category' => 'Insubordination', 'severity' => 'Serious', 'action' => 'Suspension (3 days)', 'description' => 'Refused a direct instruction from the supervisor.'],
+            ['type' => 'Incident', 'category' => 'Harassment', 'severity' => 'Serious', 'action' => 'Investigation', 'description' => 'Complaint filed regarding inappropriate behavior.'],
+        ];
+
+        $records = [];
+        $id = 1;
+
+        foreach (self::employees() as $employee) {
+            $eid = $employee['id'];
+
+            // Deterministic: who has a record at all — some one case each,
+            // and the id % 7 group is the repeat offenders with two.
+            $repeat = $eid % 7 === 0;
+            $single = $eid % 4 === 0 || $eid % 5 === 0;
+
+            if (! $repeat && ! $single) {
+                continue;
+            }
+
+            for ($i = 0; $i < ($repeat ? 2 : 1); $i++) {
+                $item = $pool[($eid * 3 + $i * 5) % count($pool)];
+                $date = ($i === 0 ? '2026-07-' : '2026-08-').str_pad((string) (1 + $eid % 28), 2, '0', STR_PAD_LEFT);
+                $isEscalated = $i === 1 && $item['severity'] === 'Serious';
+
+                $records[] = [
+                    'id' => $id++,
+                    'employee_id' => $eid,
+                    'type' => $item['type'],
+                    'severity' => $item['severity'],
+                    'category' => $item['category'],
+                    'date' => $date,
+                    'description' => $item['description'],
+                    'action' => $item['action'],
+                    'status' => match (true) {
+                        $isEscalated => 'Escalated',
+                        $date >= '2026-08-01' && $eid % 3 === 0 => 'Under Review',
+                        $date >= '2026-08-01' => 'Logged',
+                        default => 'Resolved',
+                    },
+                ];
+            }
+        }
+
+        return $records;
+    }
+
     /** All 10 modules. Status is 'available' for the ones already built. */
     public static function modules(): array
     {
@@ -557,7 +618,7 @@ class DemoData
             ['slug' => 'benefits', 'name' => 'Benefits Administration', 'short' => 'Benefits', 'status' => 'available', 'description' => 'Manage health plans, allowances, and other perks — enroll employees and send the right deductions to payroll.', 'features' => ['Benefit plans and enrollment', 'Allowance tracking', 'Deductions sent to payroll', 'Government contributions summary']],
             ['slug' => 'performance', 'name' => 'Performance Management', 'short' => 'Performance', 'status' => 'available', 'description' => 'Set goals, review progress, and record ratings. Performance results guide raises and training needs.', 'features' => ['Goals and reviews', 'Performance ratings', 'Raise recommendations for payroll', 'Skill gaps for training']],
             ['slug' => 'training', 'name' => 'Training & Development', 'short' => 'Training', 'status' => 'available', 'description' => 'Plan courses and track who has completed them. Completed trainings are recorded on each employee profile.', 'features' => ['Training calendar', 'Course enrollments', 'Certificates on employee records', 'Training history per employee']],
-            ['slug' => 'disciplinary', 'name' => 'Disciplinary Management', 'short' => 'Disciplinary', 'status' => 'soon', 'description' => 'Record warnings and incidents fairly. Repeat issues flag into offboarding when needed.', 'features' => ['Incident and warning log', 'Tracks repeated tardiness', 'Escalation to offboarding', 'Fair and consistent records']],
+            ['slug' => 'disciplinary', 'name' => 'Disciplinary Management', 'short' => 'Disciplinary', 'status' => 'available', 'description' => 'Record warnings and incidents fairly. Repeat issues flag into offboarding when needed.', 'features' => ['Incident and warning log', 'Tracks repeated tardiness', 'Escalation to offboarding', 'Fair and consistent records']],
             ['slug' => 'offboarding', 'name' => 'Separation & Offboarding', 'short' => 'Offboarding', 'status' => 'soon', 'description' => 'A smooth goodbye — clearance tasks, final pay, and safe archiving of employee records.', 'features' => ['Exit checklist and clearance', 'Resignation and termination tracking', 'Final pay calculation with payroll', 'Records archived safely']],
         ];
     }

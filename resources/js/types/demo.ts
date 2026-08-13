@@ -312,6 +312,41 @@ export type DemoTrainingRow = DemoTrainingEnrollment & {
     certificate: boolean;
 };
 
+/** One disciplinary case on the log (Module 9). */
+export type DemoDisciplinaryRecord = {
+    id: number;
+    employee_id: number;
+    type: 'Incident' | 'Warning';
+    severity: 'Minor' | 'Moderate' | 'Serious';
+    category: string;
+    date: string;
+    description: string;
+    action: string;
+    status: 'Logged' | 'Under Review' | 'Resolved' | 'Escalated';
+};
+
+/** Record enriched with the employee's record (Module 9). */
+export type DemoDisciplinaryRow = DemoDisciplinaryRecord & {
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+};
+
+/** An employee with multiple cases, flagged for offboarding review (Module 9). */
+export type DemoRepeatOffender = {
+    employee_id: number;
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+    recordCount: number;
+    seriousCount: number;
+    openCount: number;
+    /** Escalated, or enough cases to warrant offboarding review. */
+    flagged: boolean;
+};
+
 export type DemoOnboardingTask = {
     label: string;
     done: boolean;

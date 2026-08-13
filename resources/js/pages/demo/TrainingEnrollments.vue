@@ -483,7 +483,7 @@ function exportExcel(): void {
                 class="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
             >
                 <Select v-model="categoryFilter">
-                    <SelectTrigger class="w-52">
+                    <SelectTrigger class="w-48">
                         <SelectValue placeholder="All categories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -658,7 +658,7 @@ function exportExcel(): void {
                 class="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
             >
                 <Select v-model="statusFilter">
-                    <SelectTrigger class="w-44">
+                    <SelectTrigger class="w-48">
                         <SelectValue placeholder="All statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -677,7 +677,7 @@ function exportExcel(): void {
                 </Select>
 
                 <Select v-model="categoryFilter">
-                    <SelectTrigger class="w-52">
+                    <SelectTrigger class="w-48">
                         <SelectValue placeholder="All categories" />
                     </SelectTrigger>
                     <SelectContent>
@@ -949,7 +949,7 @@ function exportExcel(): void {
                                 Employee
                             </label>
                             <Select v-model="draftEmployee">
-                                <SelectTrigger>
+                                <SelectTrigger class="w-full">
                                     <SelectValue
                                         placeholder="Choose employee"
                                     />
@@ -974,7 +974,7 @@ function exportExcel(): void {
                                 Course
                             </label>
                             <Select v-model="draftCourse">
-                                <SelectTrigger>
+                                <SelectTrigger class="w-full">
                                     <SelectValue placeholder="Choose course" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1060,7 +1060,7 @@ function exportExcel(): void {
                         <div class="flex flex-col gap-1.5">
                             <Label>Category</Label>
                             <Select v-model="courseDraft.category">
-                                <SelectTrigger>
+                                <SelectTrigger class="w-full">
                                     <SelectValue
                                         placeholder="Select category"
                                     />

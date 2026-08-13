@@ -11,6 +11,7 @@ import {
     LogIn,
     LogOut,
     HeartHandshake,
+    ShieldAlert,
     Sparkles,
     UserPlus,
     Users,
@@ -71,7 +72,7 @@ const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
  * Each module gets its own sidebar — no other module appears in it.
  * The active module is derived from the current URL.
  */
-const soonModules = ['disciplinary', 'offboarding'];
+const soonModules = ['offboarding'];
 
 type ModuleNavItem = {
     slug: string;
@@ -247,6 +248,26 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
             icon: FileText,
         },
     ],
+    disciplinary: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/disciplinary/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'log',
+            title: 'Disciplinary Log',
+            href: '/demo/disciplinary/records',
+            icon: ShieldAlert,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/disciplinary/reports',
+            icon: FileText,
+        },
+    ],
 };
 
 const currentModule = computed<string | null>(() => {
@@ -282,6 +303,10 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/training')) {
         return 'training';
+    }
+
+    if (path.startsWith('/demo/disciplinary')) {
+        return 'disciplinary';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -459,6 +484,25 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/training') &&
                 !currentUrl.value.startsWith('/demo/training/dashboard') &&
                 !currentUrl.value.startsWith('/demo/training/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'disciplinary') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/disciplinary URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' &&
+                    isCurrentUrl('/demo/disciplinary'))
+            );
+        }
+
+        if (item.slug === 'log') {
+            return (
+                currentUrl.value.startsWith('/demo/disciplinary') &&
+                !currentUrl.value.startsWith('/demo/disciplinary/dashboard') &&
+                !currentUrl.value.startsWith('/demo/disciplinary/reports')
             );
         }
     }

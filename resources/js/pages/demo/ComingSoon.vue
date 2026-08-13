@@ -76,7 +76,7 @@ defineProps<{
             >
                 <p class="font-semibold">Want this module next?</p>
                 <p class="mt-1">
-                    Modules 1–8 are live. Tell us which of the remaining modules
+                    Modules 1–9 are live. Tell us which of the remaining modules
                     to build first.
                 </p>
             </div>

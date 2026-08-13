@@ -487,7 +487,7 @@ function exportExcel(): void {
                 </Select>
 
                 <Select v-model="statusFilter">
-                    <SelectTrigger class="w-40">
+                    <SelectTrigger class="w-48">
                         <SelectValue placeholder="All statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -928,7 +928,7 @@ function exportExcel(): void {
                                 Employee
                             </label>
                             <Select v-model="draftEmployee">
-                                <SelectTrigger>
+                                <SelectTrigger class="w-full">
                                     <SelectValue
                                         placeholder="Choose employee"
                                     />
@@ -960,7 +960,7 @@ function exportExcel(): void {
                                 Review period
                             </label>
                             <Select v-model="draftPeriod">
-                                <SelectTrigger>
+                                <SelectTrigger class="w-full">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1002,7 +1002,9 @@ function exportExcel(): void {
                                     {{ criterion.label }}
                                 </label>
                                 <Select v-model="draftRatings[criterion.key]">
-                                    <SelectTrigger class="justify-center">
+                                    <SelectTrigger
+                                        class="w-full justify-center"
+                                    >
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
