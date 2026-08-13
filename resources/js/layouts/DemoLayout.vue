@@ -106,10 +106,22 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
     ],
     recruitment: [
         {
-            slug: 'overview',
-            title: 'Overview',
-            href: '/demo/recruitment',
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/recruitment/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'vacancies',
+            title: 'Vacancy Management',
+            href: '/demo/recruitment/vacancies',
             icon: UserPlus,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/recruitment/reports',
+            icon: FileText,
         },
     ],
     attendance: [
@@ -169,8 +181,8 @@ const navItems = computed<ModuleNavItem[]>(() => {
 });
 
 function isItemActive(item: ModuleNavItem): boolean {
-    // On the Employee module, Dashboard / Reports are exact matches while
-    // Employee Management covers the list, profile and add pages.
+    // Dashboard / Reports are exact matches while the management list covers
+    // the list, profile and add pages of the module.
     if (currentModule.value === 'employees') {
         if (item.slug === 'dashboard' || item.slug === 'reports') {
             return isCurrentUrl(item.href);
@@ -181,6 +193,24 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/employees') &&
                 !currentUrl.value.startsWith('/demo/employees/dashboard') &&
                 !currentUrl.value.startsWith('/demo/employees/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'recruitment') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/recruitment URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/recruitment'))
+            );
+        }
+
+        if (item.slug === 'vacancies') {
+            return (
+                currentUrl.value.startsWith('/demo/recruitment') &&
+                !currentUrl.value.startsWith('/demo/recruitment/dashboard') &&
+                !currentUrl.value.startsWith('/demo/recruitment/reports')
             );
         }
     }

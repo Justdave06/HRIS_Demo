@@ -35,7 +35,7 @@ const moduleHref = (slug: string): string => {
     }
 
     if (slug === 'recruitment') {
-        return '/demo/recruitment';
+        return '/demo/recruitment/dashboard';
     }
 
     if (slug === 'attendance') {

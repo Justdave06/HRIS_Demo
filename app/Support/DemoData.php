@@ -130,43 +130,56 @@ class DemoData
         return $hours;
     }
 
-    /** Open positions (Module 2). */
+    /**
+     * Job vacancies (Module 2 - Recruitment).
+     *
+     * Each vacancy carries a manually-prepared hiring document (the file the
+     * recruiter wrote in their document app: header, qualifications and
+     * requirements) — attachments are stored by file name only, matching the
+     * demo's "nothing is uploaded" rule.
+     */
     public static function openJobs(): array
     {
         return [
-            ['id' => 1, 'title' => 'Software Engineer', 'department' => 'Information Technology', 'openings' => 2, 'applicants' => 18, 'posted' => '2026-07-14'],
-            ['id' => 2, 'title' => 'Sales Representative', 'department' => 'Sales', 'openings' => 3, 'applicants' => 24, 'posted' => '2026-07-02'],
-            ['id' => 3, 'title' => 'HR Associate', 'department' => 'Human Resources', 'openings' => 1, 'applicants' => 31, 'posted' => '2026-06-28'],
-            ['id' => 4, 'title' => 'Customer Support Agent', 'department' => 'Customer Support', 'openings' => 4, 'applicants' => 19, 'posted' => '2026-07-21'],
-            ['id' => 5, 'title' => 'Accountant', 'department' => 'Finance', 'openings' => 1, 'applicants' => 14, 'posted' => '2026-08-01'],
-            ['id' => 6, 'title' => 'QA Tester', 'department' => 'Information Technology', 'openings' => 1, 'applicants' => 9, 'posted' => '2026-08-04'],
+            ['id' => 1, 'title' => 'Software Engineer', 'position' => 'Software Engineer', 'department' => 'Information Technology', 'openings' => 2, 'applicants' => 18, 'shortlisted' => 6, 'hired' => 1, 'posted' => '2026-07-14', 'employment_type' => 'Regular', 'salary' => '₱45,000 – ₱60,000', 'status' => 'Open', 'attachment' => 'Software_Engineer_Hiring_Notice.pdf'],
+            ['id' => 2, 'title' => 'Sales Representative', 'position' => 'Sales Representative', 'department' => 'Sales', 'openings' => 3, 'applicants' => 24, 'shortlisted' => 9, 'hired' => 2, 'posted' => '2026-07-02', 'employment_type' => 'Contractual', 'salary' => '₱22,000 – ₱30,000', 'status' => 'Open', 'attachment' => 'Sales_Rep_Hiring_Notice.pdf'],
+            ['id' => 3, 'title' => 'HR Associate', 'position' => 'HR Associate', 'department' => 'Human Resources', 'openings' => 1, 'applicants' => 31, 'shortlisted' => 10, 'hired' => 1, 'posted' => '2026-06-28', 'employment_type' => 'Regular', 'salary' => '₱28,000 – ₱35,000', 'status' => 'On Hold', 'attachment' => 'HR_Associate_Hiring_Notice.pdf'],
+            ['id' => 4, 'title' => 'Customer Support Agent', 'position' => 'Support Agent', 'department' => 'Customer Support', 'openings' => 4, 'applicants' => 19, 'shortlisted' => 7, 'hired' => 1, 'posted' => '2026-07-21', 'employment_type' => 'Contractual', 'salary' => '₱18,000 – ₱24,000', 'status' => 'Open', 'attachment' => 'CS_Agent_Hiring_Notice.pdf'],
+            ['id' => 5, 'title' => 'Accountant', 'position' => 'Accountant', 'department' => 'Finance', 'openings' => 1, 'applicants' => 14, 'shortlisted' => 4, 'hired' => 0, 'posted' => '2026-08-01', 'employment_type' => 'Regular', 'salary' => '₱38,000 – ₱48,000', 'status' => 'Open', 'attachment' => 'Accountant_Hiring_Notice.pdf'],
+            ['id' => 6, 'title' => 'QA Tester', 'position' => 'QA Tester', 'department' => 'Information Technology', 'openings' => 1, 'applicants' => 9, 'shortlisted' => 3, 'hired' => 0, 'posted' => '2026-08-04', 'employment_type' => 'Probationary', 'salary' => '₱25,000 – ₱32,000', 'status' => 'Open', 'attachment' => 'QA_Tester_Hiring_Notice.pdf'],
         ];
     }
 
-    /** Candidates in the hiring pipeline (Module 2). */
+    /**
+     * Applicants in the hiring pipeline (Module 2).
+     *
+     * Stages are: Applied -> Shortlisted -> Interview -> Hired. Each applicant
+     * belongs to a vacancy via vacancy_id. "Hired this month" uses the
+     * hire date, not the application date.
+     */
     public static function candidates(): array
     {
         return [
-            ['id' => 1, 'name' => 'Aaron Lim', 'job' => 'Software Engineer', 'stage' => 'Applied', 'applied_on' => '2026-08-11'],
-            ['id' => 2, 'name' => 'Bianca Uy', 'job' => 'Software Engineer', 'stage' => 'Screening', 'applied_on' => '2026-08-09'],
-            ['id' => 3, 'name' => 'Christian Tan', 'job' => 'Software Engineer', 'stage' => 'Interview', 'applied_on' => '2026-08-05'],
-            ['id' => 4, 'name' => 'Dana Yu', 'job' => 'Software Engineer', 'stage' => 'Offer', 'applied_on' => '2026-08-01'],
-            ['id' => 5, 'name' => 'Erika Sison', 'job' => 'Sales Representative', 'stage' => 'Applied', 'applied_on' => '2026-08-10'],
-            ['id' => 6, 'name' => 'Francis Go', 'job' => 'Sales Representative', 'stage' => 'Screening', 'applied_on' => '2026-08-08'],
-            ['id' => 7, 'name' => 'Gina Ong', 'job' => 'Sales Representative', 'stage' => 'Interview', 'applied_on' => '2026-08-04'],
-            ['id' => 8, 'name' => 'Henry Chua', 'job' => 'Sales Representative', 'stage' => 'Offer', 'applied_on' => '2026-07-30'],
-            ['id' => 9, 'name' => 'Isabel Lao', 'job' => 'HR Associate', 'stage' => 'Screening', 'applied_on' => '2026-08-07'],
-            ['id' => 10, 'name' => 'Jason Co', 'job' => 'HR Associate', 'stage' => 'Interview', 'applied_on' => '2026-08-02'],
-            ['id' => 11, 'name' => 'Karen Sy', 'job' => 'HR Associate', 'stage' => 'Offer', 'applied_on' => '2026-07-28'],
-            ['id' => 12, 'name' => 'Leo Quinto', 'job' => 'Customer Support Agent', 'stage' => 'Applied', 'applied_on' => '2026-08-11'],
-            ['id' => 13, 'name' => 'Mia Pineda', 'job' => 'Customer Support Agent', 'stage' => 'Screening', 'applied_on' => '2026-08-09'],
-            ['id' => 14, 'name' => 'Nico Beltran', 'job' => 'Customer Support Agent', 'stage' => 'Interview', 'applied_on' => '2026-08-06'],
-            ['id' => 15, 'name' => 'Olivia Rosales', 'job' => 'Customer Support Agent', 'stage' => 'Hired', 'applied_on' => '2026-07-25'],
-            ['id' => 16, 'name' => 'Paolo Ocampo', 'job' => 'Accountant', 'stage' => 'Applied', 'applied_on' => '2026-08-08'],
-            ['id' => 17, 'name' => 'Queenie Estrada', 'job' => 'Accountant', 'stage' => 'Screening', 'applied_on' => '2026-08-06'],
-            ['id' => 18, 'name' => 'Rafael Samson', 'job' => 'QA Tester', 'stage' => 'Applied', 'applied_on' => '2026-08-10'],
-            ['id' => 19, 'name' => 'Sara Villanueva', 'job' => 'QA Tester', 'stage' => 'Interview', 'applied_on' => '2026-08-07'],
-            ['id' => 20, 'name' => 'Tommy Alcantara', 'job' => 'Software Engineer', 'stage' => 'Hired', 'applied_on' => '2026-07-22'],
+            ['id' => 1, 'name' => 'Aaron Lim', 'vacancy_id' => 1, 'job' => 'Software Engineer', 'stage' => 'Applied', 'applied_on' => '2026-08-11', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Aaron_Lim_Application_Form.pdf', 'phone' => '0917 111 2201', 'email' => 'aaron.lim@mail.com'],
+            ['id' => 2, 'name' => 'Bianca Uy', 'vacancy_id' => 1, 'job' => 'Software Engineer', 'stage' => 'Shortlisted', 'applied_on' => '2026-08-09', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Bianca_Uy_Resume.pdf', 'phone' => '0917 111 2202', 'email' => 'bianca.uy@mail.com'],
+            ['id' => 3, 'name' => 'Christian Tan', 'vacancy_id' => 1, 'job' => 'Software Engineer', 'stage' => 'Interview', 'applied_on' => '2026-08-05', 'hired_on' => null, 'interview_on' => '2026-08-14 10:00', 'attachment' => 'Christian_Tan_Application_Form.pdf', 'phone' => '0917 111 2203', 'email' => 'christian.tan@mail.com'],
+            ['id' => 4, 'name' => 'Dana Yu', 'vacancy_id' => 1, 'job' => 'Software Engineer', 'stage' => 'Hired', 'applied_on' => '2026-08-01', 'hired_on' => '2026-08-12', 'interview_on' => null, 'attachment' => 'Dana_Yu_Resume.pdf', 'phone' => '0917 111 2204', 'email' => 'dana.yu@mail.com'],
+            ['id' => 5, 'name' => 'Erika Sison', 'vacancy_id' => 2, 'job' => 'Sales Representative', 'stage' => 'Applied', 'applied_on' => '2026-08-10', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Erika_Sison_Application_Form.pdf', 'phone' => '0917 111 2205', 'email' => 'erika.sison@mail.com'],
+            ['id' => 6, 'name' => 'Francis Go', 'vacancy_id' => 2, 'job' => 'Sales Representative', 'stage' => 'Shortlisted', 'applied_on' => '2026-08-08', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Francis_Go_Resume.pdf', 'phone' => '0917 111 2206', 'email' => 'francis.go@mail.com'],
+            ['id' => 7, 'name' => 'Gina Ong', 'vacancy_id' => 2, 'job' => 'Sales Representative', 'stage' => 'Interview', 'applied_on' => '2026-08-04', 'hired_on' => null, 'interview_on' => '2026-08-13 14:00', 'attachment' => 'Gina_Ong_Application_Form.pdf', 'phone' => '0917 111 2207', 'email' => 'gina.ong@mail.com'],
+            ['id' => 8, 'name' => 'Henry Chua', 'vacancy_id' => 2, 'job' => 'Sales Representative', 'stage' => 'Hired', 'applied_on' => '2026-07-30', 'hired_on' => '2026-08-07', 'interview_on' => null, 'attachment' => 'Henry_Chua_Resume.pdf', 'phone' => '0917 111 2208', 'email' => 'henry.chua@mail.com'],
+            ['id' => 9, 'name' => 'Isabel Lao', 'vacancy_id' => 3, 'job' => 'HR Associate', 'stage' => 'Shortlisted', 'applied_on' => '2026-08-07', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Isabel_Lao_Application_Form.pdf', 'phone' => '0917 111 2209', 'email' => 'isabel.lao@mail.com'],
+            ['id' => 10, 'name' => 'Jason Co', 'vacancy_id' => 3, 'job' => 'HR Associate', 'stage' => 'Interview', 'applied_on' => '2026-08-02', 'hired_on' => null, 'interview_on' => '2026-08-15 09:30', 'attachment' => 'Jason_Co_Resume.pdf', 'phone' => '0917 111 2210', 'email' => 'jason.co@mail.com'],
+            ['id' => 11, 'name' => 'Karen Sy', 'vacancy_id' => 3, 'job' => 'HR Associate', 'stage' => 'Hired', 'applied_on' => '2026-07-28', 'hired_on' => '2026-08-03', 'interview_on' => null, 'attachment' => 'Karen_Sy_Application_Form.pdf', 'phone' => '0917 111 2211', 'email' => 'karen.sy@mail.com'],
+            ['id' => 12, 'name' => 'Leo Quinto', 'vacancy_id' => 4, 'job' => 'Customer Support Agent', 'stage' => 'Applied', 'applied_on' => '2026-08-11', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Leo_Quinto_Resume.pdf', 'phone' => '0917 111 2212', 'email' => 'leo.quinto@mail.com'],
+            ['id' => 13, 'name' => 'Mia Pineda', 'vacancy_id' => 4, 'job' => 'Customer Support Agent', 'stage' => 'Shortlisted', 'applied_on' => '2026-08-09', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Mia_Pineda_Application_Form.pdf', 'phone' => '0917 111 2213', 'email' => 'mia.pineda@mail.com'],
+            ['id' => 14, 'name' => 'Nico Beltran', 'vacancy_id' => 4, 'job' => 'Customer Support Agent', 'stage' => 'Interview', 'applied_on' => '2026-08-06', 'hired_on' => null, 'interview_on' => '2026-08-14 13:00', 'attachment' => 'Nico_Beltran_Resume.pdf', 'phone' => '0917 111 2214', 'email' => 'nico.beltran@mail.com'],
+            ['id' => 15, 'name' => 'Olivia Rosales', 'vacancy_id' => 4, 'job' => 'Customer Support Agent', 'stage' => 'Hired', 'applied_on' => '2026-07-25', 'hired_on' => '2026-08-01', 'interview_on' => null, 'attachment' => 'Olivia_Rosales_Application_Form.pdf', 'phone' => '0917 111 2215', 'email' => 'olivia.rosales@mail.com'],
+            ['id' => 16, 'name' => 'Paolo Ocampo', 'vacancy_id' => 5, 'job' => 'Accountant', 'stage' => 'Applied', 'applied_on' => '2026-08-08', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Paolo_Ocampo_Resume.pdf', 'phone' => '0917 111 2216', 'email' => 'paolo.ocampo@mail.com'],
+            ['id' => 17, 'name' => 'Queenie Estrada', 'vacancy_id' => 5, 'job' => 'Accountant', 'stage' => 'Shortlisted', 'applied_on' => '2026-08-06', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Queenie_Estrada_Application_Form.pdf', 'phone' => '0917 111 2217', 'email' => 'queenie.estrada@mail.com'],
+            ['id' => 18, 'name' => 'Rafael Samson', 'vacancy_id' => 6, 'job' => 'QA Tester', 'stage' => 'Applied', 'applied_on' => '2026-08-10', 'hired_on' => null, 'interview_on' => null, 'attachment' => 'Rafael_Samson_Resume.pdf', 'phone' => '0917 111 2218', 'email' => 'rafael.samson@mail.com'],
+            ['id' => 19, 'name' => 'Sara Villanueva', 'vacancy_id' => 6, 'job' => 'QA Tester', 'stage' => 'Interview', 'applied_on' => '2026-08-07', 'hired_on' => null, 'interview_on' => '2026-08-15 15:00', 'attachment' => 'Sara_Villanueva_Application_Form.pdf', 'phone' => '0917 111 2219', 'email' => 'sara.villanueva@mail.com'],
+            ['id' => 20, 'name' => 'Tommy Alcantara', 'vacancy_id' => 1, 'job' => 'Software Engineer', 'stage' => 'Hired', 'applied_on' => '2026-07-22', 'hired_on' => '2026-07-30', 'interview_on' => null, 'attachment' => 'Tommy_Alcantara_Resume.pdf', 'phone' => '0917 111 2220', 'email' => 'tommy.alcantara@mail.com'],
         ];
     }
 
@@ -224,31 +237,58 @@ class DemoData
         ];
     }
 
-    /** How each module talks to the others (the interconnection story). */
+    /**
+     * How each module talks to the others — the interconnection map.
+     *
+     * This encodes the system-wide data flow exactly:
+     *   1  Employee Information Management = the CENTRAL CORE every module
+     *      reads from and writes to (single source of truth for an employee).
+     *   2  Recruitment & Onboarding        = INBOUND — hired candidates
+     *      become employee records.
+     *   3-8 Time & Attendance / Leave / Payroll / Benefits / Performance /
+     *      Training                       = OPERATIONAL ENGINES running off
+     *      the core (3→5, 4→5, 6→5 hours & leave & deductions into payroll;
+     *      7→8 performance gaps into training).
+     *   9  Disciplinary Management        = OUTBOUND — incidents written back
+     *      against records; sanctions feed payroll; serious cases feed 10.
+     *   10 Separation & Offboarding       = the terminal stage: closes and
+     *      archives the core record and settles final pay.
+     */
     public static function moduleLinks(string $slug): array
     {
         $map = [
+            // 1 — Central core profile: every module reads from and writes to it.
             'employees' => [
                 'receives' => [
-                    ['module' => 'Recruitment', 'note' => 'New hires arrive here automatically'],
-                    ['module' => 'Training', 'note' => 'Completed trainings are added to the record'],
-                    ['module' => 'Attendance', 'note' => 'Daily status updates from timekeeping'],
+                    ['module' => 'Recruitment', 'note' => 'Hired candidates arrive as new employees (inbound)'],
+                    ['module' => 'Attendance', 'note' => 'Daily status and hours update the record'],
+                    ['module' => 'Training', 'note' => 'Completed courses and certificates are added'],
+                    ['module' => 'Performance', 'note' => 'Ratings and reviews are kept on the record'],
+                    ['module' => 'Disciplinary', 'note' => 'Warnings and incidents are recorded'],
                 ],
                 'sends' => [
-                    ['module' => 'Payroll', 'note' => 'Salary and bank details feed payslips'],
+                    ['module' => 'Recruitment', 'note' => 'Department manpower requests for new hires'],
+                    ['module' => 'Attendance', 'note' => 'Roster of who to track each day'],
                     ['module' => 'Leave', 'note' => 'Leave balances are seeded per employee'],
-                    ['module' => 'Offboarding', 'note' => 'Final records used for separation'],
+                    ['module' => 'Payroll', 'note' => 'Salary, position, and bank details for payslips'],
+                    ['module' => 'Benefits', 'note' => 'Eligibility and enrollment data'],
+                    ['module' => 'Performance', 'note' => 'Who gets reviewed and rated'],
+                    ['module' => 'Training', 'note' => 'Who gets enrolled in courses'],
+                    ['module' => 'Disciplinary', 'note' => 'Records reviewed for incidents (outbound)'],
+                    ['module' => 'Offboarding', 'note' => 'Records used for separation and archiving'],
                 ],
             ],
+            // 2 — Inbound: hiring feeds the central core.
             'recruitment' => [
                 'receives' => [
-                    ['module' => 'Employee Records', 'note' => 'Job openings requested by departments'],
+                    ['module' => 'Employee Records', 'note' => 'Manpower requests and job openings from departments'],
                 ],
                 'sends' => [
-                    ['module' => 'Employee Records', 'note' => 'Hired candidates become employees'],
+                    ['module' => 'Employee Records', 'note' => 'Hired candidates become employee records'],
                     ['module' => 'Onboarding', 'note' => 'New hires get onboarding checklists'],
                 ],
             ],
+            // 3 — Operational engine: hours feed payroll; tardiness flagged.
             'attendance' => [
                 'receives' => [
                     ['module' => 'Employee Records', 'note' => 'Who needs to be tracked each day'],
@@ -259,6 +299,7 @@ class DemoData
                     ['module' => 'Disciplinary', 'note' => 'Repeated tardiness is flagged'],
                 ],
             ],
+            // 4 — Operational engine: approved leave marks days off and hits payroll.
             'leave' => [
                 'receives' => [
                     ['module' => 'Employee Records', 'note' => 'Leave balances per employee'],
@@ -266,14 +307,16 @@ class DemoData
                 ],
                 'sends' => [
                     ['module' => 'Attendance', 'note' => 'Approved leave marks the day off'],
-                    ['module' => 'Payroll', 'note' => 'Unpaid leave days are deducted'],
+                    ['module' => 'Payroll', 'note' => 'Paid and unpaid leave days are settled'],
                 ],
             ],
+            // 5 — Operational engine: the pay engine aggregates hours, leave, and deductions.
             'payroll' => [
                 'receives' => [
                     ['module' => 'Attendance', 'note' => 'Hours worked this pay period'],
                     ['module' => 'Leave', 'note' => 'Paid and unpaid leave days'],
                     ['module' => 'Benefits', 'note' => 'Deductions and contributions'],
+                    ['module' => 'Disciplinary', 'note' => 'Suspension days and salary sanctions'],
                     ['module' => 'Employee Records', 'note' => 'Salary and bank details'],
                 ],
                 'sends' => [
@@ -281,6 +324,7 @@ class DemoData
                     ['module' => 'Performance', 'note' => 'Merit increases applied to pay'],
                 ],
             ],
+            // 6 — Operational engine: enrollments become payroll deductions.
             'benefits' => [
                 'receives' => [
                     ['module' => 'Employee Records', 'note' => 'Who is enrolled and eligible'],
@@ -290,16 +334,19 @@ class DemoData
                     ['module' => 'Payroll', 'note' => 'Deductions are added to payslips'],
                 ],
             ],
+            // 7 — Operational engine: gaps become training; ratings guide raises.
             'performance' => [
                 'receives' => [
                     ['module' => 'Employee Records', 'note' => 'Employees to be reviewed'],
                     ['module' => 'Training', 'note' => 'New skills shown on reviews'],
+                    ['module' => 'Disciplinary', 'note' => 'Incidents affect review ratings'],
                 ],
                 'sends' => [
                     ['module' => 'Training', 'note' => 'Skill gaps become training plans'],
                     ['module' => 'Payroll', 'note' => 'Raises based on performance'],
                 ],
             ],
+            // 8 — Operational engine: completed courses write back to the record.
             'training' => [
                 'receives' => [
                     ['module' => 'Performance', 'note' => 'Skill gaps turn into courses'],
@@ -310,25 +357,29 @@ class DemoData
                     ['module' => 'Performance', 'note' => 'Completed skills shown on reviews'],
                 ],
             ],
+            // 9 — Outbound: incidents are written back against records.
             'disciplinary' => [
                 'receives' => [
                     ['module' => 'Attendance', 'note' => 'Repeated tardiness flags'],
                     ['module' => 'Employee Records', 'note' => 'Records reviewed for warnings'],
                 ],
                 'sends' => [
-                    ['module' => 'Offboarding', 'note' => 'Serious cases may end employment'],
+                    ['module' => 'Employee Records', 'note' => 'Warnings and incidents recorded on file'],
+                    ['module' => 'Payroll', 'note' => 'Suspension days deducted from pay'],
                     ['module' => 'Performance', 'note' => 'Incidents affect reviews'],
+                    ['module' => 'Offboarding', 'note' => 'Serious cases may end employment'],
                 ],
             ],
+            // 10 — Terminal stage: close the record, settle final pay, archive.
             'offboarding' => [
                 'receives' => [
-                    ['module' => 'Employee Records', 'note' => 'Records to be closed'],
+                    ['module' => 'Employee Records', 'note' => 'Records to be closed and archived'],
                     ['module' => 'Disciplinary', 'note' => 'Termination cases'],
                     ['module' => 'Leave', 'note' => 'Outstanding leave to be settled'],
                 ],
                 'sends' => [
-                    ['module' => 'Payroll', 'note' => 'Final pay and clearance'],
-                    ['module' => 'Employee Records', 'note' => 'Records archived safely'],
+                    ['module' => 'Payroll', 'note' => 'Final pay and clearance computation'],
+                    ['module' => 'Employee Records', 'note' => 'Records archived safely after separation'],
                 ],
             ],
         ];

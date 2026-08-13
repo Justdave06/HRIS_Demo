@@ -23,14 +23,8 @@ const props = defineProps<{
     record: EmployeeFormState | null;
 }>();
 
-const { addedEmployees, blankForm, employeeFor, formFor } =
-    useDemoEmployees();
+const { blankForm, employeeFor, formFor } = useDemoEmployees();
 const showPreview = ref(false);
-
-// TEMP DIAGNOSTIC — remove after debugging
-console.log('[detail] employee id:', props.employee.id);
-console.log('[detail] addedEmployees:', addedEmployees.value);
-console.log('[detail] formFor:', formFor(props.employee.id) ?? 'MISSING');
 
 // For session-added employees the server sends a placeholder row; use the
 // real directory row kept in sessionStorage so the name and details match.

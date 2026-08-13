@@ -27,6 +27,9 @@ Route::prefix('demo')->name('demo.')->group(function () {
 
     // Module 2 - Recruitment & Onboarding
     Route::get('/recruitment', [RecruitmentController::class, 'index'])->name('recruitment.index');
+    Route::get('/recruitment/dashboard', [RecruitmentController::class, 'dashboard'])->name('recruitment.dashboard');
+    Route::get('/recruitment/vacancies', [RecruitmentController::class, 'vacancies'])->name('recruitment.vacancies');
+    Route::get('/recruitment/reports', [RecruitmentController::class, 'reports'])->name('recruitment.reports');
 
     // Module 3 - Time & Attendance
     Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');

@@ -60,21 +60,60 @@ export type DemoAttendance = {
     status: 'Present' | 'Late' | 'On Leave' | 'Absent' | 'Not Yet In';
 };
 
+/** Payment treatment for a declared (non-national) holiday. */
+export type DemoHolidayPay =
+    | 'Paid as regular working day'
+    | 'Special non-working rate'
+    | 'No work, no pay (excused)';
+
+/** A holiday declared through the Holiday Picker (abrupt, non-national). */
+export type DemoHoliday = {
+    id: number;
+    /** ISO dates (YYYY-MM-DD) — one declaration can cover several dates. */
+    dates: string[];
+    reason: string;
+    /** 'all' applies to everyone; 'department' only to one department. */
+    scope: 'all' | 'department';
+    /** Required when scope === 'department'. */
+    department: string | null;
+    pay: DemoHolidayPay;
+    declared_on: string;
+};
+
 export type DemoJob = {
     id: number;
     title: string;
+    position: string;
     department: string;
     openings: number;
     applicants: number;
+    shortlisted: number;
+    hired: number;
     posted: string;
+    /** Employment type for the vacancy: Regular / Probationary / Contractual. */
+    employment_type: DemoEmployee['employment_type'];
+    /** Monthly salary band, e.g. "₱28,000 – ₱35,000". */
+    salary: string;
+    status: 'Open' | 'On Hold' | 'Closed';
+    /** Attached hiring document (file name) — the manual posting written by
+     * the recruiter with header, qualifications and requirements. */
+    attachment: string;
 };
 
 export type DemoCandidate = {
     id: number;
     name: string;
+    vacancy_id: number;
     job: string;
-    stage: 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Hired';
+    stage: 'Applied' | 'Shortlisted' | 'Interview' | 'Hired';
     applied_on: string;
+    hired_on: string | null;
+    /** Scheduled interview date/time for candidates at the Interview stage. */
+    interview_on: string | null;
+    /** Attached application form / resume file name (demo: name only). */
+    attachment: string;
+    phone: string;
+    email: string;
 };
 
 export type DemoOnboardingTask = {
