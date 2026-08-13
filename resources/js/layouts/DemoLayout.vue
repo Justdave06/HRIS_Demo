@@ -3,6 +3,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import {
     CalendarCheck2,
     ChevronsUpDown,
+    ClipboardCheck,
     Clock,
     FileText,
     LayoutDashboard,
@@ -69,7 +70,7 @@ const { currentUrl, isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
  * Each module gets its own sidebar — no other module appears in it.
  * The active module is derived from the current URL.
  */
-const soonModules = ['performance', 'training', 'disciplinary', 'offboarding'];
+const soonModules = ['training', 'disciplinary', 'offboarding'];
 
 type ModuleNavItem = {
     slug: string;
@@ -205,6 +206,26 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
             icon: FileText,
         },
     ],
+    performance: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/performance/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'reviews',
+            title: 'Goals & Reviews',
+            href: '/demo/performance/reviews',
+            icon: ClipboardCheck,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/performance/reports',
+            icon: FileText,
+        },
+    ],
 };
 
 const currentModule = computed<string | null>(() => {
@@ -232,6 +253,10 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/benefits')) {
         return 'benefits';
+    }
+
+    if (path.startsWith('/demo/performance')) {
+        return 'performance';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -373,6 +398,24 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/benefits') &&
                 !currentUrl.value.startsWith('/demo/benefits/dashboard') &&
                 !currentUrl.value.startsWith('/demo/benefits/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'performance') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/performance URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/performance'))
+            );
+        }
+
+        if (item.slug === 'reviews') {
+            return (
+                currentUrl.value.startsWith('/demo/performance') &&
+                !currentUrl.value.startsWith('/demo/performance/dashboard') &&
+                !currentUrl.value.startsWith('/demo/performance/reports')
             );
         }
     }

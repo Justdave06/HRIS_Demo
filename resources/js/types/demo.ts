@@ -201,6 +201,117 @@ export type DemoEnrollmentRow = DemoEnrollment & {
     employer_cost: number;
 };
 
+/** A performance review period (Module 7), e.g. '2026-H2'. */
+export type DemoPerformancePeriod = {
+    value: string;
+    label: string;
+    status: 'Finalized' | 'In Progress';
+};
+
+/** One employee's performance review for a period (Module 7). */
+export type DemoPerformanceReview = {
+    id: number;
+    employee_id: number;
+    /** Review period value, e.g. '2026-H2'. */
+    period: string;
+    job_knowledge: number;
+    quality: number;
+    productivity: number;
+    teamwork: number;
+    initiative: number;
+    status: 'Draft' | 'Submitted' | 'Finalized';
+    reviewer: string;
+    comments: string;
+};
+
+/** Review enriched with the employee's record, overall rating and outputs. */
+export type DemoPerformanceRow = DemoPerformanceReview & {
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+    salary: number;
+    /** Average of the five criteria, rounded to one decimal. */
+    overall: number;
+    rating_label: string;
+    /** Merit raise % handed to Payroll: 5 / 3 / 0 based on the rating. */
+    raise_pct: number;
+    raise_amount: number;
+    new_salary: number;
+    /** Low-rated criteria (<= 2) with the training suggested for each. */
+    gaps: { criterion: string; training: string }[];
+};
+
+/** A goal set for an employee in the current cycle (Module 7). */
+export type DemoPerformanceGoal = {
+    id: number;
+    employee_id: number;
+    title: string;
+    category: string;
+    progress: number;
+    due: string;
+    status: 'On Track' | 'Behind' | 'At Risk';
+};
+
+/** Goal enriched with the employee's record (Module 7). */
+export type DemoPerformanceGoalRow = DemoPerformanceGoal & {
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+};
+
+/** A training course in the catalog (Module 8). */
+export type DemoTrainingCourse = {
+    id: number;
+    code: string;
+    title: string;
+    category: string;
+    provider: string;
+    venue: string;
+    start: string;
+    end: string;
+    hours: number;
+    cost: number;
+    certificate: boolean;
+};
+
+/** Course enriched with enrollment counts for the catalog view (Module 8). */
+export type DemoTrainingCourseRow = DemoTrainingCourse & {
+    enrolled: number;
+    completed: number;
+    completion_rate: number;
+    /** Derived: enrolled + a few free seats, so utilization stays under 100%. */
+    capacity: number;
+};
+
+/** One employee's enrollment in a course (Module 8). */
+export type DemoTrainingEnrollment = {
+    id: number;
+    course_id: number;
+    employee_id: number;
+    status: 'Enrolled' | 'In Progress' | 'Completed';
+    score: number | null;
+    completed_on: string | null;
+    certificate_no: string | null;
+};
+
+/** Enrollment enriched with employee + course records (Module 8). */
+export type DemoTrainingRow = DemoTrainingEnrollment & {
+    no: string;
+    name: string;
+    department: string;
+    position: string;
+    course_code: string;
+    title: string;
+    category: string;
+    venue: string;
+    start: string;
+    end: string;
+    hours: number;
+    certificate: boolean;
+};
+
 export type DemoOnboardingTask = {
     label: string;
     done: boolean;

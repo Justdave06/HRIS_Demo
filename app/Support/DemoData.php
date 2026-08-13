@@ -334,6 +334,217 @@ class DemoData
         return $enrollments;
     }
 
+    /**
+     * Performance review periods (Module 7). H1 2026 is closed (Finalized);
+     * H2 2026 is the current cycle still in progress.
+     */
+    public static function performancePeriods(): array
+    {
+        return [
+            ['value' => '2026-H1', 'label' => 'H1 2026 (Jan–Jun)', 'status' => 'Finalized'],
+            ['value' => '2026-H2', 'label' => 'H2 2026 (Jul–Dec)', 'status' => 'In Progress'],
+        ];
+    }
+
+    /**
+     * Performance reviews (Module 7). Every employee is reviewed in both H1
+     * and H2 2026 so past and current cycles are comparable. Ratings are
+     * derived deterministically: managers and leads rate higher, and each
+     * criterion jitters around the employee's level so reviews feel real.
+     * H1 is fully Finalized; H2 is still in progress (Draft / Submitted).
+     */
+    public static function performanceReviews(): array
+    {
+        $criteria = ['job_knowledge', 'quality', 'productivity', 'teamwork', 'initiative'];
+        $comments = [
+            'Consistently delivers high-quality work and supports the team.',
+            'Met all targets for the period — dependable and steady.',
+            'Shows strong initiative; keep building on this momentum.',
+            'Collaborates well and communicates clearly across teams.',
+            'Solid period overall with room to grow in a few areas.',
+            'Needs coaching on quality and attention to detail.',
+            'Great progress this cycle — continue the upward trend.',
+            'Reliable and consistent throughout the review period.',
+        ];
+
+        $reviews = [];
+        $id = 1;
+
+        foreach (self::employees() as $employee) {
+            $eid = $employee['id'];
+            $position = $employee['position'];
+            $isLead = str_contains($position, 'Manager')
+                || str_contains($position, 'Chief')
+                || str_contains($position, 'Lead')
+                || str_contains($position, 'Supervisor')
+                || str_contains($position, 'Executive');
+
+            // Base level: leads rate 4, everyone else 2-4, a few stars at 5
+            // and a couple of laggards a notch lower so the demo has spread.
+            $level = $isLead ? 4 : 2 + ($eid % 3);
+            $level = $eid % 11 === 0 ? 5 : $level;
+            $level = $eid % 13 === 0 ? max(2, $level - 1) : $level;
+
+            $ratings = [];
+            foreach ($criteria as $index => $key) {
+                $jitter = (($eid * 7 + $index * 11) % 3) - 1; // -1, 0, +1
+                $ratings[$key] = max(1, min(5, $level + $jitter));
+            }
+
+            foreach (['2026-H1', '2026-H2'] as $period) {
+                $status = $period === '2026-H1'
+                    ? 'Finalized'
+                    : match (true) {
+                        $eid % 9 === 0 => 'Draft',
+                        $eid % 7 === 0 => 'Submitted',
+                        default => 'Finalized',
+                    };
+
+                $reviews[] = [
+                    'id' => $id++,
+                    'employee_id' => $eid,
+                    'period' => $period,
+                    'job_knowledge' => $ratings['job_knowledge'],
+                    'quality' => $ratings['quality'],
+                    'productivity' => $ratings['productivity'],
+                    'teamwork' => $ratings['teamwork'],
+                    'initiative' => $ratings['initiative'],
+                    'status' => $status,
+                    'reviewer' => $employee['manager'],
+                    'comments' => $comments[$eid % count($comments)],
+                ];
+            }
+        }
+
+        return $reviews;
+    }
+
+    /**
+     * Performance goals (Module 7). Two goals per employee for the current
+     * H2 2026 cycle, picked deterministically from the pool. Progress and due
+     * dates vary so the dashboard can show On Track / Behind / At Risk.
+     */
+    public static function performanceGoals(): array
+    {
+        $pool = [
+            ['title' => 'Complete the annual product certification', 'category' => 'Development'],
+            ['title' => 'Improve turnaround time by 20%', 'category' => 'Productivity'],
+            ['title' => 'Deliver Q3 project milestones on schedule', 'category' => 'Project'],
+            ['title' => 'Attend two industry conferences this cycle', 'category' => 'Development'],
+            ['title' => 'Mentor one junior teammate', 'category' => 'Leadership'],
+            ['title' => 'Cut error rate in reports by half', 'category' => 'Quality'],
+        ];
+
+        $goals = [];
+        $id = 1;
+
+        foreach (self::employees() as $employee) {
+            $eid = $employee['id'];
+            $first = $pool[$eid % count($pool)];
+            $second = $pool[($eid + 3) % count($pool)];
+
+            foreach ([$first, $second] as $i => $goal) {
+                $progress = ($eid * 13 + $i * 29) % 101;
+
+                $goals[] = [
+                    'id' => $id++,
+                    'employee_id' => $eid,
+                    'title' => $goal['title'],
+                    'category' => $goal['category'],
+                    'progress' => $progress,
+                    'due' => $eid % 2 === 0 ? '2026-11-30' : '2026-12-15',
+                    'status' => match (true) {
+                        $progress >= 70 => 'On Track',
+                        $progress >= 35 => 'Behind',
+                        default => 'At Risk',
+                    },
+                ];
+            }
+        }
+
+        return $goals;
+    }
+
+    /**
+     * Training courses (Module 8). The Q3 2026 calendar: courses that
+     * already ran (Jul) are past, the current one (Aug 10-14) is running,
+     * and the rest are scheduled for later in the quarter. Titles match the
+     * Performance module's skill-gap suggestions so the two modules connect.
+     */
+    public static function trainingCourses(): array
+    {
+        return [
+            ['id' => 1, 'code' => 'TRN-101', 'title' => 'Advanced Job Skills Training', 'category' => 'Development', 'provider' => 'Internal L&D', 'venue' => 'Training Room A', 'start' => '2026-07-06', 'end' => '2026-07-10', 'hours' => 20, 'cost' => 0, 'certificate' => true],
+            ['id' => 2, 'code' => 'TRN-102', 'title' => 'Quality Assurance & Attention to Detail', 'category' => 'Quality', 'provider' => 'Internal L&D', 'venue' => 'Training Room B', 'start' => '2026-07-20', 'end' => '2026-07-24', 'hours' => 16, 'cost' => 0, 'certificate' => true],
+            ['id' => 3, 'code' => 'TRN-103', 'title' => 'Time Management & Productivity', 'category' => 'Productivity', 'provider' => 'Franklin Covey', 'venue' => 'Zoom', 'start' => '2026-08-03', 'end' => '2026-08-05', 'hours' => 12, 'cost' => 15000, 'certificate' => true],
+            ['id' => 4, 'code' => 'TRN-104', 'title' => 'Team Collaboration Workshop', 'category' => 'Leadership', 'provider' => 'Internal L&D', 'venue' => 'Training Room A', 'start' => '2026-08-17', 'end' => '2026-08-18', 'hours' => 8, 'cost' => 0, 'certificate' => false],
+            ['id' => 5, 'code' => 'TRN-105', 'title' => 'Leadership & Initiative', 'category' => 'Leadership', 'provider' => 'Dale Carnegie', 'venue' => 'Zoom', 'start' => '2026-08-24', 'end' => '2026-08-28', 'hours' => 20, 'cost' => 25000, 'certificate' => true],
+            ['id' => 6, 'code' => 'TRN-106', 'title' => 'Workplace Safety & First Aid', 'category' => 'Compliance', 'provider' => 'DOLE-accredited trainer', 'venue' => 'Training Room B', 'start' => '2026-07-13', 'end' => '2026-07-14', 'hours' => 8, 'cost' => 5000, 'certificate' => true],
+            ['id' => 7, 'code' => 'TRN-107', 'title' => 'Data Privacy & Security Awareness', 'category' => 'Compliance', 'provider' => 'Internal L&D', 'venue' => 'Training Room A', 'start' => '2026-09-07', 'end' => '2026-09-08', 'hours' => 8, 'cost' => 0, 'certificate' => true],
+            ['id' => 8, 'code' => 'TRN-108', 'title' => 'Customer Service Excellence', 'category' => 'Development', 'provider' => 'Service First', 'venue' => 'Zoom', 'start' => '2026-09-14', 'end' => '2026-09-18', 'hours' => 16, 'cost' => 18000, 'certificate' => true],
+            ['id' => 9, 'code' => 'TRN-109', 'title' => 'Excel for Reporting & Analysis', 'category' => 'Technical', 'provider' => 'Internal L&D', 'venue' => 'Computer Lab', 'start' => '2026-08-10', 'end' => '2026-08-14', 'hours' => 20, 'cost' => 0, 'certificate' => true],
+        ];
+    }
+
+    /**
+     * Training enrollments (Module 8). Most employees are enrolled in every
+     * course, skipped deterministically so each course has a slightly
+     * different headcount. Status follows the calendar: courses that already
+     * ended are Completed (with a score and a sequential certificate number),
+     * the course running this week is In Progress, and upcoming courses are
+     * still Enrolled.
+     */
+    public static function trainingEnrollments(): array
+    {
+        $enrollments = [];
+        $id = 1;
+
+        foreach (self::trainingCourses() as $course) {
+            $cid = $course['id'];
+
+            foreach (self::employees() as $employee) {
+                $eid = $employee['id'];
+
+                // Skip deterministically so headcounts vary per course.
+                if (($eid * 3 + $cid * 5) % 5 === 4) {
+                    continue;
+                }
+
+                $status = match (true) {
+                    $course['end'] < '2026-08-13' => 'Completed',
+                    $course['start'] <= '2026-08-13' => 'In Progress',
+                    default => 'Enrolled',
+                };
+
+                $enrollments[] = [
+                    'id' => $id++,
+                    'course_id' => $cid,
+                    'employee_id' => $eid,
+                    'status' => $status,
+                    'score' => $status === 'Completed'
+                        ? 60 + ($eid * 7 + $cid * 11) % 41
+                        : null,
+                    'completed_on' => $status === 'Completed' ? $course['end'] : null,
+                    'certificate_no' => null,
+                ];
+            }
+        }
+
+        // Sequential certificate numbers for completed enrollments only, so
+        // the certificate register reads like a real issued list.
+        $cert = 1;
+
+        foreach ($enrollments as &$enrollment) {
+            if ($enrollment['status'] === 'Completed') {
+                $enrollment['certificate_no'] = 'CERT-'.str_pad((string) $cert, 4, '0', STR_PAD_LEFT);
+                $cert++;
+            }
+        }
+        unset($enrollment);
+
+        return $enrollments;
+    }
+
     /** All 10 modules. Status is 'available' for the ones already built. */
     public static function modules(): array
     {
@@ -344,8 +555,8 @@ class DemoData
             ['slug' => 'leave', 'name' => 'Leave Management', 'short' => 'Leave', 'status' => 'available', 'description' => 'Request, approve, and track leave. Employees apply for vacation, sick, or emergency leave and managers approve it in a few clicks.', 'features' => ['Leave requests and approvals', 'Leave balances per employee', 'Auto-sync with attendance', 'Paid / unpaid leave for payroll']],
             ['slug' => 'payroll', 'name' => 'Payroll Management', 'short' => 'Payroll', 'status' => 'available', 'description' => 'Turn attendance hours, leave days, and benefits into a correct monthly payslip, every single time.', 'features' => ['Monthly payroll run', 'Payslips for every employee', 'Pulls hours from attendance', 'Deductions from leave and benefits']],
             ['slug' => 'benefits', 'name' => 'Benefits Administration', 'short' => 'Benefits', 'status' => 'available', 'description' => 'Manage health plans, allowances, and other perks — enroll employees and send the right deductions to payroll.', 'features' => ['Benefit plans and enrollment', 'Allowance tracking', 'Deductions sent to payroll', 'Government contributions summary']],
-            ['slug' => 'performance', 'name' => 'Performance Management', 'short' => 'Performance', 'status' => 'soon', 'description' => 'Set goals, review progress, and record ratings. Performance results guide raises and training needs.', 'features' => ['Goals and reviews', 'Performance ratings', 'Raise recommendations for payroll', 'Skill gaps for training']],
-            ['slug' => 'training', 'name' => 'Training & Development', 'short' => 'Training', 'status' => 'soon', 'description' => 'Plan courses and track who has completed them. Completed trainings are recorded on each employee profile.', 'features' => ['Training calendar', 'Course enrollments', 'Certificates on employee records', 'Training history per employee']],
+            ['slug' => 'performance', 'name' => 'Performance Management', 'short' => 'Performance', 'status' => 'available', 'description' => 'Set goals, review progress, and record ratings. Performance results guide raises and training needs.', 'features' => ['Goals and reviews', 'Performance ratings', 'Raise recommendations for payroll', 'Skill gaps for training']],
+            ['slug' => 'training', 'name' => 'Training & Development', 'short' => 'Training', 'status' => 'available', 'description' => 'Plan courses and track who has completed them. Completed trainings are recorded on each employee profile.', 'features' => ['Training calendar', 'Course enrollments', 'Certificates on employee records', 'Training history per employee']],
             ['slug' => 'disciplinary', 'name' => 'Disciplinary Management', 'short' => 'Disciplinary', 'status' => 'soon', 'description' => 'Record warnings and incidents fairly. Repeat issues flag into offboarding when needed.', 'features' => ['Incident and warning log', 'Tracks repeated tardiness', 'Escalation to offboarding', 'Fair and consistent records']],
             ['slug' => 'offboarding', 'name' => 'Separation & Offboarding', 'short' => 'Offboarding', 'status' => 'soon', 'description' => 'A smooth goodbye — clearance tasks, final pay, and safe archiving of employee records.', 'features' => ['Exit checklist and clearance', 'Resignation and termination tracking', 'Final pay calculation with payroll', 'Records archived safely']],
         ];

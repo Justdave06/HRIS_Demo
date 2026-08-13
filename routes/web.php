@@ -7,6 +7,7 @@ use App\Http\Controllers\Hris\EmployeeController;
 use App\Http\Controllers\Hris\HubController;
 use App\Http\Controllers\Hris\LeaveController;
 use App\Http\Controllers\Hris\PayrollController;
+use App\Http\Controllers\Hris\PerformanceController;
 use App\Http\Controllers\Hris\RecruitmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -60,7 +61,14 @@ Route::prefix('demo')->name('demo.')->group(function () {
     Route::get('/benefits/plans', [BenefitsController::class, 'plans'])->name('benefits.plans');
     Route::get('/benefits/reports', [BenefitsController::class, 'reports'])->name('benefits.reports');
 
-    // Modules 4-10 (coming soon)
+    // Module 7 - Performance Management
+    Route::get('/performance', [PerformanceController::class, 'index'])->name('performance.index');
+    Route::get('/performance/dashboard', [PerformanceController::class, 'dashboard'])->name('performance.dashboard');
+    Route::get('/performance/reviews', [PerformanceController::class, 'reviews'])->name('performance.reviews');
+    Route::get('/performance/records/{employee}', [PerformanceController::class, 'record'])->whereNumber('employee')->name('performance.records');
+    Route::get('/performance/reports', [PerformanceController::class, 'reports'])->name('performance.reports');
+
+    // Modules 8-10 (coming soon)
     Route::get('/modules/{module}', [ComingSoonController::class, 'show'])->name('modules.show');
 });
 
