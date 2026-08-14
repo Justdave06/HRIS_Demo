@@ -1,0 +1,43 @@
+# Git / VCS
+.git
+.gitignore
+
+# Local env & secrets
+.env
+.env.backup
+.env.production
+
+# Dependencies (installed inside the image)
+node_modules
+vendor
+
+# Build outputs (rebuilt inside the image)
+public/build
+public/hot
+public/fonts-manifest.dev.json
+bootstrap/ssr
+
+# Local database (the demo does not use one)
+database/database.sqlite
+database/*.sqlite
+
+# Tooling / IDE
+.idea
+.vscode
+.fleet
+.zed
+.phpunit.cache
+.phpunit.result.cache
+storage/pail
+
+# Test artifacts
+npm-debug.log
+yarn-error.log
+
+# Deployment configs not needed in the image
+Dockerfile
+.dockerignore
+render.yaml
+vercel.json
+api
+tests
