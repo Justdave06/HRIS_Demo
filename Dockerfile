@@ -29,6 +29,7 @@ RUN apk add --no-cache \
         libzip-dev \
         oniguruma-dev \
         libxml2-dev \
+        sqlite-dev \
     && docker-php-ext-install pdo pdo_mysql pdo_sqlite mbstring bcmath zip
 
 # PHP-FPM: let workers inherit the environment variables set by Render
