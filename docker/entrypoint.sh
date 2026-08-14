@@ -4,6 +4,11 @@ set -e
 export PORT="${PORT:-10000}"
 echo "[entrypoint] PORT=${PORT}"
 
+# Locate binaries (absolute paths in case PATH lacks /usr/local/sbin)
+PHP_FPM="$(command -v php-fpm 2>/dev/null || echo /usr/local/sbin/php-fpm)"
+NGINX_BIN="$(command -v nginx 2>/dev/null || echo /usr/sbin/nginx)"
+echo "[entrypoint] php-fpm=${PHP_FPM} nginx=${NGINX_BIN}"
+
 # Determine the user php-fpm should run as.
 if [ "$(id -u)" = "0" ]; then
     echo "[entrypoint] running as root"
@@ -16,7 +21,7 @@ if [ "$(id -u)" = "0" ]; then
     FPM_USER=www-data
     FPM_GROUP=www-data
 else
-    echo "[entrypoint] running as $(id -un) ($(id -u)); php-fpm runs as the container user"
+    echo "[entrypoint] running as $(id -un) ($(id -u))"
     FPM_USER="$(id -un)"
     FPM_GROUP="$(id -gn)"
 fi
@@ -41,9 +46,9 @@ EOF
 envsubst '${PORT}' < docker/nginx.conf.template > /tmp/nginx.conf
 
 echo "[entrypoint] starting php-fpm"
-php-fpm -y /tmp/www.conf -D || { echo "[entrypoint] php-fpm failed to start"; exit 1; }
+"${PHP_FPM}" -y /tmp/www.conf -D || { echo "[entrypoint] php-fpm failed to start"; exit 1; }
 
 sleep 2
 
 echo "[entrypoint] starting nginx"
-exec nginx -c /tmp/nginx.conf -g 'daemon off;'
+exec "${NGINX_BIN}" -c /tmp/nginx.conf -g 'daemon off;'
