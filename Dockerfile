@@ -17,7 +17,7 @@ RUN npm run build
 # ---------------------------------------------------------------------------
 # Stage 2: PHP-FPM + Nginx runtime
 # ---------------------------------------------------------------------------
-FROM php:8.3-fpm-alpine AS runtime
+FROM php:8.4-fpm-alpine AS runtime
 
 WORKDIR /var/www/html
 
