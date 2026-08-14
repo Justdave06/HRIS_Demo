@@ -72,7 +72,7 @@ function onSave(state: EmployeeFormState): void {
             back-label="Back to Employee Management"
             back-href="/demo/employees"
             :departments="departments"
-            :extra-tab="{ label: 'Hiring details', icon: KeyRound }"
+            :extra-tab="{ label: 'Portal account', icon: KeyRound }"
             @save="onSave"
         >
             <template #extra>
@@ -82,7 +82,7 @@ function onSave(state: EmployeeFormState): void {
                     <div class="flex items-center gap-2">
                         <KeyRound class="size-4 text-blue-700" />
                         <h2 class="font-semibold text-slate-900">
-                            Hiring details
+                            Portal account
                         </h2>
                     </div>
                     <p class="mt-0.5 text-xs text-slate-600">
