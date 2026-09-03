@@ -174,7 +174,6 @@ const tableDefs: Record<
 > = {
     dependents: {
         columns: [
-            { key: 'id', label: 'Dependent ID' },
             { key: 'fullName', label: 'Full name' },
             { key: 'birthDate', label: 'Birth date' },
         ],
@@ -206,7 +205,6 @@ const tableDefs: Record<
     },
     trainings: {
         columns: [
-            { key: 'id', label: 'Training ID' },
             { key: 'name', label: 'Training name' },
             { key: 'description', label: 'Description' },
             { key: 'venue', label: 'Venue' },
@@ -217,7 +215,6 @@ const tableDefs: Record<
     },
     licenses: {
         columns: [
-            { key: 'id', label: 'License ID' },
             { key: 'name', label: 'License name' },
             { key: 'number', label: 'License number' },
             { key: 'rating', label: 'Rating' },

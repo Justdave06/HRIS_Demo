@@ -96,12 +96,8 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
                     <!-- Dependents -->
                     <div
                         v-if="tab === 'dependents'"
-                        class="grid gap-4 sm:grid-cols-3"
+                        class="grid gap-4 sm:grid-cols-2"
                     >
-                        <div class="grid gap-2">
-                            <Label for="dep-id">Dependent ID</Label>
-                            <Input id="dep-id" v-model="draft.id" disabled />
-                        </div>
                         <div class="grid gap-2">
                             <Label for="dep-name">Full name</Label>
                             <Input id="dep-name" v-model="draft.fullName" />
@@ -238,20 +234,21 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
                         class="grid gap-4 sm:grid-cols-2"
                     >
                         <div class="grid gap-2">
-                            <Label for="trn-id">Training ID</Label>
-                            <Input id="trn-id" v-model="draft.id" disabled />
-                        </div>
-                        <div class="grid gap-2">
                             <Label for="trn-name">Training name</Label>
                             <Input id="trn-name" v-model="draft.name" />
-                        </div>
-                        <div class="grid gap-2 sm:col-span-2">
-                            <Label for="trn-desc">Description</Label>
-                            <Input id="trn-desc" v-model="draft.description" />
                         </div>
                         <div class="grid gap-2">
                             <Label for="trn-venue">Venue</Label>
                             <Input id="trn-venue" v-model="draft.venue" />
+                        </div>
+                        <div class="grid gap-2 sm:col-span-2">
+                            <Label for="trn-desc">Description</Label>
+                            <textarea
+                                id="trn-desc"
+                                v-model="draft.description"
+                                rows="4"
+                                class="min-h-24 w-full min-w-0 resize-y rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+                            ></textarea>
                         </div>
                         <div class="grid gap-2 sm:col-span-2">
                             <Label>Certificate (proof)</Label>
@@ -311,10 +308,6 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
                         v-else-if="tab === 'licenses'"
                         class="grid gap-4 sm:grid-cols-2"
                     >
-                        <div class="grid gap-2">
-                            <Label for="lic-id">License ID</Label>
-                            <Input id="lic-id" v-model="draft.id" disabled />
-                        </div>
                         <div class="grid gap-2">
                             <Label for="lic-name">License name</Label>
                             <Input id="lic-name" v-model="draft.name" />

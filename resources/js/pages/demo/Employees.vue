@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
-import { ArrowRight, Plus, Search } from '@lucide/vue';
+import { ArrowRight, ChevronDown, FileText, Plus, Search } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import StatusBadge from '@/components/demo/StatusBadge.vue';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const statusOptions = ['Regular', 'Probationary', 'Contractual'] as const;
 
@@ -69,6 +75,26 @@ function initialStatus(): string {
 
 const status = ref(initialStatus());
 
+// Report types shown in the header's Reports dropdown. Each opens the
+// reports page pre-set to that report type.
+const reportTypes = [
+    {
+        value: 'masterlist',
+        label: 'Employee Masterlist',
+        href: '/demo/employees/reports',
+    },
+    {
+        value: 'file-status',
+        label: '201 File Status Report',
+        href: '/demo/employees/reports?type=file-status',
+    },
+    {
+        value: 'employment-status',
+        label: 'Employment Status Report',
+        href: '/demo/employees/reports?type=employment-status',
+    },
+] as const;
+
 const filtered = computed(() => {
     const term = search.value.trim().toLowerCase();
 
@@ -100,13 +126,37 @@ const filtered = computed(() => {
             <h1 class="text-2xl font-bold tracking-tight">
                 Employee Management
             </h1>
-            <Button
-                class="shrink-0 bg-blue-600 hover:bg-blue-700"
-                @click="router.visit('/demo/employees/create')"
-            >
-                <Plus class="size-4" />
-                Add employee
-            </Button>
+            <div class="flex flex-wrap items-center gap-2">
+                <DropdownMenu>
+                    <DropdownMenuTrigger as-child>
+                        <Button variant="outline">
+                            <FileText class="size-4" />
+                            Reports
+                            <ChevronDown class="size-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="end"
+                        class="min-w-60 rounded-lg"
+                    >
+                        <DropdownMenuItem
+                            v-for="type in reportTypes"
+                            :key="type.value"
+                            class="cursor-pointer"
+                            @select="router.visit(type.href)"
+                        >
+                            {{ type.label }}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+                <Button
+                    class="shrink-0 bg-blue-600 hover:bg-blue-700"
+                    @click="router.visit('/demo/employees/create')"
+                >
+                    <Plus class="size-4" />
+                    Add employee
+                </Button>
+            </div>
         </div>
 
         <!-- List -->

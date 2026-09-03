@@ -643,7 +643,6 @@ const emergencyFields: {
             <RecordTable
                 title="Dependents"
                 :columns="[
-                    { key: 'id', label: 'Dependent ID' },
                     { key: 'fullName', label: 'Full name' },
                     { key: 'birthDate', label: 'Birth date' },
                 ]"
@@ -711,7 +710,6 @@ const emergencyFields: {
             <RecordTable
                 title="Training records"
                 :columns="[
-                    { key: 'id', label: 'Training ID' },
                     { key: 'name', label: 'Training name' },
                     { key: 'description', label: 'Description' },
                     { key: 'venue', label: 'Venue' },
@@ -834,7 +832,6 @@ const emergencyFields: {
             <RecordTable
                 title="Licenses attained"
                 :columns="[
-                    { key: 'id', label: 'License ID' },
                     { key: 'name', label: 'License name' },
                     { key: 'number', label: 'License number' },
                     { key: 'rating', label: 'Rating' },

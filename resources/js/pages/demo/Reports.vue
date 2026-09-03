@@ -23,6 +23,28 @@ const props = defineProps<{
     positions: string[];
 }>();
 
+const reportTypes = [
+    { value: 'masterlist', label: 'Employee Masterlist Report' },
+    { value: 'file-status', label: '201 File Status Report' },
+    { value: 'employment-status', label: 'Employment Status Report' },
+] as const;
+
+type ReportType = (typeof reportTypes)[number]['value'];
+
+// Deep-linkable via the Reports dropdown on the Employee Management page.
+function initialReportType(): ReportType {
+    if (typeof window === 'undefined') {
+        return 'masterlist';
+    }
+
+    const param = new URLSearchParams(window.location.search).get('type');
+
+    return reportTypes.some((type) => type.value === param)
+        ? (param as ReportType)
+        : 'masterlist';
+}
+
+const reportType = ref<ReportType>(initialReportType());
 const position = ref('all');
 const department = ref('all');
 const employmentType = ref('all');
@@ -43,6 +65,33 @@ const employmentTypeOptions = [
     'Contractual',
 ] as const;
 const fileStatusOptions = ['Complete', 'Incomplete'] as const;
+
+// Grouped views for the 201 File Status and Employment Status reports.
+const groups = computed(() => {
+    if (reportType.value === 'file-status') {
+        return fileStatusOptions.map((status) => ({
+            key: status,
+            title: `${status} 201 files`,
+            rows: filtered.value.filter(
+                (employee) => employee.file_status === status,
+            ),
+        }));
+    }
+
+    return employmentTypeOptions.map((type) => ({
+        key: type,
+        title: `${type} employees`,
+        rows: filtered.value.filter(
+            (employee) => employee.employment_type === type,
+        ),
+    }));
+});
+
+const reportTypeLabel = computed(
+    () =>
+        reportTypes.find((type) => type.value === reportType.value)?.label ??
+        'Employee report',
+);
 
 const filtered = computed(() => {
     const term = search.value.trim().toLowerCase();
@@ -142,6 +191,27 @@ function exportExcel(): void {
             </div>
         </div>
 
+        <!-- Report type -->
+        <div
+            class="flex flex-wrap items-center gap-3 rounded-xl border bg-card p-4 shadow-sm"
+        >
+            <span class="text-sm font-medium">Report type</span>
+            <Select v-model="reportType">
+                <SelectTrigger class="w-72">
+                    <SelectValue placeholder="Select report type" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem
+                        v-for="type in reportTypes"
+                        :key="type.value"
+                        :value="type.value"
+                    >
+                        {{ type.label }}
+                    </SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
+
         <!-- Filters + search (fixed width, even spacing — never stretched) -->
         <div
             class="flex flex-wrap gap-3 rounded-xl border bg-card p-4 shadow-sm"
@@ -225,7 +295,7 @@ function exportExcel(): void {
         <!-- Report table -->
         <div class="rounded-xl border bg-card shadow-sm">
             <div class="flex items-center justify-between border-b px-5 py-4">
-                <h2 class="font-semibold">Employee report</h2>
+                <h2 class="font-semibold">{{ reportTypeLabel }}</h2>
                 <span
                     class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
                 >
@@ -233,7 +303,8 @@ function exportExcel(): void {
                 </span>
             </div>
 
-            <div class="overflow-x-auto">
+            <!-- Masterlist: flat table -->
+            <div v-if="reportType === 'masterlist'" class="overflow-x-auto">
                 <table class="w-full min-w-[900px] text-sm">
                     <thead>
                         <tr
@@ -296,6 +367,82 @@ function exportExcel(): void {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Grouped reports: one table per status group -->
+            <div v-else class="grid gap-8 p-5">
+                <section
+                    v-for="group in groups"
+                    :key="group.key"
+                    class="min-w-0"
+                >
+                    <div class="flex items-center gap-3">
+                        <h3 class="font-semibold">{{ group.title }}</h3>
+                        <span
+                            class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                        >
+                            {{ group.rows.length }}
+                        </span>
+                    </div>
+                    <div class="mt-3 overflow-x-auto">
+                        <table class="w-full min-w-[720px] text-sm">
+                            <thead>
+                                <tr
+                                    class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+                                >
+                                    <th class="px-4 py-3 font-medium">No.</th>
+                                    <th class="px-4 py-3 font-medium">
+                                        Employee ID
+                                    </th>
+                                    <th class="px-4 py-3 font-medium">Name</th>
+                                    <th class="px-4 py-3 font-medium">
+                                        Position
+                                    </th>
+                                    <th class="px-4 py-3 font-medium">
+                                        Department
+                                    </th>
+                                    <th class="px-4 py-3 font-medium">
+                                        Date hired
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(employee, index) in group.rows"
+                                    :key="employee.id"
+                                    class="border-b transition-colors last:border-0 hover:bg-muted/40"
+                                >
+                                    <td class="px-4 py-3 text-muted-foreground">
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="px-4 py-3 font-medium">
+                                        {{ employee.no }}
+                                    </td>
+                                    <td class="px-4 py-3 font-medium">
+                                        {{ employee.name }}
+                                    </td>
+                                    <td class="px-4 py-3 text-muted-foreground">
+                                        {{ employee.position }}
+                                    </td>
+                                    <td class="px-4 py-3 text-muted-foreground">
+                                        {{ employee.department }}
+                                    </td>
+                                    <td class="px-4 py-3 text-muted-foreground">
+                                        {{ employee.hire_date }}
+                                    </td>
+                                </tr>
+                                <tr v-if="group.rows.length === 0">
+                                    <td
+                                        colspan="6"
+                                        class="px-4 py-6 text-center text-sm text-muted-foreground"
+                                    >
+                                        No records in this group.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
             </div>
         </div>
     </div>

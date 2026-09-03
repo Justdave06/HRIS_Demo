@@ -189,7 +189,7 @@ function exportExcel(): void {
                     Training history · Q3 2026 calendar
                 </p>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex shrink-0 flex-wrap gap-2 sm:flex-nowrap">
                 <Button variant="outline" @click="showPreview = true">
                     <FileBarChart2 class="size-4" />
                     Generate report
