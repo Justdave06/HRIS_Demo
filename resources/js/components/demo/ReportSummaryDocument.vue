@@ -2,33 +2,47 @@
 import { computed } from 'vue';
 import type { DemoEmployee } from '@/types';
 
-const props = defineProps<{
-    employees: DemoEmployee[];
-}>();
+const props = withDefaults(
+    defineProps<{
+        employees: DemoEmployee[];
+        variant?: 'masterlist' | 'employment-status' | 'file-status';
+    }>(),
+    {
+        variant: 'masterlist',
+    },
+);
 
-const groups = computed(() => [
-    {
-        key: 'Regular',
-        title: 'REGULAR EMPLOYEES',
-        rows: props.employees.filter(
-            (employee) => employee.employment_type === 'Regular',
-        ),
-    },
-    {
-        key: 'Probationary',
-        title: 'PROBATIONARY EMPLOYEES',
-        rows: props.employees.filter(
-            (employee) => employee.employment_type === 'Probationary',
-        ),
-    },
-    {
-        key: 'Contractual',
-        title: 'CONTRACTUAL EMPLOYEES',
-        rows: props.employees.filter(
-            (employee) => employee.employment_type === 'Contractual',
-        ),
-    },
-]);
+const title = computed(() => {
+    if (props.variant === 'file-status') {
+        return '201 File Status Report';
+    }
+
+    if (props.variant === 'employment-status') {
+        return 'Employment Status Report';
+    }
+
+    return 'Employee Masterlist Report';
+});
+
+// Each report prints the same flat table, but only the status report that
+// owns it adds its status column (masterlist stays a plain roster).
+const statusColumn = computed<
+    | {
+          label: string;
+          value: (employee: DemoEmployee) => string;
+      }
+    | undefined
+>(() => {
+    if (props.variant === 'file-status') {
+        return { label: '201 File Status', value: (e) => e.file_status };
+    }
+
+    if (props.variant === 'employment-status') {
+        return { label: 'Employee Status', value: (e) => e.employment_type };
+    }
+
+    return undefined;
+});
 
 const printedOn = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -74,7 +88,7 @@ const printedOn = new Date().toLocaleDateString('en-US', {
 
             <div class="mt-6 border-y-2 border-slate-800 py-3">
                 <h1 class="text-xl font-black tracking-wide uppercase">
-                    Employee Masterlist Report
+                    {{ title }}
                 </h1>
                 <p class="mt-1 text-xs text-slate-600">
                     As of {{ printedOn }} · Total of {{ employees.length }}
@@ -83,93 +97,76 @@ const printedOn = new Date().toLocaleDateString('en-US', {
             </div>
         </header>
 
-        <!-- Three tables: Regular / Probationary / Contractual -->
+        <!-- One flat table for every report variant; status column only on
+             the report that owns it -->
         <div class="px-8 pb-10">
-            <section
-                v-for="(group, index) in groups"
-                :key="group.key"
-                :class="index > 0 ? 'mt-10 print:break-before-page' : 'mt-8'"
-            >
-                <h2 class="text-sm font-black tracking-wide uppercase">
-                    {{ group.title }}
-                    <span class="font-medium text-slate-500">
-                        ({{ group.rows.length }})
-                    </span>
-                </h2>
-
-                <p
-                    v-if="group.rows.length === 0"
-                    class="mt-2 text-sm text-slate-400 italic"
-                >
-                    No employees under this employment status.
-                </p>
-
-                <table
-                    v-else
-                    class="mt-3 w-full table-fixed border-collapse text-[11px]"
-                >
-                    <thead>
-                        <tr
-                            class="border-b-2 border-slate-800 text-left text-[10px] text-slate-700 uppercase"
+            <table class="w-full table-fixed border-collapse text-[11px]">
+                <thead>
+                    <tr
+                        class="border-b-2 border-slate-800 text-left text-[10px] text-slate-700 uppercase"
+                    >
+                        <th class="py-1.5 pr-2 font-bold break-words">No.</th>
+                        <th class="py-1.5 pr-2 font-bold break-words">
+                            Employee ID
+                        </th>
+                        <th class="py-1.5 pr-2 font-bold break-words">Name</th>
+                        <th class="py-1.5 pr-2 font-bold break-words">
+                            Position
+                        </th>
+                        <th class="py-1.5 pr-2 font-bold break-words">
+                            Department
+                        </th>
+                        <th class="py-1.5 pr-2 font-bold break-words">
+                            Date Hired
+                        </th>
+                        <th
+                            v-if="statusColumn"
+                            class="py-1.5 font-bold break-words"
                         >
-                            <th class="py-1.5 pr-2 font-bold break-words">
-                                No.
-                            </th>
-                            <th class="py-1.5 pr-2 font-bold break-words">
-                                Employee ID
-                            </th>
-                            <th class="py-1.5 pr-2 font-bold break-words">
-                                Name
-                            </th>
-                            <th class="py-1.5 pr-2 font-bold break-words">
-                                Position
-                            </th>
-                            <th class="py-1.5 pr-2 font-bold break-words">
-                                Department
-                            </th>
-                            <th class="py-1.5 font-bold break-words">
-                                Date Hired
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="(employee, rowIndex) in group.rows"
-                            :key="employee.id"
-                            class="border-b border-slate-200"
+                            {{ statusColumn.label }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="(employee, rowIndex) in employees"
+                        :key="employee.id"
+                        class="border-b border-slate-200"
+                    >
+                        <td class="py-1 pr-2 text-slate-600 tabular-nums">
+                            {{ rowIndex + 1 }}
+                        </td>
+                        <td class="py-1 pr-2 font-medium">
+                            {{ employee.no }}
+                        </td>
+                        <td class="py-1 pr-2 font-medium break-words">
+                            {{ employee.name }}
+                        </td>
+                        <td class="py-1 pr-2 break-words text-slate-600">
+                            {{ employee.position }}
+                        </td>
+                        <td class="py-1 pr-2 break-words text-slate-600">
+                            {{ employee.department }}
+                        </td>
+                        <td class="py-1 text-slate-600 tabular-nums">
+                            {{ employee.hire_date }}
+                        </td>
+                        <td v-if="statusColumn" class="py-1">
+                            {{ statusColumn.value(employee) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td
+                            :colspan="statusColumn ? 7 : 6"
+                            class="border-b-2 border-slate-800 py-1.5 pr-2 text-right text-[10px] font-bold tracking-wide uppercase"
                         >
-                            <td class="py-1 pr-2 text-slate-600 tabular-nums">
-                                {{ rowIndex + 1 }}
-                            </td>
-                            <td class="py-1 pr-2 font-medium">
-                                {{ employee.no }}
-                            </td>
-                            <td class="py-1 pr-2 font-medium break-words">
-                                {{ employee.name }}
-                            </td>
-                            <td class="py-1 pr-2 break-words text-slate-600">
-                                {{ employee.position }}
-                            </td>
-                            <td class="py-1 pr-2 break-words text-slate-600">
-                                {{ employee.department }}
-                            </td>
-                            <td class="py-1 text-slate-600 tabular-nums">
-                                {{ employee.hire_date }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td
-                                colspan="6"
-                                class="border-b-2 border-slate-800 py-1.5 pr-2 text-right text-[10px] font-bold tracking-wide uppercase"
-                            >
-                                Total: {{ group.rows.length }} employee{{
-                                    group.rows.length === 1 ? '' : 's'
-                                }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+                            Total: {{ employees.length }} employee{{
+                                employees.length === 1 ? '' : 's'
+                            }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
             <!-- Signature block -->
             <section class="mt-14 grid grid-cols-2 gap-x-12 gap-y-8 text-sm">

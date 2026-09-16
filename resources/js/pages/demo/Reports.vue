@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import { FileBarChart2, FileSpreadsheet, Search } from '@lucide/vue';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import RecordPrintModal from '@/components/demo/RecordPrintModal.vue';
 import ReportSummaryDocument from '@/components/demo/ReportSummaryDocument.vue';
 import StatusBadge from '@/components/demo/StatusBadge.vue';
@@ -52,6 +52,16 @@ const employmentType = ref('all');
 const fileStatus = ref('all');
 const search = ref('');
 
+// Filters don't carry over between reports: switching types resets all of
+// them so each report always starts from a clean/complete view.
+watch(reportType, () => {
+    search.value = '';
+    position.value = 'all';
+    department.value = 'all';
+    employmentType.value = 'all';
+    fileStatus.value = 'all';
+});
+
 // Session-added demo employees are merged in so they appear in reports too.
 const { addedEmployees } = useDemoEmployees();
 
@@ -67,25 +77,22 @@ const employmentTypeOptions = [
 ] as const;
 const fileStatusOptions = ['Complete', 'Incomplete'] as const;
 
-// Grouped views for the 201 File Status and Employment Status reports.
-const groups = computed(() => {
-    if (reportType.value === 'file-status') {
-        return fileStatusOptions.map((status) => ({
-            key: status,
-            title: `${status} 201 files`,
-            rows: filtered.value.filter(
-                (employee) => employee.file_status === status,
-            ),
-        }));
+// Heading for the flat 201 File Status table, reflecting the active filter.
+const fileStatusTitle = computed(() => {
+    if (fileStatus.value === 'all') {
+        return 'All 201 files';
     }
 
-    return employmentTypeOptions.map((type) => ({
-        key: type,
-        title: `${type} employees`,
-        rows: filtered.value.filter(
-            (employee) => employee.employment_type === type,
-        ),
-    }));
+    return `${fileStatus.value} 201 files`;
+});
+
+// Heading for the flat Employment Status table, reflecting the active filter.
+const employmentStatusTitle = computed(() => {
+    if (employmentType.value === 'all') {
+        return 'All employees';
+    }
+
+    return `${employmentType.value} employees`;
 });
 
 const reportTypeLabel = computed(
@@ -123,15 +130,20 @@ function generate(): void {
 }
 
 function exportExcel(): void {
+    // Status columns only belong to their own reports: the masterlist stays a
+    // plain roster, employment status shows employee status, 201 file status
+    // shows the 201 file status.
+    const showEmployeeStatus = reportType.value === 'employment-status';
+    const showFileStatus = reportType.value === 'file-status';
     const headers = [
         'No.',
         'Employee ID',
         'Name',
         'Position',
         'Department',
-        'Employee Status',
+        ...(showEmployeeStatus ? ['Employee Status'] : []),
         'Date Hired',
-        '201 File Status',
+        ...(showFileStatus ? ['201 File Status'] : []),
     ];
     const rows = filtered.value.map((employee, index) => [
         index + 1,
@@ -139,11 +151,10 @@ function exportExcel(): void {
         employee.name,
         employee.position,
         employee.department,
-        employee.status,
+        ...(showEmployeeStatus ? [employee.employment_type] : []),
         employee.hire_date,
-        employee.file_status,
+        ...(showFileStatus ? [employee.file_status] : []),
     ]);
-
 
     exportSheet('employee-report', 'Employees', headers, rows);
 }
@@ -241,7 +252,10 @@ function exportExcel(): void {
                 </SelectContent>
             </Select>
 
-            <Select v-model="employmentType">
+            <Select
+                v-if="reportType === 'employment-status'"
+                v-model="employmentType"
+            >
                 <SelectTrigger class="w-56">
                     <SelectValue placeholder="All statuses" />
                 </SelectTrigger>
@@ -257,7 +271,7 @@ function exportExcel(): void {
                 </SelectContent>
             </Select>
 
-            <Select v-model="fileStatus">
+            <Select v-if="reportType === 'file-status'" v-model="fileStatus">
                 <SelectTrigger class="w-56">
                     <SelectValue placeholder="All 201 file statuses" />
                 </SelectTrigger>
@@ -297,13 +311,7 @@ function exportExcel(): void {
                             <th class="px-4 py-3 font-medium">Name</th>
                             <th class="px-4 py-3 font-medium">Position</th>
                             <th class="px-4 py-3 font-medium">Department</th>
-                            <th class="px-4 py-3 font-medium">
-                                Employee status
-                            </th>
                             <th class="px-4 py-3 font-medium">Date hired</th>
-                            <th class="px-4 py-3 font-medium">
-                                201 file status
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -327,21 +335,13 @@ function exportExcel(): void {
                             <td class="px-4 py-3 text-muted-foreground">
                                 {{ employee.department }}
                             </td>
-                            <td class="px-4 py-3">
-                                <StatusBadge
-                                    :status="employee.employment_type"
-                                />
-                            </td>
                             <td class="px-4 py-3 text-muted-foreground">
                                 {{ employee.hire_date }}
-                            </td>
-                            <td class="px-4 py-3">
-                                <StatusBadge :status="employee.file_status" />
                             </td>
                         </tr>
                         <tr v-if="filtered.length === 0">
                             <td
-                                colspan="8"
+                                colspan="6"
                                 class="px-4 py-10 text-center text-sm text-muted-foreground"
                             >
                                 No records match the selected filters.
@@ -351,91 +351,170 @@ function exportExcel(): void {
                 </table>
             </div>
 
-            <!-- Grouped reports: one table per status group -->
-            <div v-else class="grid gap-8 p-5">
-                <section
-                    v-for="group in groups"
-                    :key="group.key"
-                    class="min-w-0"
-                >
-                    <div class="flex items-center gap-3">
-                        <h3 class="font-semibold">{{ group.title }}</h3>
-                        <span
-                            class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                        >
-                            {{ group.rows.length }}
-                        </span>
-                    </div>
-                    <div class="mt-3 overflow-x-auto">
-                        <table class="w-full min-w-[720px] text-sm">
-                            <thead>
-                                <tr
-                                    class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+            <!-- 201 File Status: single flat table, driven by the filter -->
+            <div v-else-if="reportType === 'file-status'" class="p-5">
+                <div class="flex items-center gap-3">
+                    <h3 class="font-semibold">{{ fileStatusTitle }}</h3>
+                    <span
+                        class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    >
+                        {{ filtered.length }}
+                    </span>
+                </div>
+                <div class="mt-3 overflow-x-auto">
+                    <table class="w-full min-w-[900px] text-sm">
+                        <thead>
+                            <tr
+                                class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+                            >
+                                <th class="px-4 py-3 font-medium">No.</th>
+                                <th class="px-4 py-3 font-medium">
+                                    Employee ID
+                                </th>
+                                <th class="px-4 py-3 font-medium">Name</th>
+                                <th class="px-4 py-3 font-medium">Position</th>
+                                <th class="px-4 py-3 font-medium">
+                                    Department
+                                </th>
+                                <th class="px-4 py-3 font-medium">
+                                    Date hired
+                                </th>
+                                <th class="px-4 py-3 font-medium">
+                                    201 file status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(employee, index) in filtered"
+                                :key="employee.id"
+                                class="border-b transition-colors last:border-0 hover:bg-muted/40"
+                            >
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ index + 1 }}
+                                </td>
+                                <td class="px-4 py-3 font-medium">
+                                    {{ employee.no }}
+                                </td>
+                                <td class="px-4 py-3 font-medium">
+                                    {{ employee.name }}
+                                </td>
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ employee.position }}
+                                </td>
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ employee.department }}
+                                </td>
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ employee.hire_date }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <StatusBadge
+                                        :status="employee.file_status"
+                                    />
+                                </td>
+                            </tr>
+                            <tr v-if="filtered.length === 0">
+                                <td
+                                    colspan="7"
+                                    class="px-4 py-10 text-center text-sm text-muted-foreground"
                                 >
-                                    <th class="px-4 py-3 font-medium">No.</th>
-                                    <th class="px-4 py-3 font-medium">
-                                        Employee ID
-                                    </th>
-                                    <th class="px-4 py-3 font-medium">Name</th>
-                                    <th class="px-4 py-3 font-medium">
-                                        Position
-                                    </th>
-                                    <th class="px-4 py-3 font-medium">
-                                        Department
-                                    </th>
-                                    <th class="px-4 py-3 font-medium">
-                                        Date hired
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    v-for="(employee, index) in group.rows"
-                                    :key="employee.id"
-                                    class="border-b transition-colors last:border-0 hover:bg-muted/40"
+                                    No records match the selected filters.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Employment Status: single flat table, driven by the filter -->
+            <div v-else-if="reportType === 'employment-status'" class="p-5">
+                <div class="flex items-center gap-3">
+                    <h3 class="font-semibold">{{ employmentStatusTitle }}</h3>
+                    <span
+                        class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    >
+                        {{ filtered.length }}
+                    </span>
+                </div>
+                <div class="mt-3 overflow-x-auto">
+                    <table class="w-full min-w-[900px] text-sm">
+                        <thead>
+                            <tr
+                                class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+                            >
+                                <th class="px-4 py-3 font-medium">No.</th>
+                                <th class="px-4 py-3 font-medium">
+                                    Employee ID
+                                </th>
+                                <th class="px-4 py-3 font-medium">Name</th>
+                                <th class="px-4 py-3 font-medium">Position</th>
+                                <th class="px-4 py-3 font-medium">
+                                    Department
+                                </th>
+                                <th class="px-4 py-3 font-medium">
+                                    Date hired
+                                </th>
+                                <th class="px-4 py-3 font-medium">
+                                    Employee status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="(employee, index) in filtered"
+                                :key="employee.id"
+                                class="border-b transition-colors last:border-0 hover:bg-muted/40"
+                            >
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ index + 1 }}
+                                </td>
+                                <td class="px-4 py-3 font-medium">
+                                    {{ employee.no }}
+                                </td>
+                                <td class="px-4 py-3 font-medium">
+                                    {{ employee.name }}
+                                </td>
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ employee.position }}
+                                </td>
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ employee.department }}
+                                </td>
+                                <td class="px-4 py-3 text-muted-foreground">
+                                    {{ employee.hire_date }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <StatusBadge
+                                        :status="employee.employment_type"
+                                    />
+                                </td>
+                            </tr>
+                            <tr v-if="filtered.length === 0">
+                                <td
+                                    colspan="7"
+                                    class="px-4 py-10 text-center text-sm text-muted-foreground"
                                 >
-                                    <td class="px-4 py-3 text-muted-foreground">
-                                        {{ index + 1 }}
-                                    </td>
-                                    <td class="px-4 py-3 font-medium">
-                                        {{ employee.no }}
-                                    </td>
-                                    <td class="px-4 py-3 font-medium">
-                                        {{ employee.name }}
-                                    </td>
-                                    <td class="px-4 py-3 text-muted-foreground">
-                                        {{ employee.position }}
-                                    </td>
-                                    <td class="px-4 py-3 text-muted-foreground">
-                                        {{ employee.department }}
-                                    </td>
-                                    <td class="px-4 py-3 text-muted-foreground">
-                                        {{ employee.hire_date }}
-                                    </td>
-                                </tr>
-                                <tr v-if="group.rows.length === 0">
-                                    <td
-                                        colspan="6"
-                                        class="px-4 py-6 text-center text-sm text-muted-foreground"
-                                    >
-                                        No records in this group.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                                    No records match the selected filters.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Print preview: official summary report with Regular/Probationary/Contractual tables -->
+    <!-- Print preview: official summary report matching the selected report type -->
     <RecordPrintModal
         v-if="showPreview"
-        :heading="`Report preview — ${previewEmployees.length} employees`"
-        subtitle="Official employee masterlist · ready to print"
+        :heading="`${reportTypeLabel} preview — ${previewEmployees.length} employees`"
+        subtitle="Official report · ready to print"
         @close="showPreview = false"
     >
-        <ReportSummaryDocument :employees="previewEmployees" />
+        <ReportSummaryDocument
+            :employees="previewEmployees"
+            :variant="reportType"
+        />
     </RecordPrintModal>
 </template>
