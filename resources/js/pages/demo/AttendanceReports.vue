@@ -15,6 +15,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useDemoDtr } from '@/composables/useDemoDtr';
+import { exportSheet } from '@/lib/exportExcel';
 
 type RosterRow = {
     employee_id: number;
@@ -212,27 +213,9 @@ function exportExcel(): void {
                   row.otDays,
                   row.otHours,
               ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...payload]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = 'attendance-report.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet('attendance-report', 'Attendance', headers, payload);
 }
 </script>
 

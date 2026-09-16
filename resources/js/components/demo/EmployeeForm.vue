@@ -9,6 +9,7 @@ import {
     Eraser,
     FileText,
     GraduationCap,
+    Pencil,
     Save,
     ShieldCheck,
     User,
@@ -58,6 +59,14 @@ const props = withDefaults(
          * Add Employee page). Its content goes in the #extra slot.
          */
         extraTab?: { label: string; icon?: Component } | null;
+        /** Show the sticky bar with the identity summary and Save / Clear actions. */
+        saveBar?: boolean;
+        /**
+         * Read-only mode (e.g. when opened from the employee directory).
+         * In this mode the Personal data and Gov. record tabs render locked
+         * fields that only become editable after pressing Update.
+         */
+        readonly?: boolean;
     }>(),
     {
         description: '',
@@ -67,6 +76,8 @@ const props = withDefaults(
         initial: undefined,
         persistKey: null,
         extraTab: null,
+        saveBar: true,
+        readonly: false,
     },
 );
 
@@ -169,6 +180,44 @@ type TabKey = BaseTabKey | 'extra';
 type RecordTabKey = Exclude<BaseTabKey, 'personal' | 'gov'>;
 
 const activeTab = ref<TabKey>('personal');
+
+/* ------------------------------------------------------------------ */
+/* Read-only (directory view) editing toggle                           */
+/* ------------------------------------------------------------------ */
+
+// In readonly mode the Personal data and Gov. record tabs are locked until
+// the user presses Update; saving (or cancelling) locks them again.
+const personalEditing = ref(false);
+const govEditing = ref(false);
+
+const personalLocked = computed(() => props.readonly && !personalEditing.value);
+const govLocked = computed(() => props.readonly && !govEditing.value);
+
+function startPersonalEdit(): void {
+    personalEditing.value = true;
+}
+
+function savePersonalEdit(): void {
+    personalEditing.value = false;
+    toast.success('Personal data updated (demo)');
+}
+
+function cancelPersonalEdit(): void {
+    personalEditing.value = false;
+}
+
+function startGovEdit(): void {
+    govEditing.value = true;
+}
+
+function saveGovEdit(): void {
+    govEditing.value = false;
+    toast.success('Gov. record updated (demo)');
+}
+
+function cancelGovEdit(): void {
+    govEditing.value = false;
+}
 
 /* ------------------------------------------------------------------ */
 /* Record tables: draft form + add / edit / delete                     */
@@ -531,7 +580,13 @@ const emergencyFields: {
                             {{ getInitials(fullName()) }}
                         </AvatarFallback>
                     </Avatar>
-                    <div class="flex flex-col gap-2">
+                    <div v-if="personalLocked" class="flex flex-col gap-2">
+                        <p class="text-xs text-muted-foreground">
+                            Locked in view mode — press Update on a section to
+                            edit.
+                        </p>
+                    </div>
+                    <div v-else class="flex flex-col gap-2">
                         <input
                             ref="fileInput"
                             type="file"
@@ -561,8 +616,65 @@ const emergencyFields: {
 
             <!-- Personal information -->
             <div class="rounded-xl border bg-card p-6 shadow-sm">
-                <h2 class="font-semibold">Personal information</h2>
-                <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="font-semibold">Personal information</h2>
+                    <template v-if="personalLocked">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="startPersonalEdit"
+                        >
+                            <Pencil class="size-4" />
+                            Update
+                        </Button>
+                    </template>
+                    <template v-else-if="props.readonly">
+                        <div class="flex gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                @click="cancelPersonalEdit"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size="sm"
+                                class="bg-blue-600 hover:bg-blue-700"
+                                @click="savePersonalEdit"
+                            >
+                                <Save class="size-4" />
+                                Save changes
+                            </Button>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Read-only view -->
+                <div
+                    v-if="personalLocked"
+                    class="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                    <div
+                        v-for="item in personalFields"
+                        :key="item.id"
+                        class="min-w-0"
+                    >
+                        <p
+                            class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase"
+                        >
+                            {{ item.label }}
+                        </p>
+                        <p class="mt-0.5 text-sm break-words">
+                            {{ state.personal[item.model] || '—' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Editable view -->
+                <div
+                    v-else
+                    class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                >
                     <div
                         v-for="item in personalFields"
                         :key="item.id"
@@ -601,8 +713,62 @@ const emergencyFields: {
 
             <!-- Family / dependent information -->
             <div class="rounded-xl border bg-card p-6 shadow-sm">
-                <h2 class="font-semibold">Family / dependent information</h2>
-                <div class="mt-5 grid gap-4 sm:grid-cols-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="font-semibold">
+                        Family / dependent information
+                    </h2>
+                    <template v-if="personalLocked">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="startPersonalEdit"
+                        >
+                            <Pencil class="size-4" />
+                            Update
+                        </Button>
+                    </template>
+                    <template v-else-if="props.readonly">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="cancelPersonalEdit"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            size="sm"
+                            class="bg-blue-600 hover:bg-blue-700"
+                            @click="savePersonalEdit"
+                        >
+                            <Save class="size-4" />
+                            Save changes
+                        </Button>
+                    </template>
+                </div>
+
+                <!-- Read-only view -->
+                <div
+                    v-if="personalLocked"
+                    class="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-3"
+                >
+                    <div
+                        v-for="item in familyFields"
+                        :key="item.id"
+                        class="min-w-0"
+                    >
+                        <p
+                            class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase"
+                        >
+                            {{ item.label }}
+                        </p>
+                        <p class="mt-0.5 text-sm break-words">
+                            {{ state.personal[item.model] || '—' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Editable view -->
+                <div v-else class="mt-5 grid gap-4 sm:grid-cols-3">
                     <div
                         v-for="item in familyFields"
                         :key="item.id"
@@ -621,8 +787,60 @@ const emergencyFields: {
             <div
                 class="rounded-xl border border-blue-200 bg-card p-6 shadow-sm dark:border-blue-500/30"
             >
-                <h2 class="font-semibold">In case of emergency</h2>
-                <div class="mt-5 grid gap-4 sm:grid-cols-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="font-semibold">In case of emergency</h2>
+                    <template v-if="personalLocked">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="startPersonalEdit"
+                        >
+                            <Pencil class="size-4" />
+                            Update
+                        </Button>
+                    </template>
+                    <template v-else-if="props.readonly">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="cancelPersonalEdit"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            size="sm"
+                            class="bg-blue-600 hover:bg-blue-700"
+                            @click="savePersonalEdit"
+                        >
+                            <Save class="size-4" />
+                            Save changes
+                        </Button>
+                    </template>
+                </div>
+
+                <!-- Read-only view -->
+                <div
+                    v-if="personalLocked"
+                    class="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-3"
+                >
+                    <div
+                        v-for="item in emergencyFields"
+                        :key="item.id"
+                        class="min-w-0"
+                    >
+                        <p
+                            class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase"
+                        >
+                            {{ item.label }}
+                        </p>
+                        <p class="mt-0.5 text-sm break-words">
+                            {{ state.personal[item.model] || '—' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Editable view -->
+                <div v-else class="mt-5 grid gap-4 sm:grid-cols-3">
                     <div
                         v-for="item in emergencyFields"
                         :key="item.id"
@@ -727,15 +945,86 @@ const emergencyFields: {
         <!-- ============ 7. EMPLOYEE & GOV. RECORD ============ -->
         <section v-if="activeTab === 'gov'" class="grid gap-6">
             <div class="rounded-xl border bg-card p-6 shadow-sm">
-                <div class="flex items-center gap-2">
-                    <ShieldCheck
-                        class="size-4 text-blue-600 dark:text-blue-400"
-                    />
-                    <h2 class="font-semibold">
-                        Employee &amp; government records
-                    </h2>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <ShieldCheck
+                            class="size-4 text-blue-600 dark:text-blue-400"
+                        />
+                        <h2 class="font-semibold">
+                            Employee &amp; government records
+                        </h2>
+                    </div>
+                    <template v-if="govLocked">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="startGovEdit"
+                        >
+                            <Pencil class="size-4" />
+                            Update
+                        </Button>
+                    </template>
+                    <template v-else-if="props.readonly">
+                        <div class="flex gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                @click="cancelGovEdit"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size="sm"
+                                class="bg-blue-600 hover:bg-blue-700"
+                                @click="saveGovEdit"
+                            >
+                                <Save class="size-4" />
+                                Save changes
+                            </Button>
+                        </div>
+                    </template>
                 </div>
-                <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+                <!-- Read-only view -->
+                <div
+                    v-if="govLocked"
+                    class="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                    <div
+                        v-for="field in [
+                            { label: 'DARBC ID', value: state.gov.darbc },
+                            {
+                                label: 'Biometric',
+                                value: state.gov.biometric,
+                            },
+                            { label: 'ATM number', value: state.gov.atm },
+                            { label: 'TIN', value: state.gov.tin },
+                            { label: 'Pag-IBIG', value: state.gov.pagibig },
+                            {
+                                label: 'PhilHealth',
+                                value: state.gov.philhealth,
+                            },
+                            { label: 'SSS', value: state.gov.sss },
+                        ]"
+                        :key="field.label"
+                        class="min-w-0"
+                    >
+                        <p
+                            class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase"
+                        >
+                            {{ field.label }}
+                        </p>
+                        <p class="mt-0.5 text-sm break-words">
+                            {{ field.value || '—' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Editable view -->
+                <div
+                    v-else
+                    class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                >
                     <div class="grid gap-2">
                         <Label for="g-darbc">DARBC ID</Label>
                         <Input id="g-darbc" v-model="state.gov.darbc" />
@@ -774,11 +1063,87 @@ const emergencyFields: {
             <div
                 class="rounded-xl border border-blue-200 bg-card p-6 shadow-sm dark:border-blue-500/30"
             >
-                <div class="flex items-center gap-2">
-                    <FileText class="size-4 text-blue-600 dark:text-blue-400" />
-                    <h2 class="font-semibold">Residential certificate</h2>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                        <FileText
+                            class="size-4 text-blue-600 dark:text-blue-400"
+                        />
+                        <h2 class="font-semibold">Residential certificate</h2>
+                    </div>
+                    <template v-if="govLocked">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            @click="startGovEdit"
+                        >
+                            <Pencil class="size-4" />
+                            Update
+                        </Button>
+                    </template>
+                    <template v-else-if="props.readonly">
+                        <div class="flex gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                @click="cancelGovEdit"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size="sm"
+                                class="bg-blue-600 hover:bg-blue-700"
+                                @click="saveGovEdit"
+                            >
+                                <Save class="size-4" />
+                                Save changes
+                            </Button>
+                        </div>
+                    </template>
                 </div>
-                <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+                <!-- Read-only view -->
+                <div
+                    v-if="govLocked"
+                    class="mt-5 grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4"
+                >
+                    <div
+                        v-for="field in [
+                            {
+                                label: 'Cert. type',
+                                value: state.residentCert.type,
+                            },
+                            {
+                                label: 'Cert. number',
+                                value: state.residentCert.number,
+                            },
+                            {
+                                label: 'Issued at',
+                                value: state.residentCert.issuedAt,
+                            },
+                            {
+                                label: 'Issued on',
+                                value: state.residentCert.issuedOn,
+                            },
+                        ]"
+                        :key="field.label"
+                        class="min-w-0"
+                    >
+                        <p
+                            class="text-[11px] font-medium tracking-wide text-muted-foreground uppercase"
+                        >
+                            {{ field.label }}
+                        </p>
+                        <p class="mt-0.5 text-sm break-words">
+                            {{ field.value || '—' }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Editable view -->
+                <div
+                    v-else
+                    class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                >
                     <div class="grid gap-2">
                         <Label>Cert. type</Label>
                         <Select v-model="state.residentCert.type">
@@ -852,6 +1217,7 @@ const emergencyFields: {
 
         <!-- Sticky save bar (single set of Save / Clear actions) -->
         <div
+            v-if="saveBar"
             class="sticky bottom-4 z-10 flex flex-col gap-3 rounded-xl border bg-card/95 p-4 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between"
         >
             <div class="flex items-center gap-3">

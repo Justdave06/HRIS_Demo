@@ -29,6 +29,11 @@ try {
 }
 
 export default defineConfig({
+    server: {
+        host: 'localhost',
+        port: 3000,
+        strictPort: true,
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.ts'],

@@ -17,6 +17,7 @@ import {
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoTraining } from '@/composables/useDemoTraining';
 import type { TrainingEmployee } from '@/composables/useDemoTraining';
+import { exportSheet } from '@/lib/exportExcel';
 import type { DemoTrainingCourse, DemoTrainingEnrollment } from '@/types';
 
 const props = defineProps<{
@@ -261,27 +262,9 @@ function exportExcel(): void {
     const payload = documentRows.value.map((row) =>
         documentColumns.value.map((column) => row[column.key] ?? ''),
     );
-    const csv =
-        '\uFEFF' +
-        [headers, ...payload]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = `training-${reportType.value}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet(`training-${reportType.value}`, 'Training', headers, payload);
 }
 </script>
 

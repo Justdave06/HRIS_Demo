@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLeave } from '@/composables/useDemoLeave';
+import { exportSheet } from '@/lib/exportExcel';
 import type { DemoLeaveRequest, DemoLeaveRow } from '@/types';
 
 type EmployeeOption = {
@@ -328,27 +329,9 @@ function exportExcel(): void {
         row.days,
         row.status,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rows]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = 'leave-requests.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet('leave-requests', 'Leave Requests', headers, rows);
 }
 </script>
 

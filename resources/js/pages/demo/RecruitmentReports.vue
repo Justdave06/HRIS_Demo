@@ -12,6 +12,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useDemoVacancies } from '@/composables/useDemoVacancies';
+import { exportSheet  } from '@/lib/exportExcel';
+import type {XlsxCell} from '@/lib/exportExcel';
 import type { DemoCandidate, DemoJob, DemoOnboarding } from '@/types';
 
 const props = defineProps<{
@@ -169,7 +171,7 @@ function exportExcel(): void {
         onboarding: ['No.', 'New Hire', 'Position', 'Start Date', 'Progress'],
     };
 
-    const rowMap: Record<ReportType, unknown[][]> = {
+    const rowMap: Record<ReportType, XlsxCell[][]> = {
         vacancy: filteredJobs.value.map((job, index) => [
             index + 1,
             job.title,
@@ -214,27 +216,9 @@ function exportExcel(): void {
         ]),
     };
 
-    const csv =
-        '\uFEFF' +
-        [headerMap[reportType.value], ...rowMap[reportType.value]]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = 'recruitment-report.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet('recruitment-report', 'Recruitment', headerMap[reportType.value], rowMap[reportType.value]);
 }
 
 const printedOn = new Date().toLocaleDateString('en-US', {

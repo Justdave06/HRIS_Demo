@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { useDemoDisciplinary } from '@/composables/useDemoDisciplinary';
 import type { DisciplinaryEmployee } from '@/composables/useDemoDisciplinary';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
+import { exportSheet } from '@/lib/exportExcel';
 import type { DemoDisciplinaryRecord } from '@/types';
 
 const props = defineProps<{
@@ -148,27 +149,9 @@ function exportExcel(): void {
         row.action,
         row.status,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rowsCsv]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = `${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-disciplinary-record.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet(`${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-disciplinary-record`, 'Disciplinary Record', headers, rowsCsv);
 }
 </script>
 

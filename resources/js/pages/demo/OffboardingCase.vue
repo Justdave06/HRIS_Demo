@@ -19,6 +19,7 @@ import { useDemoDisciplinary } from '@/composables/useDemoDisciplinary';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoOffboarding } from '@/composables/useDemoOffboarding';
 import type { OffboardingEmployee } from '@/composables/useDemoOffboarding';
+import { exportSheet } from '@/lib/exportExcel';
 import { cn } from '@/lib/utils';
 import type {
     DemoDisciplinaryRecord,
@@ -154,27 +155,9 @@ function exportFinalPay(): void {
 
     const headers = ['Item', 'Amount'];
     const lines = finalPayLines.value.map((line) => [line.label, line.amount]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...lines]
-            .map((cells) =>
-                cells
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = `${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-final-pay.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet(`${displayEmployee.value.name.replaceAll(' ', '-').toLowerCase()}-final-pay`, 'Final Pay', headers, lines);
     toast.success('Final pay breakdown exported (demo)');
 }
 </script>

@@ -15,6 +15,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
+import { exportSheet } from '@/lib/exportExcel';
 import type { DemoEmployee } from '@/types';
 
 const props = defineProps<{
@@ -142,28 +143,9 @@ function exportExcel(): void {
         employee.hire_date,
         employee.file_status,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rows]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = 'employee-report.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    // Revoke on the next tick so the download starts before the URL is freed.
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet('employee-report', 'Employees', headers, rows);
 }
 </script>
 

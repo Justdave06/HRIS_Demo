@@ -31,6 +31,7 @@ import {
     useDemoPerformance,
 } from '@/composables/useDemoPerformance';
 import type { PerformanceEmployee } from '@/composables/useDemoPerformance';
+import { exportSheet } from '@/lib/exportExcel';
 import { cn } from '@/lib/utils';
 import type {
     DemoPerformanceGoal,
@@ -341,27 +342,9 @@ function exportExcel(): void {
         row.gaps,
         row.status,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rowsCsv]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = 'performance-reviews.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet('performance-reviews', 'Reviews', headers, rowsCsv);
 }
 </script>
 

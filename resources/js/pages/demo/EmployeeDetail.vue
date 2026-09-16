@@ -61,6 +61,8 @@ function onSave(): void {
         :heading="displayEmployee.name"
         :description="`${displayEmployee.no} · ${displayEmployee.department}`"
         save-label="Save changes"
+        :save-bar="false"
+        :readonly="true"
         back-label="Back to all employees"
         back-href="/demo/employees"
         :departments="departments"

@@ -27,6 +27,7 @@ import type {
     PayrollEmployee,
     PayrollPeriod,
 } from '@/composables/useDemoPayroll';
+import { exportSheet } from '@/lib/exportExcel';
 import type { DemoPayslip } from '@/types';
 
 const props = defineProps<{
@@ -162,27 +163,9 @@ function exportExcel(): void {
         row.net,
         row.status,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rows]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = `payroll-${period.value}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet(`payroll-${period.value}`, 'Payslips', headers, rows);
 }
 </script>
 

@@ -95,11 +95,15 @@ class AttendanceController extends Controller
         // The starter roster (5 employees) or the full sample set. In starter
         // mode no attendance has been logged yet, so every employee reads
         // "Not Yet In" until the user runs the attendance workflow.
-        $employees = collect(DemoMode::employees());
+        $employees = collect(DemoMode::employees())->keyBy('id');
         $records = DemoMode::blank() ? collect() : collect(DemoData::attendance());
 
         $roster = $records->map(function ($record) use ($employees) {
             $employee = $employees->get($record['employee_id']);
+
+            if (! $employee) {
+                return null;
+            }
 
             return [
                 'employee_id' => $record['employee_id'],
@@ -111,7 +115,7 @@ class AttendanceController extends Controller
                 'time_out' => $record['time_out'],
                 'status' => $record['status'],
             ];
-        })->values()->all();
+        })->filter()->values()->all();
 
         // In starter mode the roster has no attendance rows yet, so fall back
         // to a "Not Yet In" row per starter employee to keep the manager and

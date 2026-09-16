@@ -26,6 +26,7 @@ import { useDemoBenefits } from '@/composables/useDemoBenefits';
 import type { BenefitsEmployee } from '@/composables/useDemoBenefits';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLoans } from '@/composables/useDemoLoans';
+import { exportSheet } from '@/lib/exportExcel';
 import { cn } from '@/lib/utils';
 import type { DemoBenefitPlan, DemoEnrollment } from '@/types';
 
@@ -292,27 +293,9 @@ function exportExcel(): void {
         row.employer_cost,
         row.status,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rowsCsv]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = 'benefit-enrollments.csv';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet('benefit-enrollments', 'Benefit Enrollments', headers, rowsCsv);
 }
 </script>
 

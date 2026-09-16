@@ -36,6 +36,7 @@ import {
     useDemoOffboarding,
 } from '@/composables/useDemoOffboarding';
 import type { OffboardingEmployee } from '@/composables/useDemoOffboarding';
+import { exportSheet } from '@/lib/exportExcel';
 import { cn } from '@/lib/utils';
 import type {
     DemoDisciplinaryRecord,
@@ -439,27 +440,9 @@ function exportExcel(): void {
         row.status,
         row.finalPay,
     ]);
-    const csv =
-        '\uFEFF' +
-        [headers, ...rowsCsv]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = `offboarding-${activeTab.value}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet(`offboarding-${activeTab.value}`, 'Offboarding', headers, rowsCsv);
 }
 </script>
 

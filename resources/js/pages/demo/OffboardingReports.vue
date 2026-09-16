@@ -18,6 +18,7 @@ import { useDemoDisciplinary } from '@/composables/useDemoDisciplinary';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoOffboarding } from '@/composables/useDemoOffboarding';
 import type { OffboardingEmployee } from '@/composables/useDemoOffboarding';
+import { exportSheet } from '@/lib/exportExcel';
 import type { DemoDisciplinaryRecord, DemoOffboardingCase } from '@/types';
 
 const props = defineProps<{
@@ -277,27 +278,9 @@ function exportExcel(): void {
     const payload = documentRows.value.map((row) =>
         documentColumns.value.map((column) => row[column.key] ?? ''),
     );
-    const csv =
-        '\uFEFF' +
-        [headers, ...payload]
-            .map((row) =>
-                row
-                    .map((cell) => `"${String(cell).replaceAll('"', '""')}"`)
-                    .join(','),
-            )
-            .join('\n');
-    const url = URL.createObjectURL(
-        new Blob([csv], { type: 'text/csv;charset=utf-8;' }),
-    );
-    const link = document.createElement('a');
 
-    link.href = url;
-    link.download = `offboarding-${reportType.value}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    exportSheet(`offboarding-${reportType.value}`, 'Offboarding', headers, payload);
 }
 </script>
 
