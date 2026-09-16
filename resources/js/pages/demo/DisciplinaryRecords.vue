@@ -89,7 +89,7 @@ function sendHandoff(employeeId: number, name: string): void {
 
 /* ------------------------------------------------------------------ */
 /* Query-param pre-fill so dashboard stat cards can deep-link into a   */
-/* filtered directory: ?tab=repeat, ?status=open, ?type=warning…      */
+/* filtered directory: ?tab=repeat, ?status=Logged, ?type=warning…     */
 /* ------------------------------------------------------------------ */
 
 function queryParam(name: string): string | null {
@@ -110,8 +110,10 @@ function initialTab(): 'log' | 'repeat' {
 function initialStatus(): string {
     const status = queryParam('status');
 
+    // The dashboard's "Open cases" card deep-links with ?status=open; the
+    // dropdown has no combined option, so land on "Logged" instead.
     if (status === 'open') {
-        return 'open';
+        return 'Logged';
     }
 
     if (
@@ -153,8 +155,7 @@ const statusFilter = ref(initialStatus());
 const typeFilter = ref(initialType());
 const search = ref('');
 
-// Individual statuses for the filter dropdown. The combined "open"
-// (Logged + Under Review) option is rendered separately above these.
+// Individual statuses for the filter dropdown.
 const statusOptions = [
     'Logged',
     'Under Review',
@@ -168,9 +169,7 @@ const filtered = computed(() => {
     return rows.value.filter(
         (row) =>
             (statusFilter.value === 'all' ||
-                (statusFilter.value === 'open'
-                    ? row.status === 'Logged' || row.status === 'Under Review'
-                    : row.status === statusFilter.value)) &&
+                row.status === statusFilter.value) &&
             (typeFilter.value === 'all' || row.type === typeFilter.value) &&
             (term === '' ||
                 row.name.toLowerCase().includes(term) ||
@@ -493,9 +492,6 @@ function exportExcel(): void {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">All statuses</SelectItem>
-                        <SelectItem value="open">
-                            Open (logged + in review)
-                        </SelectItem>
                         <SelectItem
                             v-for="status in statusOptions"
                             :key="status"
