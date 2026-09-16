@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\TrainingController::index
  * @see app/Http/Controllers/Hris/TrainingController.php:16
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\TrainingController::index
- * @see app/Http/Controllers/Hris/TrainingController.php:16
- * @route '/demo/training'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::index
- * @see app/Http/Controllers/Hris/TrainingController.php:16
- * @route '/demo/training'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::index
- * @see app/Http/Controllers/Hris/TrainingController.php:16
- * @route '/demo/training'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\TrainingController::dashboard
  * @see app/Http/Controllers/Hris/TrainingController.php:26
@@ -120,41 +85,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\TrainingController::dashboard
- * @see app/Http/Controllers/Hris/TrainingController.php:26
- * @route '/demo/training/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::dashboard
- * @see app/Http/Controllers/Hris/TrainingController.php:26
- * @route '/demo/training/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::dashboard
- * @see app/Http/Controllers/Hris/TrainingController.php:26
- * @route '/demo/training/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\TrainingController::enrollments
  * @see app/Http/Controllers/Hris/TrainingController.php:36
@@ -198,41 +128,6 @@ enrollments.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\TrainingController::enrollments
- * @see app/Http/Controllers/Hris/TrainingController.php:36
- * @route '/demo/training/enrollments'
- */
-    const enrollmentsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: enrollments.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::enrollments
- * @see app/Http/Controllers/Hris/TrainingController.php:36
- * @route '/demo/training/enrollments'
- */
-        enrollmentsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: enrollments.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::enrollments
- * @see app/Http/Controllers/Hris/TrainingController.php:36
- * @route '/demo/training/enrollments'
- */
-        enrollmentsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: enrollments.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    enrollments.form = enrollmentsForm
 /**
 * @see \App\Http\Controllers\Hris\TrainingController::record
  * @see app/Http/Controllers/Hris/TrainingController.php:45
@@ -295,41 +190,6 @@ record.head = (args: { employee: string | number } | [employee: string | number 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\TrainingController::record
- * @see app/Http/Controllers/Hris/TrainingController.php:45
- * @route '/demo/training/records/{employee}'
- */
-    const recordForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: record.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::record
- * @see app/Http/Controllers/Hris/TrainingController.php:45
- * @route '/demo/training/records/{employee}'
- */
-        recordForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: record.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::record
- * @see app/Http/Controllers/Hris/TrainingController.php:45
- * @route '/demo/training/records/{employee}'
- */
-        recordForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: record.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    record.form = recordForm
 /**
 * @see \App\Http\Controllers\Hris\TrainingController::sessionRecord
  * @see app/Http/Controllers/Hris/TrainingController.php:69
@@ -392,41 +252,6 @@ sessionRecord.head = (args: { employee: string | number } | [employee: string | 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\TrainingController::sessionRecord
- * @see app/Http/Controllers/Hris/TrainingController.php:69
- * @route '/demo/training/records/session/{employee}'
- */
-    const sessionRecordForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: sessionRecord.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::sessionRecord
- * @see app/Http/Controllers/Hris/TrainingController.php:69
- * @route '/demo/training/records/session/{employee}'
- */
-        sessionRecordForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionRecord.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::sessionRecord
- * @see app/Http/Controllers/Hris/TrainingController.php:69
- * @route '/demo/training/records/session/{employee}'
- */
-        sessionRecordForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionRecord.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    sessionRecord.form = sessionRecordForm
 /**
 * @see \App\Http\Controllers\Hris\TrainingController::reports
  * @see app/Http/Controllers/Hris/TrainingController.php:93
@@ -469,42 +294,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\TrainingController::reports
- * @see app/Http/Controllers/Hris/TrainingController.php:93
- * @route '/demo/training/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::reports
- * @see app/Http/Controllers/Hris/TrainingController.php:93
- * @route '/demo/training/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\TrainingController::reports
- * @see app/Http/Controllers/Hris/TrainingController.php:93
- * @route '/demo/training/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const TrainingController = { index, dashboard, enrollments, record, sessionRecord, reports }
 
 export default TrainingController

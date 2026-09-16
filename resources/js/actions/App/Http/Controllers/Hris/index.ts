@@ -9,6 +9,7 @@ import PerformanceController from './PerformanceController'
 import TrainingController from './TrainingController'
 import DisciplinaryController from './DisciplinaryController'
 import OffboardingController from './OffboardingController'
+import ProjectController from './ProjectController'
 import PortalController from './PortalController'
 import ComingSoonController from './ComingSoonController'
 const Hris = {
@@ -23,6 +24,7 @@ PerformanceController: Object.assign(PerformanceController, PerformanceControlle
 TrainingController: Object.assign(TrainingController, TrainingController),
 DisciplinaryController: Object.assign(DisciplinaryController, DisciplinaryController),
 OffboardingController: Object.assign(OffboardingController, OffboardingController),
+ProjectController: Object.assign(ProjectController, ProjectController),
 PortalController: Object.assign(PortalController, PortalController),
 ComingSoonController: Object.assign(ComingSoonController, ComingSoonController),
 }

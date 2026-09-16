@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 import recordsE88d67 from './records'
 /**
 * @see \App\Http\Controllers\Hris\LeaveController::index
@@ -43,41 +43,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\LeaveController::index
- * @see app/Http/Controllers/Hris/LeaveController.php:16
- * @route '/demo/leave'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::index
- * @see app/Http/Controllers/Hris/LeaveController.php:16
- * @route '/demo/leave'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::index
- * @see app/Http/Controllers/Hris/LeaveController.php:16
- * @route '/demo/leave'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\LeaveController::dashboard
  * @see app/Http/Controllers/Hris/LeaveController.php:25
@@ -121,41 +86,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\LeaveController::dashboard
- * @see app/Http/Controllers/Hris/LeaveController.php:25
- * @route '/demo/leave/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::dashboard
- * @see app/Http/Controllers/Hris/LeaveController.php:25
- * @route '/demo/leave/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::dashboard
- * @see app/Http/Controllers/Hris/LeaveController.php:25
- * @route '/demo/leave/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\LeaveController::requests
  * @see app/Http/Controllers/Hris/LeaveController.php:49
@@ -199,41 +129,6 @@ requests.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\LeaveController::requests
- * @see app/Http/Controllers/Hris/LeaveController.php:49
- * @route '/demo/leave/requests'
- */
-    const requestsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: requests.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::requests
- * @see app/Http/Controllers/Hris/LeaveController.php:49
- * @route '/demo/leave/requests'
- */
-        requestsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: requests.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::requests
- * @see app/Http/Controllers/Hris/LeaveController.php:49
- * @route '/demo/leave/requests'
- */
-        requestsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: requests.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    requests.form = requestsForm
 /**
 * @see \App\Http\Controllers\Hris\LeaveController::records
  * @see app/Http/Controllers/Hris/LeaveController.php:73
@@ -296,41 +191,6 @@ records.head = (args: { employee: string | number } | [employee: string | number
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\LeaveController::records
- * @see app/Http/Controllers/Hris/LeaveController.php:73
- * @route '/demo/leave/records/{employee}'
- */
-    const recordsForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: records.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::records
- * @see app/Http/Controllers/Hris/LeaveController.php:73
- * @route '/demo/leave/records/{employee}'
- */
-        recordsForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: records.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::records
- * @see app/Http/Controllers/Hris/LeaveController.php:73
- * @route '/demo/leave/records/{employee}'
- */
-        recordsForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: records.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    records.form = recordsForm
 /**
 * @see \App\Http\Controllers\Hris\LeaveController::reports
  * @see app/Http/Controllers/Hris/LeaveController.php:127
@@ -373,42 +233,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\LeaveController::reports
- * @see app/Http/Controllers/Hris/LeaveController.php:127
- * @route '/demo/leave/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::reports
- * @see app/Http/Controllers/Hris/LeaveController.php:127
- * @route '/demo/leave/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::reports
- * @see app/Http/Controllers/Hris/LeaveController.php:127
- * @route '/demo/leave/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const leave = {
     index: Object.assign(index, index),
 dashboard: Object.assign(dashboard, dashboard),

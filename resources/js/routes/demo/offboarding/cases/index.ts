@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::session
  * @see app/Http/Controllers/Hris/OffboardingController.php:69
@@ -61,41 +61,6 @@ session.head = (args: { employee: string | number } | [employee: string | number
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::session
- * @see app/Http/Controllers/Hris/OffboardingController.php:69
- * @route '/demo/offboarding/cases/session/{employee}'
- */
-    const sessionForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: session.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::session
- * @see app/Http/Controllers/Hris/OffboardingController.php:69
- * @route '/demo/offboarding/cases/session/{employee}'
- */
-        sessionForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: session.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::session
- * @see app/Http/Controllers/Hris/OffboardingController.php:69
- * @route '/demo/offboarding/cases/session/{employee}'
- */
-        sessionForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: session.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    session.form = sessionForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::show
  * @see app/Http/Controllers/Hris/OffboardingController.php:44
@@ -157,42 +122,6 @@ show.head = (args: { employee: string | number } | [employee: string | number ] 
     url: show.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::show
- * @see app/Http/Controllers/Hris/OffboardingController.php:44
- * @route '/demo/offboarding/cases/{employee}'
- */
-    const showForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: show.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::show
- * @see app/Http/Controllers/Hris/OffboardingController.php:44
- * @route '/demo/offboarding/cases/{employee}'
- */
-        showForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::show
- * @see app/Http/Controllers/Hris/OffboardingController.php:44
- * @route '/demo/offboarding/cases/{employee}'
- */
-        showForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    show.form = showForm
 const cases = {
     session: Object.assign(session, session),
 show: Object.assign(show, show),

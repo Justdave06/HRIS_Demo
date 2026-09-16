@@ -1,6 +1,7 @@
 import {
     CalendarCheck2,
     Clock,
+    FolderKanban,
     Gift,
     GraduationCap,
     LayoutDashboard,
@@ -25,4 +26,5 @@ export const moduleIcons: Record<string, LucideIcon> = {
     training: GraduationCap,
     disciplinary: ShieldAlert,
     offboarding: LogOut,
+    projects: FolderKanban,
 };

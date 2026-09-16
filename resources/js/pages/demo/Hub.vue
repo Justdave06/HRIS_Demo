@@ -75,6 +75,10 @@ const moduleHref = (slug: string): string => {
         return '/demo/offboarding/dashboard';
     }
 
+    if (slug === 'projects') {
+        return '/demo/projects/dashboard';
+    }
+
     return `/demo/modules/${slug}`;
 };
 
@@ -84,19 +88,6 @@ function loginAs(demoAccount: DemoAccount): void {
         `Signed in as ${demoAccount.name} — Module ${moduleNumber(demoAccount.module)}`,
     );
     router.visit(moduleHref(demoAccount.module));
-}
-
-function openModule(module: DemoModule): void {
-    if (!account.value) {
-        const first = accounts.value[0];
-
-        if (first) {
-            selectAccount(first);
-            toast(`Signed in as ${first.name} (demo)`);
-        }
-    }
-
-    router.visit(moduleHref(module.slug));
 }
 
 /* Start fresh — wipe every record created during testing and reload. */
@@ -125,7 +116,7 @@ function startFresh(): void {
                     HRIS Demo
                 </h1>
                 <p class="mt-2 max-w-md text-sm text-muted-foreground">
-                    Log in by picking who you are — 10 demo accounts, one per
+                    Log in by picking who you are — 11 demo accounts, one per
                     module. No email, no password.
                 </p>
                 <span
@@ -251,43 +242,6 @@ function startFresh(): void {
                 </Link>
             </section>
 
-            <!-- All modules reference -->
-            <section class="mt-12 rounded-xl border bg-muted/40 p-5">
-                <h2 class="text-sm font-semibold">All 10 modules</h2>
-                <p class="mt-1 text-xs text-muted-foreground">
-                    All 10 modules are ready to explore — click any chip to jump
-                    straight in.
-                </p>
-                <div class="mt-3 flex flex-wrap gap-2">
-                    <button
-                        v-for="(module, index) in modules"
-                        :key="module.slug"
-                        type="button"
-                        class="inline-flex items-center gap-1.5 rounded-lg border bg-card px-3 py-1.5 text-xs font-medium shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-400/60 hover:shadow-md"
-                        @click="openModule(module)"
-                    >
-                        <component
-                            :is="moduleIcons[module.slug]"
-                            class="size-3.5 text-muted-foreground"
-                        />
-                        {{ index + 1 }}. {{ module.short }}
-                        <span
-                            class="font-semibold"
-                            :class="
-                                module.status === 'available'
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : 'text-slate-400'
-                            "
-                        >
-                            {{
-                                module.status === 'available'
-                                    ? '· live'
-                                    : '· soon'
-                            }}
-                        </span>
-                    </button>
-                </div>
-            </section>
             <!-- System data mode + start fresh -->
             <section
                 class="mt-10 flex flex-col items-start justify-between gap-4 rounded-xl border border-red-200 bg-red-50/40 p-5 sm:flex-row sm:items-center"

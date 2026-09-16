@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\HubController::index
  * @see app/Http/Controllers/Hris/HubController.php:16
@@ -45,41 +45,6 @@ index980bb49ee7ae63891f1d891d2fbcf1c9.head = (options?: RouteQueryOptions): Rout
     /**
 * @see \App\Http\Controllers\Hris\HubController::index
  * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/'
- */
-    const index980bb49ee7ae63891f1d891d2fbcf1c9Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index980bb49ee7ae63891f1d891d2fbcf1c9.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\HubController::index
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/'
- */
-        index980bb49ee7ae63891f1d891d2fbcf1c9Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index980bb49ee7ae63891f1d891d2fbcf1c9.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\HubController::index
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/'
- */
-        index980bb49ee7ae63891f1d891d2fbcf1c9Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index980bb49ee7ae63891f1d891d2fbcf1c9.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index980bb49ee7ae63891f1d891d2fbcf1c9.form = index980bb49ee7ae63891f1d891d2fbcf1c9Form
-    /**
-* @see \App\Http\Controllers\Hris\HubController::index
- * @see app/Http/Controllers/Hris/HubController.php:16
  * @route '/demo'
  */
 const index0efea5765db02e3af45380ee625e3ea3 = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -119,42 +84,6 @@ index0efea5765db02e3af45380ee625e3ea3.head = (options?: RouteQueryOptions): Rout
     url: index0efea5765db02e3af45380ee625e3ea3.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\HubController::index
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/demo'
- */
-    const index0efea5765db02e3af45380ee625e3ea3Form = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index0efea5765db02e3af45380ee625e3ea3.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\HubController::index
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/demo'
- */
-        index0efea5765db02e3af45380ee625e3ea3Form.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index0efea5765db02e3af45380ee625e3ea3.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\HubController::index
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/demo'
- */
-        index0efea5765db02e3af45380ee625e3ea3Form.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index0efea5765db02e3af45380ee625e3ea3.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index0efea5765db02e3af45380ee625e3ea3.form = index0efea5765db02e3af45380ee625e3ea3Form
 
 /**
 * Multiple routes resolve to \App\Http\Controllers\Hris\HubController::index, so this export is a
@@ -227,42 +156,6 @@ mode.head = (args: { mode: string | number } | [mode: string | number ] | string
     url: mode.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\HubController::mode
- * @see app/Http/Controllers/Hris/HubController.php:29
- * @route '/demo/mode/{mode}'
- */
-    const modeForm = (args: { mode: string | number } | [mode: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: mode.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\HubController::mode
- * @see app/Http/Controllers/Hris/HubController.php:29
- * @route '/demo/mode/{mode}'
- */
-        modeForm.get = (args: { mode: string | number } | [mode: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: mode.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\HubController::mode
- * @see app/Http/Controllers/Hris/HubController.php:29
- * @route '/demo/mode/{mode}'
- */
-        modeForm.head = (args: { mode: string | number } | [mode: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: mode.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    mode.form = modeForm
 const HubController = { index, mode }
 
 export default HubController

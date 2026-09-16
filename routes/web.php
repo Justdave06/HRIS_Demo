@@ -11,6 +11,7 @@ use App\Http\Controllers\Hris\OffboardingController;
 use App\Http\Controllers\Hris\PayrollController;
 use App\Http\Controllers\Hris\PerformanceController;
 use App\Http\Controllers\Hris\PortalController;
+use App\Http\Controllers\Hris\ProjectController;
 use App\Http\Controllers\Hris\RecruitmentController;
 use App\Http\Controllers\Hris\TrainingController;
 use Illuminate\Support\Facades\Route;
@@ -114,6 +115,14 @@ Route::prefix('demo')->name('demo.')->group(function () {
     Route::get('/offboarding/employees/session/{employee}', [OffboardingController::class, 'sessionEmployeeOverview'])->whereNumber('employee')->name('offboarding.employees.session');
     Route::get('/offboarding/employees/{employee}', [OffboardingController::class, 'employeeOverview'])->whereNumber('employee')->name('offboarding.employees.show');
     Route::get('/offboarding/reports', [OffboardingController::class, 'reports'])->name('offboarding.reports');
+
+    // Module 11 - Project Management
+    Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/dashboard', [ProjectController::class, 'dashboard'])->name('projects.dashboard');
+    Route::get('/projects/registry', [ProjectController::class, 'projects'])->name('projects.registry');
+    Route::get('/projects/registry/session/{project}', [ProjectController::class, 'sessionProject'])->whereNumber('project')->name('projects.registry.session');
+    Route::get('/projects/registry/{project}', [ProjectController::class, 'project'])->whereNumber('project')->name('projects.registry.show');
+    Route::get('/projects/reports', [ProjectController::class, 'reports'])->name('projects.reports');
 
     // Employee Portal — employees log in with the email + temporary password
     // HR created when they were hired in Employee Management.

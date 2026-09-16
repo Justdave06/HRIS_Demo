@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\PerformanceController::index
  * @see app/Http/Controllers/Hris/PerformanceController.php:16
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PerformanceController::index
- * @see app/Http/Controllers/Hris/PerformanceController.php:16
- * @route '/demo/performance'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::index
- * @see app/Http/Controllers/Hris/PerformanceController.php:16
- * @route '/demo/performance'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::index
- * @see app/Http/Controllers/Hris/PerformanceController.php:16
- * @route '/demo/performance'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\PerformanceController::dashboard
  * @see app/Http/Controllers/Hris/PerformanceController.php:26
@@ -120,41 +85,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PerformanceController::dashboard
- * @see app/Http/Controllers/Hris/PerformanceController.php:26
- * @route '/demo/performance/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::dashboard
- * @see app/Http/Controllers/Hris/PerformanceController.php:26
- * @route '/demo/performance/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::dashboard
- * @see app/Http/Controllers/Hris/PerformanceController.php:26
- * @route '/demo/performance/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\PerformanceController::reviews
  * @see app/Http/Controllers/Hris/PerformanceController.php:35
@@ -198,41 +128,6 @@ reviews.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PerformanceController::reviews
- * @see app/Http/Controllers/Hris/PerformanceController.php:35
- * @route '/demo/performance/reviews'
- */
-    const reviewsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reviews.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::reviews
- * @see app/Http/Controllers/Hris/PerformanceController.php:35
- * @route '/demo/performance/reviews'
- */
-        reviewsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reviews.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::reviews
- * @see app/Http/Controllers/Hris/PerformanceController.php:35
- * @route '/demo/performance/reviews'
- */
-        reviewsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reviews.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reviews.form = reviewsForm
 /**
 * @see \App\Http\Controllers\Hris\PerformanceController::record
  * @see app/Http/Controllers/Hris/PerformanceController.php:55
@@ -295,41 +190,6 @@ record.head = (args: { employee: string | number } | [employee: string | number 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PerformanceController::record
- * @see app/Http/Controllers/Hris/PerformanceController.php:55
- * @route '/demo/performance/records/{employee}'
- */
-    const recordForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: record.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::record
- * @see app/Http/Controllers/Hris/PerformanceController.php:55
- * @route '/demo/performance/records/{employee}'
- */
-        recordForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: record.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::record
- * @see app/Http/Controllers/Hris/PerformanceController.php:55
- * @route '/demo/performance/records/{employee}'
- */
-        recordForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: record.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    record.form = recordForm
 /**
 * @see \App\Http\Controllers\Hris\PerformanceController::sessionRecord
  * @see app/Http/Controllers/Hris/PerformanceController.php:81
@@ -392,41 +252,6 @@ sessionRecord.head = (args: { employee: string | number } | [employee: string | 
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PerformanceController::sessionRecord
- * @see app/Http/Controllers/Hris/PerformanceController.php:81
- * @route '/demo/performance/records/session/{employee}'
- */
-    const sessionRecordForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: sessionRecord.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::sessionRecord
- * @see app/Http/Controllers/Hris/PerformanceController.php:81
- * @route '/demo/performance/records/session/{employee}'
- */
-        sessionRecordForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionRecord.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::sessionRecord
- * @see app/Http/Controllers/Hris/PerformanceController.php:81
- * @route '/demo/performance/records/session/{employee}'
- */
-        sessionRecordForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionRecord.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    sessionRecord.form = sessionRecordForm
 /**
 * @see \App\Http\Controllers\Hris\PerformanceController::reports
  * @see app/Http/Controllers/Hris/PerformanceController.php:45
@@ -469,42 +294,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\PerformanceController::reports
- * @see app/Http/Controllers/Hris/PerformanceController.php:45
- * @route '/demo/performance/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::reports
- * @see app/Http/Controllers/Hris/PerformanceController.php:45
- * @route '/demo/performance/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PerformanceController::reports
- * @see app/Http/Controllers/Hris/PerformanceController.php:45
- * @route '/demo/performance/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const PerformanceController = { index, dashboard, reviews, record, sessionRecord, reports }
 
 export default PerformanceController

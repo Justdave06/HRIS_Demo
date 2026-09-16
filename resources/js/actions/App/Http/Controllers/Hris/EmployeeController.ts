@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\EmployeeController::dashboard
  * @see app/Http/Controllers/Hris/EmployeeController.php:16
@@ -42,41 +42,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\EmployeeController::dashboard
- * @see app/Http/Controllers/Hris/EmployeeController.php:16
- * @route '/demo/employees/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::dashboard
- * @see app/Http/Controllers/Hris/EmployeeController.php:16
- * @route '/demo/employees/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::dashboard
- * @see app/Http/Controllers/Hris/EmployeeController.php:16
- * @route '/demo/employees/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\EmployeeController::reports
  * @see app/Http/Controllers/Hris/EmployeeController.php:44
@@ -120,41 +85,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\EmployeeController::reports
- * @see app/Http/Controllers/Hris/EmployeeController.php:44
- * @route '/demo/employees/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::reports
- * @see app/Http/Controllers/Hris/EmployeeController.php:44
- * @route '/demo/employees/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::reports
- * @see app/Http/Controllers/Hris/EmployeeController.php:44
- * @route '/demo/employees/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 /**
 * @see \App\Http\Controllers\Hris\EmployeeController::create
  * @see app/Http/Controllers/Hris/EmployeeController.php:59
@@ -198,41 +128,6 @@ create.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\EmployeeController::create
- * @see app/Http/Controllers/Hris/EmployeeController.php:59
- * @route '/demo/employees/create'
- */
-    const createForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: create.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::create
- * @see app/Http/Controllers/Hris/EmployeeController.php:59
- * @route '/demo/employees/create'
- */
-        createForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::create
- * @see app/Http/Controllers/Hris/EmployeeController.php:59
- * @route '/demo/employees/create'
- */
-        createForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: create.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    create.form = createForm
 /**
 * @see \App\Http\Controllers\Hris\EmployeeController::index
  * @see app/Http/Controllers/Hris/EmployeeController.php:30
@@ -276,41 +171,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\EmployeeController::index
- * @see app/Http/Controllers/Hris/EmployeeController.php:30
- * @route '/demo/employees'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::index
- * @see app/Http/Controllers/Hris/EmployeeController.php:30
- * @route '/demo/employees'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::index
- * @see app/Http/Controllers/Hris/EmployeeController.php:30
- * @route '/demo/employees'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\EmployeeController::sessionShow
  * @see app/Http/Controllers/Hris/EmployeeController.php:100
@@ -373,41 +233,6 @@ sessionShow.head = (args: { employee: string | number } | [employee: string | nu
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\EmployeeController::sessionShow
- * @see app/Http/Controllers/Hris/EmployeeController.php:100
- * @route '/demo/employees/session/{employee}'
- */
-    const sessionShowForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: sessionShow.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::sessionShow
- * @see app/Http/Controllers/Hris/EmployeeController.php:100
- * @route '/demo/employees/session/{employee}'
- */
-        sessionShowForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionShow.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::sessionShow
- * @see app/Http/Controllers/Hris/EmployeeController.php:100
- * @route '/demo/employees/session/{employee}'
- */
-        sessionShowForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionShow.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    sessionShow.form = sessionShowForm
 /**
 * @see \App\Http\Controllers\Hris\EmployeeController::show
  * @see app/Http/Controllers/Hris/EmployeeController.php:76
@@ -469,42 +294,6 @@ show.head = (args: { employee: string | number } | [employee: string | number ] 
     url: show.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\EmployeeController::show
- * @see app/Http/Controllers/Hris/EmployeeController.php:76
- * @route '/demo/employees/{employee}'
- */
-    const showForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: show.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::show
- * @see app/Http/Controllers/Hris/EmployeeController.php:76
- * @route '/demo/employees/{employee}'
- */
-        showForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\EmployeeController::show
- * @see app/Http/Controllers/Hris/EmployeeController.php:76
- * @route '/demo/employees/{employee}'
- */
-        showForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    show.form = showForm
 const EmployeeController = { dashboard, reports, create, index, sessionShow, show }
 
 export default EmployeeController

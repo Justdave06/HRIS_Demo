@@ -7,6 +7,7 @@ import {
     ClipboardCheck,
     Clock,
     FileText,
+    FolderKanban,
     LayoutDashboard,
     LogIn,
     LogOut,
@@ -278,6 +279,26 @@ const moduleNav: Record<string, ModuleNavItem[]> = {
             icon: FileText,
         },
     ],
+    projects: [
+        {
+            slug: 'dashboard',
+            title: 'Dashboard',
+            href: '/demo/projects/dashboard',
+            icon: LayoutDashboard,
+        },
+        {
+            slug: 'registry',
+            title: 'Project Registry',
+            href: '/demo/projects/registry',
+            icon: FolderKanban,
+        },
+        {
+            slug: 'reports',
+            title: 'Reports',
+            href: '/demo/projects/reports',
+            icon: FileText,
+        },
+    ],
 };
 
 const currentModule = computed<string | null>(() => {
@@ -321,6 +342,10 @@ const currentModule = computed<string | null>(() => {
 
     if (path.startsWith('/demo/offboarding')) {
         return 'offboarding';
+    }
+
+    if (path.startsWith('/demo/projects')) {
+        return 'projects';
     }
 
     const match = path.match(/^\/demo\/modules\/([a-z]+)/);
@@ -535,6 +560,24 @@ function isItemActive(item: ModuleNavItem): boolean {
                 currentUrl.value.startsWith('/demo/offboarding') &&
                 !currentUrl.value.startsWith('/demo/offboarding/dashboard') &&
                 !currentUrl.value.startsWith('/demo/offboarding/reports')
+            );
+        }
+    }
+
+    if (currentModule.value === 'projects') {
+        if (item.slug === 'dashboard' || item.slug === 'reports') {
+            // The legacy /demo/projects URL also counts as the dashboard.
+            return (
+                isCurrentUrl(item.href) ||
+                (item.slug === 'dashboard' && isCurrentUrl('/demo/projects'))
+            );
+        }
+
+        if (item.slug === 'registry') {
+            return (
+                currentUrl.value.startsWith('/demo/projects') &&
+                !currentUrl.value.startsWith('/demo/projects/dashboard') &&
+                !currentUrl.value.startsWith('/demo/projects/reports')
             );
         }
     }

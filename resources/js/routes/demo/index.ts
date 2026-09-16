@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 import employees from './employees'
 import recruitment from './recruitment'
 import attendance from './attendance'
@@ -9,6 +9,7 @@ import performance from './performance'
 import training from './training'
 import disciplinary from './disciplinary'
 import offboarding from './offboarding'
+import projects from './projects'
 import portal from './portal'
 import modules from './modules'
 /**
@@ -54,41 +55,6 @@ hub.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\HubController::hub
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/demo'
- */
-    const hubForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: hub.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\HubController::hub
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/demo'
- */
-        hubForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: hub.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\HubController::hub
- * @see app/Http/Controllers/Hris/HubController.php:16
- * @route '/demo'
- */
-        hubForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: hub.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    hub.form = hubForm
 /**
 * @see \App\Http\Controllers\Hris\HubController::mode
  * @see app/Http/Controllers/Hris/HubController.php:29
@@ -150,42 +116,6 @@ mode.head = (args: { mode: string | number } | [mode: string | number ] | string
     url: mode.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\HubController::mode
- * @see app/Http/Controllers/Hris/HubController.php:29
- * @route '/demo/mode/{mode}'
- */
-    const modeForm = (args: { mode: string | number } | [mode: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: mode.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\HubController::mode
- * @see app/Http/Controllers/Hris/HubController.php:29
- * @route '/demo/mode/{mode}'
- */
-        modeForm.get = (args: { mode: string | number } | [mode: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: mode.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\HubController::mode
- * @see app/Http/Controllers/Hris/HubController.php:29
- * @route '/demo/mode/{mode}'
- */
-        modeForm.head = (args: { mode: string | number } | [mode: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: mode.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    mode.form = modeForm
 const demo = {
     hub: Object.assign(hub, hub),
 mode: Object.assign(mode, mode),
@@ -199,6 +129,7 @@ performance: Object.assign(performance, performance),
 training: Object.assign(training, training),
 disciplinary: Object.assign(disciplinary, disciplinary),
 offboarding: Object.assign(offboarding, offboarding),
+projects: Object.assign(projects, projects),
 portal: Object.assign(portal, portal),
 modules: Object.assign(modules, modules),
 }

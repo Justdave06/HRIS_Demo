@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::index
  * @see app/Http/Controllers/Hris/OffboardingController.php:17
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::index
- * @see app/Http/Controllers/Hris/OffboardingController.php:17
- * @route '/demo/offboarding'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::index
- * @see app/Http/Controllers/Hris/OffboardingController.php:17
- * @route '/demo/offboarding'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::index
- * @see app/Http/Controllers/Hris/OffboardingController.php:17
- * @route '/demo/offboarding'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::dashboard
  * @see app/Http/Controllers/Hris/OffboardingController.php:26
@@ -120,41 +85,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::dashboard
- * @see app/Http/Controllers/Hris/OffboardingController.php:26
- * @route '/demo/offboarding/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::dashboard
- * @see app/Http/Controllers/Hris/OffboardingController.php:26
- * @route '/demo/offboarding/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::dashboard
- * @see app/Http/Controllers/Hris/OffboardingController.php:26
- * @route '/demo/offboarding/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::cases
  * @see app/Http/Controllers/Hris/OffboardingController.php:35
@@ -198,41 +128,6 @@ cases.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::cases
- * @see app/Http/Controllers/Hris/OffboardingController.php:35
- * @route '/demo/offboarding/cases'
- */
-    const casesForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: cases.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::cases
- * @see app/Http/Controllers/Hris/OffboardingController.php:35
- * @route '/demo/offboarding/cases'
- */
-        casesForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: cases.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::cases
- * @see app/Http/Controllers/Hris/OffboardingController.php:35
- * @route '/demo/offboarding/cases'
- */
-        casesForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: cases.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    cases.form = casesForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::sessionCase
  * @see app/Http/Controllers/Hris/OffboardingController.php:69
@@ -295,41 +190,6 @@ sessionCase.head = (args: { employee: string | number } | [employee: string | nu
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::sessionCase
- * @see app/Http/Controllers/Hris/OffboardingController.php:69
- * @route '/demo/offboarding/cases/session/{employee}'
- */
-    const sessionCaseForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: sessionCase.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::sessionCase
- * @see app/Http/Controllers/Hris/OffboardingController.php:69
- * @route '/demo/offboarding/cases/session/{employee}'
- */
-        sessionCaseForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionCase.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::sessionCase
- * @see app/Http/Controllers/Hris/OffboardingController.php:69
- * @route '/demo/offboarding/cases/session/{employee}'
- */
-        sessionCaseForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionCase.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    sessionCase.form = sessionCaseForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::caseMethod
  * @see app/Http/Controllers/Hris/OffboardingController.php:44
@@ -392,41 +252,6 @@ caseMethod.head = (args: { employee: string | number } | [employee: string | num
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::caseMethod
- * @see app/Http/Controllers/Hris/OffboardingController.php:44
- * @route '/demo/offboarding/cases/{employee}'
- */
-    const caseMethodForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: caseMethod.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::caseMethod
- * @see app/Http/Controllers/Hris/OffboardingController.php:44
- * @route '/demo/offboarding/cases/{employee}'
- */
-        caseMethodForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: caseMethod.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::caseMethod
- * @see app/Http/Controllers/Hris/OffboardingController.php:44
- * @route '/demo/offboarding/cases/{employee}'
- */
-        caseMethodForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: caseMethod.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    caseMethod.form = caseMethodForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::sessionEmployeeOverview
  * @see app/Http/Controllers/Hris/OffboardingController.php:116
@@ -489,41 +314,6 @@ sessionEmployeeOverview.head = (args: { employee: string | number } | [employee:
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::sessionEmployeeOverview
- * @see app/Http/Controllers/Hris/OffboardingController.php:116
- * @route '/demo/offboarding/employees/session/{employee}'
- */
-    const sessionEmployeeOverviewForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: sessionEmployeeOverview.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::sessionEmployeeOverview
- * @see app/Http/Controllers/Hris/OffboardingController.php:116
- * @route '/demo/offboarding/employees/session/{employee}'
- */
-        sessionEmployeeOverviewForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionEmployeeOverview.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::sessionEmployeeOverview
- * @see app/Http/Controllers/Hris/OffboardingController.php:116
- * @route '/demo/offboarding/employees/session/{employee}'
- */
-        sessionEmployeeOverviewForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: sessionEmployeeOverview.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    sessionEmployeeOverview.form = sessionEmployeeOverviewForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::employeeOverview
  * @see app/Http/Controllers/Hris/OffboardingController.php:94
@@ -586,41 +376,6 @@ employeeOverview.head = (args: { employee: string | number } | [employee: string
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::employeeOverview
- * @see app/Http/Controllers/Hris/OffboardingController.php:94
- * @route '/demo/offboarding/employees/{employee}'
- */
-    const employeeOverviewForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: employeeOverview.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::employeeOverview
- * @see app/Http/Controllers/Hris/OffboardingController.php:94
- * @route '/demo/offboarding/employees/{employee}'
- */
-        employeeOverviewForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: employeeOverview.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::employeeOverview
- * @see app/Http/Controllers/Hris/OffboardingController.php:94
- * @route '/demo/offboarding/employees/{employee}'
- */
-        employeeOverviewForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: employeeOverview.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    employeeOverview.form = employeeOverviewForm
 /**
 * @see \App\Http\Controllers\Hris\OffboardingController::reports
  * @see app/Http/Controllers/Hris/OffboardingController.php:154
@@ -663,42 +418,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\OffboardingController::reports
- * @see app/Http/Controllers/Hris/OffboardingController.php:154
- * @route '/demo/offboarding/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::reports
- * @see app/Http/Controllers/Hris/OffboardingController.php:154
- * @route '/demo/offboarding/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\OffboardingController::reports
- * @see app/Http/Controllers/Hris/OffboardingController.php:154
- * @route '/demo/offboarding/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const OffboardingController = { index, dashboard, cases, sessionCase, caseMethod, sessionEmployeeOverview, employeeOverview, reports, case: caseMethod }
 
 export default OffboardingController

@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
 import recordsE88d67 from './records'
 /**
 * @see \App\Http\Controllers\Hris\DisciplinaryController::index
@@ -43,41 +43,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::index
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:16
- * @route '/demo/disciplinary'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::index
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:16
- * @route '/demo/disciplinary'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::index
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:16
- * @route '/demo/disciplinary'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\DisciplinaryController::dashboard
  * @see app/Http/Controllers/Hris/DisciplinaryController.php:26
@@ -121,41 +86,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::dashboard
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:26
- * @route '/demo/disciplinary/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::dashboard
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:26
- * @route '/demo/disciplinary/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::dashboard
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:26
- * @route '/demo/disciplinary/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\DisciplinaryController::records
  * @see app/Http/Controllers/Hris/DisciplinaryController.php:36
@@ -199,41 +129,6 @@ records.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::records
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:36
- * @route '/demo/disciplinary/records'
- */
-    const recordsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: records.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::records
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:36
- * @route '/demo/disciplinary/records'
- */
-        recordsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: records.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::records
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:36
- * @route '/demo/disciplinary/records'
- */
-        recordsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: records.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    records.form = recordsForm
 /**
 * @see \App\Http\Controllers\Hris\DisciplinaryController::reports
  * @see app/Http/Controllers/Hris/DisciplinaryController.php:94
@@ -276,42 +171,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::reports
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:94
- * @route '/demo/disciplinary/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::reports
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:94
- * @route '/demo/disciplinary/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\DisciplinaryController::reports
- * @see app/Http/Controllers/Hris/DisciplinaryController.php:94
- * @route '/demo/disciplinary/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const disciplinary = {
     index: Object.assign(index, index),
 dashboard: Object.assign(dashboard, dashboard),

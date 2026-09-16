@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\ComingSoonController::show
  * @see app/Http/Controllers/Hris/ComingSoonController.php:14
@@ -60,42 +60,6 @@ show.head = (args: { module: string | number } | [module: string | number ] | st
     url: show.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\ComingSoonController::show
- * @see app/Http/Controllers/Hris/ComingSoonController.php:14
- * @route '/demo/modules/{module}'
- */
-    const showForm = (args: { module: string | number } | [module: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: show.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\ComingSoonController::show
- * @see app/Http/Controllers/Hris/ComingSoonController.php:14
- * @route '/demo/modules/{module}'
- */
-        showForm.get = (args: { module: string | number } | [module: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\ComingSoonController::show
- * @see app/Http/Controllers/Hris/ComingSoonController.php:14
- * @route '/demo/modules/{module}'
- */
-        showForm.head = (args: { module: string | number } | [module: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: show.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    show.form = showForm
 const modules = {
     show: Object.assign(show, show),
 }

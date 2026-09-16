@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\PayrollController::index
  * @see app/Http/Controllers/Hris/PayrollController.php:16
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PayrollController::index
- * @see app/Http/Controllers/Hris/PayrollController.php:16
- * @route '/demo/payroll'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::index
- * @see app/Http/Controllers/Hris/PayrollController.php:16
- * @route '/demo/payroll'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::index
- * @see app/Http/Controllers/Hris/PayrollController.php:16
- * @route '/demo/payroll'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\PayrollController::dashboard
  * @see app/Http/Controllers/Hris/PayrollController.php:25
@@ -120,41 +85,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PayrollController::dashboard
- * @see app/Http/Controllers/Hris/PayrollController.php:25
- * @route '/demo/payroll/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::dashboard
- * @see app/Http/Controllers/Hris/PayrollController.php:25
- * @route '/demo/payroll/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::dashboard
- * @see app/Http/Controllers/Hris/PayrollController.php:25
- * @route '/demo/payroll/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\PayrollController::payslips
  * @see app/Http/Controllers/Hris/PayrollController.php:34
@@ -198,41 +128,6 @@ payslips.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\PayrollController::payslips
- * @see app/Http/Controllers/Hris/PayrollController.php:34
- * @route '/demo/payroll/payslips'
- */
-    const payslipsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: payslips.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::payslips
- * @see app/Http/Controllers/Hris/PayrollController.php:34
- * @route '/demo/payroll/payslips'
- */
-        payslipsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: payslips.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::payslips
- * @see app/Http/Controllers/Hris/PayrollController.php:34
- * @route '/demo/payroll/payslips'
- */
-        payslipsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: payslips.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    payslips.form = payslipsForm
 /**
 * @see \App\Http\Controllers\Hris\PayrollController::reports
  * @see app/Http/Controllers/Hris/PayrollController.php:43
@@ -275,42 +170,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\PayrollController::reports
- * @see app/Http/Controllers/Hris/PayrollController.php:43
- * @route '/demo/payroll/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::reports
- * @see app/Http/Controllers/Hris/PayrollController.php:43
- * @route '/demo/payroll/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\PayrollController::reports
- * @see app/Http/Controllers/Hris/PayrollController.php:43
- * @route '/demo/payroll/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const PayrollController = { index, dashboard, payslips, reports }
 
 export default PayrollController

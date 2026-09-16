@@ -11,9 +11,9 @@ namespace App\Support;
 class DemoData
 {
     /**
-     * The 10 demo accounts shown on the simple login screen.
+     * The 11 demo accounts shown on the simple login screen.
      *
-     * Each account maps to one module (1-10): logging in as an account
+     * Each account maps to one module (1-11): logging in as an account
      * automatically opens that account's module.
      */
     public static function accounts(): array
@@ -29,6 +29,7 @@ class DemoData
             ['id' => 8, 'name' => 'Ramon Villanueva', 'role' => 'Training Coordinator', 'department' => 'Human Resources', 'email' => 'ramon.villanueva@demo.hris', 'color' => '#4f46e5', 'module' => 'training'],
             ['id' => 9, 'name' => 'Grace Aquino', 'role' => 'Compliance Officer', 'department' => 'Legal & Compliance', 'email' => 'grace.aquino@demo.hris', 'color' => '#0f172a', 'module' => 'disciplinary'],
             ['id' => 10, 'name' => 'Paolo Garcia', 'role' => 'HR Assistant', 'department' => 'Human Resources', 'email' => 'paolo.garcia@demo.hris', 'color' => '#0891b2', 'module' => 'offboarding'],
+            ['id' => 11, 'name' => 'Diana Mercado', 'role' => 'Project Manager', 'department' => 'Information Technology', 'email' => 'diana.mercado@demo.hris', 'color' => '#047857', 'module' => 'projects'],
         ];
     }
 
@@ -714,7 +715,207 @@ class DemoData
         ];
     }
 
-    /** All 10 modules. Status is 'available' for the ones already built. */
+    /**
+     * Milestone lists for the Project Management registry (Module 11). The
+     * first $doneCount items are marked completed so each project shows a
+     * realistic progress bar.
+     */
+    private static function milestones(array $items, int $doneCount): array
+    {
+        return array_map(fn ($item, $i) => [
+            'name' => $item['name'],
+            'due_date' => $item['due_date'],
+            'completed' => $i < $doneCount,
+        ], $items, array_keys($items));
+    }
+
+    /**
+     * Project Management registry (Module 11).
+     *
+     * Statuses follow the project lifecycle: Planning → Active → On Hold →
+     * Completed, with Cancelled for stopped work. Teams pull from the
+     * Employee Records module (every lead and member is a real employee).
+     */
+    public static function projects(): array
+    {
+        return [
+            [
+                'id' => 1,
+                'name' => 'Core HR Digitalization',
+                'description' => 'Move employee records, benefits enrollment and performance reviews onto a single digital system.',
+                'start_date' => '2026-01-05',
+                'end_date' => '2026-09-30',
+                'status' => 'Active',
+                'department' => 'Human Resources',
+                'lead_id' => 1,
+                'team_ids' => [5, 7, 2],
+                'milestones' => self::milestones([
+                    ['name' => 'Project kickoff', 'due_date' => '2026-01-31'],
+                    ['name' => 'Requirements gathering', 'due_date' => '2026-03-15'],
+                    ['name' => 'System configuration', 'due_date' => '2026-06-30'],
+                    ['name' => 'Mid-year go-live', 'due_date' => '2026-08-15'],
+                    ['name' => 'Training and rollout', 'due_date' => '2026-09-30'],
+                ], 3),
+                'budget' => 1500000,
+            ],
+            [
+                'id' => 2,
+                'name' => 'Recruitment Portal Upgrade',
+                'description' => 'Re-platform the applicant tracking workflow — postings, candidate pipeline and onboarding handoff.',
+                'start_date' => '2026-06-01',
+                'end_date' => '2026-10-15',
+                'status' => 'Active',
+                'department' => 'Human Resources',
+                'lead_id' => 2,
+                'team_ids' => [1, 6, 24],
+                'milestones' => self::milestones([
+                    ['name' => 'Vendor selection', 'due_date' => '2026-06-30'],
+                    ['name' => 'Data migration', 'due_date' => '2026-08-15'],
+                    ['name' => 'Integration with Employee Records', 'due_date' => '2026-09-15'],
+                    ['name' => 'User acceptance testing', 'due_date' => '2026-10-15'],
+                ], 2),
+                'budget' => 850000,
+            ],
+            [
+                'id' => 3,
+                'name' => 'Payroll Engine Rework',
+                'description' => 'Simplify the monthly payroll run — taxes, government contributions and final pay in one engine.',
+                'start_date' => '2026-08-03',
+                'end_date' => '2026-12-18',
+                'status' => 'Planning',
+                'department' => 'Finance',
+                'lead_id' => 11,
+                'team_ids' => [3, 12],
+                'milestones' => self::milestones([
+                    ['name' => 'Requirements workshop', 'due_date' => '2026-09-30'],
+                    ['name' => 'System design', 'due_date' => '2026-11-15'],
+                    ['name' => 'Parallel run with current payroll', 'due_date' => '2026-12-18'],
+                ], 0),
+                'budget' => 1200000,
+            ],
+            [
+                'id' => 4,
+                'name' => 'ERP Implementation — Phase 1',
+                'description' => 'First phase of the enterprise resource planning platform covering finance, operations and HR modules.',
+                'start_date' => '2026-03-02',
+                'end_date' => '2026-11-30',
+                'status' => 'Active',
+                'department' => 'Information Technology',
+                'lead_id' => 6,
+                'team_ids' => [23, 25, 10, 30, 13],
+                'milestones' => self::milestones([
+                    ['name' => 'Infrastructure setup', 'due_date' => '2026-04-30'],
+                    ['name' => 'Data migration', 'due_date' => '2026-07-31'],
+                    ['name' => 'User training', 'due_date' => '2026-10-31'],
+                    ['name' => 'Phase 1 go-live', 'due_date' => '2026-11-30'],
+                ], 2),
+                'budget' => 5000000,
+            ],
+            [
+                'id' => 5,
+                'name' => 'Sales CRM Rollout',
+                'description' => 'Deploy a customer relationship tool to the sales team and migrate the lead pipeline.',
+                'start_date' => '2026-05-11',
+                'end_date' => '2026-09-04',
+                'status' => 'On Hold',
+                'department' => 'Sales',
+                'lead_id' => 14,
+                'team_ids' => [15, 16],
+                'milestones' => self::milestones([
+                    ['name' => 'Account setup', 'due_date' => '2026-06-15'],
+                    ['name' => 'Pipeline configuration', 'due_date' => '2026-07-15'],
+                    ['name' => 'Sales team rollout', 'due_date' => '2026-09-04'],
+                ], 2),
+                'budget' => 700000,
+            ],
+            [
+                'id' => 6,
+                'name' => 'Brand Refresh Campaign 2026',
+                'description' => 'Full brand refresh — new visual identity, collaterals and a product launch page for the year.',
+                'start_date' => '2026-02-02',
+                'end_date' => '2026-06-30',
+                'status' => 'Completed',
+                'department' => 'Marketing',
+                'lead_id' => 17,
+                'team_ids' => [18, 19],
+                'milestones' => self::milestones([
+                    ['name' => 'Concept presentation', 'due_date' => '2026-03-31'],
+                    ['name' => 'Design production', 'due_date' => '2026-05-31'],
+                    ['name' => 'Campaign launch', 'due_date' => '2026-06-30'],
+                ], 3),
+                'budget' => 900000,
+            ],
+            [
+                'id' => 7,
+                'name' => 'Warehouse Automation Pilot',
+                'description' => 'Pilot automated sorting and inventory tracking in the main warehouse before a full roll-out.',
+                'start_date' => '2026-10-05',
+                'end_date' => '2027-03-31',
+                'status' => 'Planning',
+                'department' => 'Operations',
+                'lead_id' => 26,
+                'team_ids' => [27, 4],
+                'milestones' => self::milestones([
+                    ['name' => 'Feasibility study', 'due_date' => '2026-11-30'],
+                    ['name' => 'Vendor procurement', 'due_date' => '2027-01-31'],
+                    ['name' => 'Pilot operations', 'due_date' => '2027-03-31'],
+                ], 0),
+                'budget' => 2000000,
+            ],
+            [
+                'id' => 8,
+                'name' => 'Customer Support System Upgrade',
+                'description' => 'Upgrade the ticketing and self-service portal to reduce first-response time for customers.',
+                'start_date' => '2026-07-06',
+                'end_date' => '2026-09-30',
+                'status' => 'Active',
+                'department' => 'Customer Support',
+                'lead_id' => 20,
+                'team_ids' => [21, 22, 23],
+                'milestones' => self::milestones([
+                    ['name' => 'Requirements workshop', 'due_date' => '2026-07-31'],
+                    ['name' => 'System integration', 'due_date' => '2026-09-15'],
+                    ['name' => 'Support team training', 'due_date' => '2026-09-30'],
+                ], 1),
+                'budget' => 650000,
+            ],
+            [
+                'id' => 9,
+                'name' => 'Compliance Framework Review',
+                'description' => 'Annual review of policies and controls to keep the company compliant with labor regulations.',
+                'start_date' => '2026-01-12',
+                'end_date' => '2026-04-30',
+                'status' => 'Completed',
+                'department' => 'Legal & Compliance',
+                'lead_id' => 8,
+                'team_ids' => [28],
+                'milestones' => self::milestones([
+                    ['name' => 'Policy audit', 'due_date' => '2026-02-28'],
+                    ['name' => 'Drafting updates', 'due_date' => '2026-03-31'],
+                    ['name' => 'Management sign-off', 'due_date' => '2026-04-30'],
+                ], 3),
+                'budget' => 300000,
+            ],
+            [
+                'id' => 10,
+                'name' => 'Legacy System Decommission',
+                'description' => 'Retire the outdated attendance and payroll servers once all data has been migrated to the new engine.',
+                'start_date' => '2025-11-03',
+                'end_date' => '2026-03-31',
+                'status' => 'Cancelled',
+                'department' => 'Information Technology',
+                'lead_id' => 6,
+                'team_ids' => [25, 10],
+                'milestones' => self::milestones([
+                    ['name' => 'Data extraction', 'due_date' => '2026-01-31'],
+                    ['name' => 'Server shutdown', 'due_date' => '2026-03-31'],
+                ], 1),
+                'budget' => 400000,
+            ],
+        ];
+    }
+
+    /** All 11 modules. Status is 'available' for the ones already built. */
     public static function modules(): array
     {
         return [
@@ -728,6 +929,7 @@ class DemoData
             ['slug' => 'training', 'name' => 'Training & Development', 'short' => 'Training', 'status' => 'available', 'description' => 'Plan courses and track who has completed them. Completed trainings are recorded on each employee profile.', 'features' => ['Training calendar', 'Course enrollments', 'Certificates on employee records', 'Training history per employee']],
             ['slug' => 'disciplinary', 'name' => 'Disciplinary Management', 'short' => 'Disciplinary', 'status' => 'available', 'description' => 'Record warnings and incidents fairly. Repeat issues flag into offboarding when needed.', 'features' => ['Incident and warning log', 'Tracks repeated tardiness', 'Escalation to offboarding', 'Fair and consistent records']],
             ['slug' => 'offboarding', 'name' => 'Separation & Offboarding', 'short' => 'Offboarding', 'status' => 'available', 'description' => 'A smooth goodbye — clearance tasks, final pay, and safe archiving of employee records.', 'features' => ['Exit checklist and clearance', 'Resignation and termination tracking', 'Final pay calculation with payroll', 'Records archived safely']],
+            ['slug' => 'projects', 'name' => 'Project Management', 'short' => 'Projects', 'status' => 'available', 'description' => 'A simple project registry — status, dates, assigned teams and milestones, all linked to employee records.', 'features' => ['Project registry with search and filters', 'Status lifecycle: Planning → Completed', 'Teams pulled from employee records', 'Team utilization reports']],
         ];
     }
 
@@ -747,6 +949,8 @@ class DemoData
      *      against records; sanctions feed payroll; serious cases feed 10.
      *   10 Separation & Offboarding       = the terminal stage: closes and
      *      archives the core record and settles final pay.
+     *   11 Project Management             = READ ENGINE — leads and teams are
+     *      pulled straight from the core record; delivery informs 7 & 5.
      */
     public static function moduleLinks(string $slug): array
     {
@@ -770,6 +974,7 @@ class DemoData
                     ['module' => 'Training', 'note' => 'Who gets enrolled in courses'],
                     ['module' => 'Disciplinary', 'note' => 'Records reviewed for incidents (outbound)'],
                     ['module' => 'Offboarding', 'note' => 'Records used for separation and archiving'],
+                    ['module' => 'Projects', 'note' => 'Leads and team members assigned to projects'],
                 ],
             ],
             // 2 — Inbound: hiring feeds the central core.
@@ -874,6 +1079,16 @@ class DemoData
                 'sends' => [
                     ['module' => 'Payroll', 'note' => 'Final pay and clearance computation'],
                     ['module' => 'Employee Records', 'note' => 'Records archived safely after separation'],
+                ],
+            ],
+            // 11 — Read engine: teams and leads are pulled from the core record.
+            'projects' => [
+                'receives' => [
+                    ['module' => 'Employee Records', 'note' => 'Leads and team members assigned to projects'],
+                ],
+                'sends' => [
+                    ['module' => 'Performance', 'note' => 'Project delivery feeds performance reviews'],
+                    ['module' => 'Payroll', 'note' => 'Project milestones may trigger incentives'],
                 ],
             ],
         ];

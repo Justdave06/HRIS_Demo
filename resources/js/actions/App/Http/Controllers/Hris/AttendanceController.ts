@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\AttendanceController::index
  * @see app/Http/Controllers/Hris/AttendanceController.php:16
@@ -42,41 +42,6 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\AttendanceController::index
- * @see app/Http/Controllers/Hris/AttendanceController.php:16
- * @route '/demo/attendance'
- */
-    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: index.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::index
- * @see app/Http/Controllers/Hris/AttendanceController.php:16
- * @route '/demo/attendance'
- */
-        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::index
- * @see app/Http/Controllers/Hris/AttendanceController.php:16
- * @route '/demo/attendance'
- */
-        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: index.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\AttendanceController::dashboard
  * @see app/Http/Controllers/Hris/AttendanceController.php:25
@@ -120,41 +85,6 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\AttendanceController::dashboard
- * @see app/Http/Controllers/Hris/AttendanceController.php:25
- * @route '/demo/attendance/dashboard'
- */
-    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: dashboard.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::dashboard
- * @see app/Http/Controllers/Hris/AttendanceController.php:25
- * @route '/demo/attendance/dashboard'
- */
-        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::dashboard
- * @see app/Http/Controllers/Hris/AttendanceController.php:25
- * @route '/demo/attendance/dashboard'
- */
-        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: dashboard.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\AttendanceController::manager
  * @see app/Http/Controllers/Hris/AttendanceController.php:41
@@ -198,41 +128,6 @@ manager.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\AttendanceController::manager
- * @see app/Http/Controllers/Hris/AttendanceController.php:41
- * @route '/demo/attendance/manager'
- */
-    const managerForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: manager.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::manager
- * @see app/Http/Controllers/Hris/AttendanceController.php:41
- * @route '/demo/attendance/manager'
- */
-        managerForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: manager.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::manager
- * @see app/Http/Controllers/Hris/AttendanceController.php:41
- * @route '/demo/attendance/manager'
- */
-        managerForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: manager.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    manager.form = managerForm
 /**
 * @see \App\Http\Controllers\Hris\AttendanceController::holidays
  * @see app/Http/Controllers/Hris/AttendanceController.php:56
@@ -276,41 +171,6 @@ holidays.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
-    /**
-* @see \App\Http\Controllers\Hris\AttendanceController::holidays
- * @see app/Http/Controllers/Hris/AttendanceController.php:56
- * @route '/demo/attendance/holidays'
- */
-    const holidaysForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: holidays.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::holidays
- * @see app/Http/Controllers/Hris/AttendanceController.php:56
- * @route '/demo/attendance/holidays'
- */
-        holidaysForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: holidays.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::holidays
- * @see app/Http/Controllers/Hris/AttendanceController.php:56
- * @route '/demo/attendance/holidays'
- */
-        holidaysForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: holidays.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    holidays.form = holidaysForm
 /**
 * @see \App\Http\Controllers\Hris\AttendanceController::reports
  * @see app/Http/Controllers/Hris/AttendanceController.php:77
@@ -353,42 +213,6 @@ reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\AttendanceController::reports
- * @see app/Http/Controllers/Hris/AttendanceController.php:77
- * @route '/demo/attendance/reports'
- */
-    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: reports.url(options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::reports
- * @see app/Http/Controllers/Hris/AttendanceController.php:77
- * @route '/demo/attendance/reports'
- */
-        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url(options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\AttendanceController::reports
- * @see app/Http/Controllers/Hris/AttendanceController.php:77
- * @route '/demo/attendance/reports'
- */
-        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: reports.url({
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    reports.form = reportsForm
 const AttendanceController = { index, dashboard, manager, holidays, reports }
 
 export default AttendanceController

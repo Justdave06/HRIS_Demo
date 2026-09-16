@@ -477,3 +477,59 @@ export type DemoOffboardingRow = DemoOffboardingCase & {
     /** Completed cases are archived in the register. */
     archived: boolean;
 };
+
+/* ------------------------------------------------------------------ */
+/* Module 11 — Project Management                                      */
+/* ------------------------------------------------------------------ */
+
+export type DemoProjectStatus =
+    | 'Planning'
+    | 'Active'
+    | 'On Hold'
+    | 'Completed'
+    | 'Cancelled';
+
+export type DemoProjectMilestone = {
+    name: string;
+    due_date: string;
+    completed: boolean;
+};
+
+/** One project in the registry (Module 11). */
+export type DemoProject = {
+    id: number;
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    status: DemoProjectStatus;
+    department: string;
+    lead_id: number;
+    team_ids: number[];
+    milestones: DemoProjectMilestone[];
+    budget: number;
+};
+
+/** Draft captured by the New project modal (Module 11). */
+export type DemoProjectDraft = {
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    status: DemoProjectStatus;
+    department: string;
+    lead_id: number;
+    team_ids: number[];
+    budget: number;
+};
+
+/** Project enriched with employee names and progress (Module 11). */
+export type DemoProjectRow = DemoProject & {
+    lead_name: string;
+    team_names: string[];
+    team_count: number;
+    /** Percent of milestones completed. */
+    progress: number;
+    /** True when end_date has passed and status is not Completed/Cancelled. */
+    overdue: boolean;
+};

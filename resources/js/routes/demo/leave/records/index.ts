@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\Hris\LeaveController::session
  * @see app/Http/Controllers/Hris/LeaveController.php:100
@@ -60,42 +60,6 @@ session.head = (args: { employee: string | number } | [employee: string | number
     url: session.url(args, options),
     method: 'head',
 })
-
-    /**
-* @see \App\Http\Controllers\Hris\LeaveController::session
- * @see app/Http/Controllers/Hris/LeaveController.php:100
- * @route '/demo/leave/records/session/{employee}'
- */
-    const sessionForm = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-        action: session.url(args, options),
-        method: 'get',
-    })
-
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::session
- * @see app/Http/Controllers/Hris/LeaveController.php:100
- * @route '/demo/leave/records/session/{employee}'
- */
-        sessionForm.get = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: session.url(args, options),
-            method: 'get',
-        })
-            /**
-* @see \App\Http\Controllers\Hris\LeaveController::session
- * @see app/Http/Controllers/Hris/LeaveController.php:100
- * @route '/demo/leave/records/session/{employee}'
- */
-        sessionForm.head = (args: { employee: string | number } | [employee: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
-            action: session.url(args, {
-                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
-                            _method: 'HEAD',
-                            ...(options?.query ?? options?.mergeQuery ?? {}),
-                        }
-                    }),
-            method: 'get',
-        })
-    
-    session.form = sessionForm
 const records = {
     session: Object.assign(session, session),
 }
