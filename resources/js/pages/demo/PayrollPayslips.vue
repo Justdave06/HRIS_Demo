@@ -48,6 +48,7 @@ const allEmployees = computed<PayrollEmployee[]>(() => [
         department: employee.department,
         position: employee.position,
         salary: employee.salary,
+        hire_date: employee.hire_date,
     })),
 ]);
 

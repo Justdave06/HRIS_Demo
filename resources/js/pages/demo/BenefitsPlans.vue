@@ -26,6 +26,7 @@ import { useDemoBenefits } from '@/composables/useDemoBenefits';
 import type { BenefitsEmployee } from '@/composables/useDemoBenefits';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoLoans } from '@/composables/useDemoLoans';
+import { useDemoRead } from '@/composables/useDemoRead';
 import { exportSheet } from '@/lib/exportExcel';
 import { cn } from '@/lib/utils';
 import type { DemoBenefitPlan, DemoEnrollment } from '@/types';
@@ -63,6 +64,37 @@ const {
 
 // Loan applications filed from the Employee Portal — reviewed here.
 const { applications, setStatus } = useDemoLoans();
+
+// Tab badges count only rows not yet opened via View — once every row has
+// been read, the badge disappears until a new record arrives (session-backed).
+const { markRead, unreadCount } = useDemoRead();
+
+const enrollmentBadge = computed(
+    () =>
+        unreadCount(
+            rows.value.map((row) => `enrollment:${row.id}`),
+        ),
+);
+const loanBadge = computed(
+    () =>
+        unreadCount(
+            applications.value.map((loan) => `loan:${loan.id}`),
+        ),
+);
+
+function openRecord(employeeId: number, key: string): void {
+    markRead(key);
+
+    // Session-added employees (id 1001+) hydrate their record from
+    // sessionStorage on the record page.
+    if (employeeId >= 1001) {
+        router.visit(`/demo/benefits/employees/session/${employeeId}`);
+
+        return;
+    }
+
+    router.visit(`/demo/benefits/employees/${employeeId}`);
+}
 
 const loanRows = computed(() =>
     applications.value.map((loan) => {
@@ -170,22 +202,6 @@ const filteredLoans = computed(() => {
                     Number(a.status === 'Pending') || b.id - a.id,
         );
 });
-
-/* ------------------------------------------------------------------ */
-/* Employee benefits record — opens the full-page record view          */
-/* ------------------------------------------------------------------ */
-
-function openRecord(employeeId: number): void {
-    // Session-added employees (id 1001+) hydrate their record from
-    // sessionStorage on the record page.
-    if (employeeId >= 1001) {
-        router.visit(`/demo/benefits/employees/session/${employeeId}`);
-
-        return;
-    }
-
-    router.visit(`/demo/benefits/employees/${employeeId}`);
-}
 
 /* ------------------------------------------------------------------ */
 /* Enroll modal                                                        */
@@ -395,11 +411,12 @@ function exportExcel(): void {
             >
                 <HeartHandshake class="size-4" />
                 Enrollments
+                <!-- Badge shows only while rows are unread; hidden when all read. -->
                 <span
-                    v-if="rows.length > 0"
+                    v-if="enrollmentBadge > 0"
                     class="rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-semibold text-blue-700 tabular-nums dark:bg-blue-500/20 dark:text-blue-300"
                 >
-                    {{ rows.length }}
+                    {{ enrollmentBadge }}
                 </span>
             </button>
             <button
@@ -416,11 +433,12 @@ function exportExcel(): void {
             >
                 <Banknote class="size-4" />
                 Loan applications
+                <!-- Badge shows only while applications are unread; hidden when all read. -->
                 <span
-                    v-if="applications.length > 0"
+                    v-if="loanBadge > 0"
                     class="rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-semibold text-blue-700 tabular-nums dark:bg-blue-500/20 dark:text-blue-300"
                 >
-                    {{ applications.length }}
+                    {{ loanBadge }}
                 </span>
             </button>
         </div>
@@ -581,7 +599,7 @@ function exportExcel(): void {
                                             variant="outline"
                                             size="sm"
                                             class="text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
-                                            @click="openRecord(row.employee_id)"
+                                            @click="openRecord(row.employee_id, `enrollment:${row.id}`)"
                                         >
                                             <Eye class="size-3.5" />
                                             View
@@ -758,7 +776,7 @@ function exportExcel(): void {
                                             size="sm"
                                             class="text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
                                             @click="
-                                                openRecord(loan.employee_id)
+                                                openRecord(loan.employee_id, `loan:${loan.id}`)
                                             "
                                         >
                                             <Eye class="size-3.5" />

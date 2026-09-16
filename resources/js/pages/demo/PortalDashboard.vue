@@ -5,6 +5,7 @@ import {
     Banknote,
     BookOpen,
     CalendarCheck2,
+    ChevronDown,
     ClipboardCheck,
     Clock,
     HeartHandshake,
@@ -241,6 +242,9 @@ const leaveBalance = computed(() =>
 );
 
 const latestPayslip = computed(() => myPayslips.value[0]);
+
+/** Period currently expanded in the My payslips timeline. */
+const expandedPayslip = ref<string | null>(null);
 
 const myLoans = computed<DemoLoanApplication[]>(() =>
     sessionId.value === null ? [] : applicationsFor(sessionId.value),
@@ -942,36 +946,255 @@ const payslipTone: Record<string, string> = {
                             <Banknote class="size-4 text-emerald-600" />
                             <h2 class="font-semibold">My payslips</h2>
                         </div>
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            Tap a period to see how the pay was computed —
+                            deductions start once benefits or loans are active.
+                        </p>
                         <ul class="mt-3 space-y-2">
                             <li
                                 v-for="payslip in myPayslips.slice(0, 3)"
                                 :key="payslip.period"
-                                class="flex items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-2 text-sm"
+                                class="rounded-lg border border-slate-200 text-sm"
                             >
-                                <div>
-                                    <p class="font-medium text-slate-800">
-                                        {{ payslip.period }}
-                                    </p>
-                                    <p class="text-xs text-slate-500">
-                                        {{
-                                            payslip.deductions === 0
-                                                ? `Full salary · ${payslip.status}`
-                                                : `Gross ${formatMoney(payslip.gross)} · deductions ${formatMoney(payslip.deductions)}`
-                                        }}
-                                    </p>
-                                </div>
-                                <div class="text-right">
+                                <!-- Collapsed row: period + net pay + status -->
+                                <button
+                                    type="button"
+                                    class="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
+                                    @click="
+                                        expandedPayslip =
+                                            expandedPayslip === payslip.period
+                                                ? null
+                                                : payslip.period
+                                    "
+                                >
+                                    <div>
+                                        <p class="font-medium text-slate-800">
+                                            {{ payslip.periodLabel }}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            Net
+                                            {{
+                                                formatMoney(payslip.net)
+                                            }}<template
+                                                v-if="payslip.deductions > 0"
+                                            >
+                                                ·
+                                                {{
+                                                    formatMoney(
+                                                        payslip.deductions,
+                                                    )
+                                                }}
+                                                deductions</template
+                                            ><template
+                                                v-else-if="
+                                                    payslip.gross !==
+                                                    payslip.net
+                                                "
+                                            >
+                                                · adjusted from
+                                                {{
+                                                    formatMoney(payslip.gross)
+                                                }}</template
+                                            >
+                                        </p>
+                                    </div>
+                                    <div
+                                        class="flex shrink-0 items-center gap-2"
+                                    >
+                                        <div class="text-right">
+                                            <p
+                                                class="font-semibold text-slate-900 tabular-nums"
+                                            >
+                                                {{ formatMoney(payslip.net) }}
+                                            </p>
+                                            <span
+                                                class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium"
+                                                :class="
+                                                    payslipTone[payslip.status]
+                                                "
+                                            >
+                                                {{ payslip.status }}
+                                            </span>
+                                        </div>
+                                        <ChevronDown
+                                            class="size-4 text-slate-400 transition-transform"
+                                            :class="
+                                                expandedPayslip ===
+                                                payslip.period
+                                                    ? 'rotate-180'
+                                                    : ''
+                                            "
+                                        />
+                                    </div>
+                                </button>
+
+                                <!-- Expanded: full earnings → deductions → net breakdown -->
+                                <div
+                                    v-if="
+                                        expandedPayslip === payslip.period
+                                    "
+                                    class="border-t border-slate-100 bg-slate-50/60 px-3 py-3 text-xs"
+                                >
                                     <p
-                                        class="font-semibold text-slate-900 tabular-nums"
+                                        class="text-[10px] font-semibold tracking-wide text-slate-500 uppercase"
                                     >
-                                        {{ formatMoney(payslip.net) }}
+                                        Earnings
                                     </p>
-                                    <span
-                                        class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-medium"
-                                        :class="payslipTone[payslip.status]"
+                                    <div
+                                        class="mt-1 space-y-1 text-slate-700"
                                     >
-                                        {{ payslip.status }}
-                                    </span>
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>Basic pay</span>
+                                            <span class="tabular-nums">
+                                                {{
+                                                    formatMoney(payslip.basic)
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>
+                                                Overtime
+                                                ({{ payslip.otHours }} hrs)
+                                            </span>
+                                            <span class="tabular-nums">
+                                                +
+                                                {{
+                                                    formatMoney(payslip.otPay)
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="payslip.unpaidDays > 0"
+                                            class="flex items-center justify-between text-red-600"
+                                        >
+                                            <span>
+                                                Unpaid absences
+                                                ({{ payslip.unpaidDays }}
+                                                day{{
+                                                    payslip.unpaidDays === 1
+                                                        ? ''
+                                                        : 's'
+                                                }})
+                                            </span>
+                                            <span class="tabular-nums">
+                                                −{{
+                                                    formatMoney(
+                                                        payslip.unpaidDeduction,
+                                                    )
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-between border-t border-slate-200 pt-1 font-semibold text-slate-900"
+                                        >
+                                            <span>Gross pay</span>
+                                            <span class="tabular-nums">
+                                                {{
+                                                    formatMoney(payslip.gross)
+                                                }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <p
+                                        class="mt-3 text-[10px] font-semibold tracking-wide text-slate-500 uppercase"
+                                    >
+                                        Deductions
+                                    </p>
+                                    <div
+                                        class="mt-1 space-y-1 text-slate-700"
+                                    >
+                                        <div
+                                            v-if="payslip.sss > 0"
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>SSS</span>
+                                            <span class="tabular-nums">
+                                                {{ formatMoney(payslip.sss) }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="payslip.philhealth > 0"
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>PhilHealth</span>
+                                            <span class="tabular-nums">
+                                                {{
+                                                    formatMoney(
+                                                        payslip.philhealth,
+                                                    )
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="payslip.pagibig > 0"
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>Pag-IBIG</span>
+                                            <span class="tabular-nums">
+                                                {{
+                                                    formatMoney(
+                                                        payslip.pagibig,
+                                                    )
+                                                }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="payslip.tax > 0"
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>Withholding tax</span>
+                                            <span class="tabular-nums">
+                                                {{ formatMoney(payslip.tax) }}
+                                            </span>
+                                        </div>
+                                        <div
+                                            v-if="payslip.loan > 0"
+                                            class="flex items-center justify-between"
+                                        >
+                                            <span>
+                                                Loan amortization
+                                            </span>
+                                            <span class="tabular-nums">
+                                                {{ formatMoney(payslip.loan) }}
+                                            </span>
+                                        </div>
+                                        <p
+                                            v-if="
+                                                payslip.deductions === 0
+                                            "
+                                            class="text-slate-400"
+                                        >
+                                            None yet — contributions start
+                                            once you enroll in a benefit or
+                                            apply for a loan.
+                                        </p>
+                                        <div
+                                            class="flex items-center justify-between border-t border-slate-200 pt-1 font-semibold text-slate-900"
+                                        >
+                                            <span>Total deductions</span>
+                                            <span class="tabular-nums">
+                                                {{
+                                                    formatMoney(
+                                                        payslip.deductions,
+                                                    )
+                                                }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="mt-3 flex items-center justify-between rounded-lg border border-slate-800 bg-white px-3 py-2 font-semibold text-slate-900"
+                                    >
+                                        <span>Net pay</span>
+                                        <span class="tabular-nums">
+                                            {{ formatMoney(payslip.net) }}
+                                        </span>
+                                    </div>
                                 </div>
                             </li>
                             <li

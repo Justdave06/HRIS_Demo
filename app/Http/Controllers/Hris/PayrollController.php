@@ -60,6 +60,7 @@ class PayrollController extends Controller
                 'department' => $e['department'],
                 'position' => $e['position'],
                 'salary' => $e['salary'],
+                'hire_date' => $e['hire_date'],
             ])->values()->all(),
             'periods' => DemoData::payrollPeriods(),
         ];

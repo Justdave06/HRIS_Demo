@@ -29,6 +29,8 @@ export type PayrollEmployee = {
     department: string;
     position: string;
     salary: number;
+    /** ISO start date — no pay, OT or absences before this day. */
+    hire_date?: string;
 };
 
 export type PayrollPeriod = {
@@ -77,8 +79,13 @@ export function useDemoPayroll(
         return new Date(year, month, 0).getDate();
     }
 
-    /** Declared no-work-no-pay holidays inside this period for a department. */
-    function unpaidHolidayDays(period: string, department: string): number {
+    /** Declared no-work-no-pay holidays inside this period for a department.
+     *  Days before the hire date don't count — the employee wasn't employed. */
+    function unpaidHolidayDays(
+        period: string,
+        department: string,
+        startDay = 1,
+    ): number {
         return declaredHolidays.value.reduce((sum, holiday) => {
             if (holiday.pay !== 'No work, no pay (excused)') {
                 return sum;
@@ -87,12 +94,19 @@ export function useDemoPayroll(
             const applies =
                 holiday.scope === 'all' || holiday.department === department;
 
+            if (!applies) {
+                return sum;
+            }
+
             return (
                 sum +
-                (applies
-                    ? holiday.dates.filter((date) => date.startsWith(period))
-                          .length
-                    : 0)
+                holiday.dates.filter((date) => {
+                    if (!date.startsWith(period)) {
+                        return false;
+                    }
+
+                    return Number(date.slice(8, 10)) >= startDay;
+                }).length
             );
         }, 0);
     }
@@ -118,33 +132,82 @@ export function useDemoPayroll(
         return 33541.67 + (monthly - 166667) * 0.3;
     }
 
+    /**
+     * Hired mid-period? Pay runs only from the hire date: earlier periods
+     * return null (no payslip at all) and the hire month is prorated from
+     * the daily rate. Absences and overtime are also only counted on/after
+     * the hire date, so a fresh employee is never docked for days they
+     * weren't employed yet.
+     */
+    function hireBounds(
+        employee: PayrollEmployee,
+        period: PayrollPeriod,
+    ): { start: number; end: number } | null {
+        const days = daysInMonth(period.value);
+
+        if (!employee.hire_date) {
+            return { start: 1, end: days };
+        }
+
+        const hireMonth = employee.hire_date.slice(0, 7);
+
+        // Hired after this period — no payslip for it at all.
+        if (hireMonth > period.value) {
+            return null;
+        }
+
+        // Hired before this period — full month.
+        if (hireMonth < period.value) {
+            return { start: 1, end: days };
+        }
+
+        // Hired during this period — count only the days from the hire date.
+        return { start: new Date(`${employee.hire_date}T00:00:00`).getDate(), end: days };
+    }
+
     function computePayslip(
         employee: PayrollEmployee,
         period: PayrollPeriod,
-    ): DemoPayslip {
+    ): DemoPayslip | null {
         // A new employee has no Benefits activity yet (no loan filed, no plan
         // enrolled), so nothing is deducted — net equals gross. Statutory
         // contributions (SSS, PhilHealth, Pag-IBIG, tax) start once they
         // apply for a benefit or loan, from the next payslip onward.
         const hasDeductionLines = hasDeductions(employee.id);
-        const stats = rangeStats(
-            employee.id,
-            `${period.value}-01`,
-            `${period.value}-${daysInMonth(period.value)}`,
-        );
+        const bounds = hireBounds(employee, period);
+
+        if (bounds === null) {
+            return null; // Not hired yet — no payslip for this period.
+        }
+
+        const monthDays = daysInMonth(period.value);
         const hourlyRate = employee.salary / 176;
         const dailyRate = employee.salary / 22;
+        // Attendance patterns only count on/after the hire date, so a
+        // mid-month hire is neither paid nor docked for earlier days.
+        const stats = rangeStats(
+            employee.id,
+            `${period.value}-${String(Math.max(1, bounds.start)).padStart(2, '0')}`,
+            `${period.value}-${String(monthDays).padStart(2, '0')}`,
+        );
         const otPay = round2(stats.otHours * hourlyRate * 1.25);
         // A declared no-work-no-pay holiday overrides the absence pattern on
         // the DTR card (day off, not absent), so it must not be double-counted.
         const holidayDays = unpaidHolidayDays(
             period.value,
             employee.department,
+            bounds.start,
         );
         const unpaidDays =
             holidayDays + Math.max(0, stats.absentDays - holidayDays);
         const unpaidDeduction = round2(unpaidDays * dailyRate);
-        const gross = round2(employee.salary + otPay - unpaidDeduction);
+        // Hired mid-month: basic pay is prorated from the daily rate for the
+        // days from hire to month end (hired on the 1st ⇒ full salary).
+        const basic =
+            bounds.start > 1
+                ? round2(dailyRate * (monthDays - bounds.start + 1))
+                : employee.salary;
+        const gross = round2(basic + otPay - unpaidDeduction);
         const sss = hasDeductionLines
             ? round2(Math.min(1125, gross * 0.045))
             : 0;
@@ -172,7 +235,7 @@ export function useDemoPayroll(
             name: employee.name,
             department: employee.department,
             position: employee.position,
-            basic: employee.salary,
+            basic,
             otHours: stats.otHours,
             otPay,
             unpaidDays,
@@ -195,7 +258,9 @@ export function useDemoPayroll(
             periods.find((row) => row.value === periodValue) ??
             periods[periods.length - 1];
 
-        return employees.map((employee) => computePayslip(employee, period));
+        return employees
+            .map((employee) => computePayslip(employee, period))
+            .filter((row): row is DemoPayslip => row !== null);
     }
 
     /** Mark one payslip as Paid (session-persisted). */
