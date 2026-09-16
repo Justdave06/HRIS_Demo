@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { useDemoDtr } from '@/composables/useDemoDtr';
 import { useDemoHolidays } from '@/composables/useDemoHolidays';
-import { useDemoLoans } from '@/composables/useDemoLoans';
+import { hasDeductions, useDemoLoans } from '@/composables/useDemoLoans';
 import type { DemoPayslip, DemoPayslipStatus } from '@/types';
 
 /*
@@ -122,6 +122,11 @@ export function useDemoPayroll(
         employee: PayrollEmployee,
         period: PayrollPeriod,
     ): DemoPayslip {
+        // A new employee has no Benefits activity yet (no loan filed, no plan
+        // enrolled), so nothing is deducted — net equals gross. Statutory
+        // contributions (SSS, PhilHealth, Pag-IBIG, tax) start once they
+        // apply for a benefit or loan, from the next payslip onward.
+        const hasDeductionLines = hasDeductions(employee.id);
         const stats = rangeStats(
             employee.id,
             `${period.value}-01`,
@@ -140,11 +145,21 @@ export function useDemoPayroll(
             holidayDays + Math.max(0, stats.absentDays - holidayDays);
         const unpaidDeduction = round2(unpaidDays * dailyRate);
         const gross = round2(employee.salary + otPay - unpaidDeduction);
-        const sss = round2(Math.min(1125, gross * 0.045));
-        const philhealth = round2(Math.min(2500, Math.max(250, gross * 0.025)));
-        const pagibig = round2(Math.min(200, Math.max(100, gross * 0.02)));
-        const tax = round2(withholdingTax(gross - sss - philhealth - pagibig));
-        const loan = round2(monthlyDeductionFor(employee.id));
+        const sss = hasDeductionLines
+            ? round2(Math.min(1125, gross * 0.045))
+            : 0;
+        const philhealth = hasDeductionLines
+            ? round2(Math.min(2500, Math.max(250, gross * 0.025)))
+            : 0;
+        const pagibig = hasDeductionLines
+            ? round2(Math.min(200, Math.max(100, gross * 0.02)))
+            : 0;
+        const tax = hasDeductionLines
+            ? round2(withholdingTax(gross - sss - philhealth - pagibig))
+            : 0;
+        const loan = hasDeductionLines
+            ? round2(monthlyDeductionFor(employee.id))
+            : 0;
         const deductions = round2(sss + philhealth + pagibig + tax + loan);
         const net = round2(gross - deductions);
         const isPaid = paid.value[`${period.value}:${employee.id}`];

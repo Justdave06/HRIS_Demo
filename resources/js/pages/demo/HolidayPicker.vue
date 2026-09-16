@@ -361,12 +361,12 @@ function submitDeclaration(): void {
                     </span>
                     <h2 class="font-semibold text-slate-900">
                         Declared holidays
-                    </h2>
-                    <span
-                        class="ml-auto rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                    >
-                        {{ declaredHolidays.length }}
-                    </span>
+                    </h2>                        <span
+                            v-if="declaredHolidays.length > 0"
+                            class="ml-auto inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                        >
+                            {{ declaredHolidays.length }}
+                        </span>
                 </div>
                 <div class="mt-4 overflow-x-auto">
                     <table class="w-full min-w-[640px] text-sm">

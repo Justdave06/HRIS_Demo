@@ -343,7 +343,8 @@ const statusTone: Record<string, string> = {
                     Enrollment summary report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="enrollmentRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ enrollmentRows.length }} enrollments
                 </span>
@@ -425,7 +426,8 @@ const statusTone: Record<string, string> = {
                     Contributions report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="contributionRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ contributionRows.length }} employees
                 </span>
@@ -504,7 +506,8 @@ const statusTone: Record<string, string> = {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Plan cost report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="planCostRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ planCostRows.length }} plans
                 </span>
@@ -586,7 +589,8 @@ const statusTone: Record<string, string> = {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Allowances report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="allowanceRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ allowanceRows.length }} allowances
                 </span>

@@ -109,17 +109,24 @@ const search = ref('');
 const filtered = computed(() => {
     const term = search.value.trim().toLowerCase();
 
-    return rows.value.filter(
-        (row) =>
-            (planFilter.value === 'all' ||
-                row.plan_id === Number(planFilter.value)) &&
-            (statusFilter.value === 'all' ||
-                row.status === statusFilter.value) &&
-            (term === '' ||
-                row.employee_name.toLowerCase().includes(term) ||
-                row.employee_no.toLowerCase().includes(term) ||
-                row.plan.toLowerCase().includes(term)),
-    );
+    return rows.value
+        .filter(
+            (row) =>
+                (planFilter.value === 'all' ||
+                    row.plan_id === Number(planFilter.value)) &&
+                (statusFilter.value === 'all' ||
+                    row.status === statusFilter.value) &&
+                (term === '' ||
+                    row.employee_name.toLowerCase().includes(term) ||
+                    row.employee_no.toLowerCase().includes(term) ||
+                    row.plan.toLowerCase().includes(term)),
+        )
+        // Pending first so they never get buried below active rows.
+        .sort(
+            (a, b) =>
+                Number(b.status === 'Pending') -
+                    Number(a.status === 'Pending') || a.id - b.id,
+        );
 });
 
 const typeTone: Record<string, string> = {
@@ -149,12 +156,19 @@ const loanSearch = ref('');
 const filteredLoans = computed(() => {
     const term = loanSearch.value.trim().toLowerCase();
 
-    return loanRows.value.filter(
-        (loan) =>
-            term === '' ||
-            loan.name.toLowerCase().includes(term) ||
-            loan.type.toLowerCase().includes(term),
-    );
+    return loanRows.value
+        .filter(
+            (loan) =>
+                term === '' ||
+                loan.name.toLowerCase().includes(term) ||
+                loan.type.toLowerCase().includes(term),
+        )
+        // Pending applications first — they are the ones awaiting HR action.
+        .sort(
+            (a, b) =>
+                Number(b.status === 'Pending') -
+                    Number(a.status === 'Pending') || b.id - a.id,
+        );
 });
 
 /* ------------------------------------------------------------------ */
@@ -382,12 +396,8 @@ function exportExcel(): void {
                 <HeartHandshake class="size-4" />
                 Enrollments
                 <span
-                    class="rounded-full px-1.5 py-px text-[10px] font-semibold tabular-nums"
-                    :class="
-                        activeTab === 'enrollments'
-                            ? 'bg-primary-foreground/20'
-                            : 'bg-muted'
-                    "
+                    v-if="rows.length > 0"
+                    class="rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-semibold text-blue-700 tabular-nums dark:bg-blue-500/20 dark:text-blue-300"
                 >
                     {{ rows.length }}
                 </span>
@@ -407,12 +417,8 @@ function exportExcel(): void {
                 <Banknote class="size-4" />
                 Loan applications
                 <span
-                    class="rounded-full px-1.5 py-px text-[10px] font-semibold tabular-nums"
-                    :class="
-                        activeTab === 'loans'
-                            ? 'bg-primary-foreground/20'
-                            : 'bg-muted'
-                    "
+                    v-if="applications.length > 0"
+                    class="rounded-full bg-blue-100 px-1.5 py-px text-[10px] font-semibold text-blue-700 tabular-nums dark:bg-blue-500/20 dark:text-blue-300"
                 >
                     {{ applications.length }}
                 </span>
@@ -473,14 +479,14 @@ function exportExcel(): void {
                     <div class="flex items-center gap-3">
                         <h2 class="font-semibold text-slate-900">
                             Enrollments
-                        </h2>
-                        <span
-                            class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                        >
-                            {{ filtered.length }} enrollment{{
-                                filtered.length === 1 ? '' : 's'
-                            }}
-                        </span>
+                        </h2>                            <span
+                                v-if="filtered.length > 0"
+                                class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                            >
+                                {{ filtered.length }} enrollment{{
+                                    filtered.length === 1 ? '' : 's'
+                                }}
+                            </span>
                     </div>
                     <Button
                         class="bg-blue-600 hover:bg-blue-700"

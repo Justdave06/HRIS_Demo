@@ -355,7 +355,13 @@ function exportExcel(): void {
                     }}
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="
+                        (reportType === 'register'
+                            ? registerRows
+                            : archivedRows
+                        ).length > 0
+                    "
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{
                         (reportType === 'register'
@@ -482,7 +488,8 @@ function exportExcel(): void {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Active separations</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="activeRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ activeRows.length }} cases
                 </span>
@@ -566,7 +573,8 @@ function exportExcel(): void {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Final pay summary</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="finalPayRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ finalPayRows.length }} cases
                 </span>

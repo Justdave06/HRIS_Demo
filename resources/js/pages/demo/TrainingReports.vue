@@ -333,7 +333,8 @@ function exportExcel(): void {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Enrollment report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="enrollmentRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ enrollmentRows.length }} enrollments
                 </span>
@@ -433,7 +434,8 @@ function exportExcel(): void {
                     Completion & scores report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="completionRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ completionRows.length }} completed
                 </span>
@@ -527,7 +529,8 @@ function exportExcel(): void {
                     Certificate register
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="certificateRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ certificateRows.length }} certificates
                 </span>
@@ -608,7 +611,8 @@ function exportExcel(): void {
                     Course summary report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="summaryRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ summaryRows.length }} courses
                 </span>

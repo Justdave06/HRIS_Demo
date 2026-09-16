@@ -278,14 +278,14 @@ function exportExcel(): void {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">
                     {{ periodLabel }} payroll
-                </h2>
-                <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                >
-                    {{ filtered.length }} payslip{{
-                        filtered.length === 1 ? '' : 's'
-                    }}
-                </span>
+                </h2>                    <span
+                        v-if="filtered.length > 0"
+                        class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                    >
+                        {{ filtered.length }} payslip{{
+                            filtered.length === 1 ? '' : 's'
+                        }}
+                    </span>
             </div>
 
             <div class="overflow-x-auto">
@@ -585,25 +585,37 @@ function exportExcel(): void {
                             <div
                                 class="mt-2 space-y-1.5 text-sm text-slate-700"
                             >
-                                <div class="flex items-center justify-between">
+                                <div
+                                    v-if="selected.sss > 0"
+                                    class="flex items-center justify-between"
+                                >
                                     <span>SSS</span>
                                     <span class="tabular-nums">
                                         {{ formatMoney(selected.sss) }}
                                     </span>
                                 </div>
-                                <div class="flex items-center justify-between">
+                                <div
+                                    v-if="selected.philhealth > 0"
+                                    class="flex items-center justify-between"
+                                >
                                     <span>PhilHealth</span>
                                     <span class="tabular-nums">
                                         {{ formatMoney(selected.philhealth) }}
                                     </span>
                                 </div>
-                                <div class="flex items-center justify-between">
+                                <div
+                                    v-if="selected.pagibig > 0"
+                                    class="flex items-center justify-between"
+                                >
                                     <span>Pag-IBIG</span>
                                     <span class="tabular-nums">
                                         {{ formatMoney(selected.pagibig) }}
                                     </span>
                                 </div>
-                                <div class="flex items-center justify-between">
+                                <div
+                                    v-if="selected.tax > 0"
+                                    class="flex items-center justify-between"
+                                >
                                     <span>Withholding tax</span>
                                     <span class="tabular-nums">
                                         {{ formatMoney(selected.tax) }}
@@ -617,6 +629,13 @@ function exportExcel(): void {
                                     <span class="tabular-nums">
                                         {{ formatMoney(selected.loan) }}
                                     </span>
+                                </div>
+                                <div
+                                    v-if="selected.deductions === 0"
+                                    class="text-xs text-slate-400"
+                                >
+                                    No deductions yet — contributions start once
+                                    the employee applies for a benefit or loan.
                                 </div>
                                 <div
                                     class="mt-1 flex items-center justify-between border-t border-slate-200 pt-1.5 font-semibold text-slate-900"

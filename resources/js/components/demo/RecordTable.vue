@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Pencil, Plus, Trash2 } from '@lucide/vue';
+import CountBadge from '@/components/demo/CountBadge.vue';
 import { Button } from '@/components/ui/button';
 
 type Column = {
@@ -41,11 +42,7 @@ const emit = defineEmits<{
                 </p>
             </div>
             <div class="flex items-center gap-3">
-                <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                >
-                    {{ rows.length }}
-                </span>
+                <CountBadge :value="rows.length" />
                 <Button size="sm" @click="emit('add')">
                     <Plus class="size-4" />
                     {{ addLabel }}

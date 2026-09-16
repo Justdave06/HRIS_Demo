@@ -402,7 +402,8 @@ function exportExcel(): void {
                     Rating summary report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="ratingRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ ratingRows.length }} reviews
                 </span>
@@ -518,7 +519,8 @@ function exportExcel(): void {
                     Raise recommendations report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="raiseRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ raiseRows.length }} recommendations
                 </span>
@@ -624,7 +626,8 @@ function exportExcel(): void {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Skill gaps report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="gapRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ gapRows.length }} gaps
                 </span>
@@ -712,7 +715,8 @@ function exportExcel(): void {
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Goals report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="goalReportRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ goalReportRows.length }} goals
                 </span>

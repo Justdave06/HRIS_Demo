@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { grantDeductions } from '@/composables/useDemoLoans';
 import type {
     DemoBenefitPlan,
     DemoEnrollment,
@@ -180,6 +181,10 @@ export function useDemoBenefits(
 
     /** Enroll an employee in a plan — starts as Pending, awaiting confirmation. */
     function addEnrollment(draft: EnrollmentDraft): DemoEnrollment {
+        // Benefits activity (even just applying) starts their statutory
+        // deductions — the payroll engine reads this entitlement.
+        grantDeductions(draft.employee_id);
+
         const enrollment: DemoEnrollment = {
             id: nextId(),
             employee_id: draft.employee_id,

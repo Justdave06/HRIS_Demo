@@ -291,12 +291,12 @@ function exportExcel(): void {
         <!-- Report table -->
         <div class="rounded-xl border bg-card shadow-sm">
             <div class="flex items-center justify-between border-b px-5 py-4">
-                <h2 class="font-semibold">{{ reportTypeLabel }}</h2>
-                <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                >
-                    {{ filtered.length }} records
-                </span>
+                <h2 class="font-semibold">{{ reportTypeLabel }}</h2>                    <span
+                        v-if="filtered.length > 0"
+                        class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                    >
+                        {{ filtered.length }} records
+                    </span>
             </div>
 
             <!-- Masterlist: flat table -->
@@ -354,12 +354,12 @@ function exportExcel(): void {
             <!-- 201 File Status: single flat table, driven by the filter -->
             <div v-else-if="reportType === 'file-status'" class="p-5">
                 <div class="flex items-center gap-3">
-                    <h3 class="font-semibold">{{ fileStatusTitle }}</h3>
-                    <span
-                        class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                    >
-                        {{ filtered.length }}
-                    </span>
+                    <h3 class="font-semibold">{{ fileStatusTitle }}</h3>                        <span
+                            v-if="filtered.length > 0"
+                            class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                        >
+                            {{ filtered.length }}
+                        </span>
                 </div>
                 <div class="mt-3 overflow-x-auto">
                     <table class="w-full min-w-[900px] text-sm">
@@ -430,12 +430,12 @@ function exportExcel(): void {
             <!-- Employment Status: single flat table, driven by the filter -->
             <div v-else-if="reportType === 'employment-status'" class="p-5">
                 <div class="flex items-center gap-3">
-                    <h3 class="font-semibold">{{ employmentStatusTitle }}</h3>
-                    <span
-                        class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                    >
-                        {{ filtered.length }}
-                    </span>
+                    <h3 class="font-semibold">{{ employmentStatusTitle }}</h3>                        <span
+                            v-if="filtered.length > 0"
+                            class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                        >
+                            {{ filtered.length }}
+                        </span>
                 </div>
                 <div class="mt-3 overflow-x-auto">
                     <table class="w-full min-w-[900px] text-sm">

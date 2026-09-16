@@ -669,7 +669,9 @@ const payslipTone: Record<string, string> = {
                         <p class="mt-1 text-xs text-slate-500">
                             {{
                                 latestPayslip
-                                    ? `${latestPayslip.period} · ${latestPayslip.status}`
+                                    ? latestPayslip.deductions === 0
+                                        ? `${latestPayslip.period} · ${latestPayslip.status} · no deductions yet`
+                                        : `${latestPayslip.period} · ${latestPayslip.status} · ${formatMoney(latestPayslip.deductions)} deductions`
                                     : 'No payslip on file'
                             }}
                         </p>
@@ -951,8 +953,11 @@ const payslipTone: Record<string, string> = {
                                         {{ payslip.period }}
                                     </p>
                                     <p class="text-xs text-slate-500">
-                                        Gross
-                                        {{ formatMoney(payslip.gross) }}
+                                        {{
+                                            payslip.deductions === 0
+                                                ? `Full salary · ${payslip.status}`
+                                                : `Gross ${formatMoney(payslip.gross)} · deductions ${formatMoney(payslip.deductions)}`
+                                        }}
                                     </p>
                                 </div>
                                 <div class="text-right">

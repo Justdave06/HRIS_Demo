@@ -51,6 +51,56 @@ const applications = ref<DemoLoanApplication[]>(
     loadStored<DemoLoanApplication[]>(STORAGE_KEY, []),
 );
 
+/**
+ * Employees who already have a Benefits history — filed a loan or were
+ * enrolled in a plan. Everyone else (e.g. a freshly added employee) has no
+ * deductions at all yet, so their payslip shows the full salary as net.
+ */
+const DEDUCTION_ENTITLEMENT_KEY = 'hris-demo-deduction-entitlements';
+
+function loadEntitlements(): Set<number> {
+    if (typeof window === 'undefined') {
+        return new Set();
+    }
+
+    try {
+        const raw = window.sessionStorage.getItem(DEDUCTION_ENTITLEMENT_KEY);
+
+        return new Set(raw ? (JSON.parse(raw) as number[]) : []);
+    } catch {
+        return new Set();
+    }
+}
+
+function saveEntitlements(entitlements: Set<number>): void {
+    if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem(
+            DEDUCTION_ENTITLEMENT_KEY,
+            JSON.stringify([...entitlements]),
+        );
+    }
+}
+
+const deductionEntitlements = ref<Set<number>>(loadEntitlements());
+
+/**
+ * True once an employee has any Benefits activity (loan filed, plan
+ * enrolled) — statutory contributions start with the next payslip run.
+ */
+export function hasDeductions(employeeId: number): boolean {
+    return deductionEntitlements.value.has(employeeId);
+}
+
+/** Mark an employee as having Benefits activity — enables their deductions. */
+export function grantDeductions(employeeId: number): void {
+    if (deductionEntitlements.value.has(employeeId)) {
+        return;
+    }
+
+    deductionEntitlements.value.add(employeeId);
+    saveEntitlements(deductionEntitlements.value);
+}
+
 function round2(value: number): number {
     return Math.round(value * 100) / 100;
 }
@@ -79,6 +129,7 @@ export function useDemoLoans() {
 
     /** File a loan application — starts as Pending, awaiting HR review. */
     function applyLoan(draft: LoanDraft): DemoLoanApplication {
+        grantDeductions(draft.employee_id);
         const amount = Math.max(0, Number(draft.amount) || 0);
         const terms = Math.max(1, Math.round(Number(draft.terms) || 1));
         const application: DemoLoanApplication = {

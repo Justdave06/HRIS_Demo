@@ -298,7 +298,8 @@ const previewTitle = computed(
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Job vacancy report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="filteredJobs.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ filteredJobs.length }} vacancy/ies
                 </span>
@@ -390,7 +391,8 @@ const previewTitle = computed(
                     Applicant master list
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="allCandidates.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ allCandidates.length }} applicants
                 </span>
@@ -462,7 +464,8 @@ const previewTitle = computed(
                     Interview schedule report
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="interviewCandidates.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ interviewCandidates.length }} interviews
                 </span>
@@ -515,7 +518,8 @@ const previewTitle = computed(
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Hiring summary</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="hiredCandidates.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ hiredCandidates.length }} hired
                 </span>
@@ -567,7 +571,8 @@ const previewTitle = computed(
             <div class="flex items-center justify-between border-b px-5 py-4">
                 <h2 class="font-semibold text-slate-900">Onboarding report</h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="onboarding.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ onboarding.length }} new hires
                 </span>

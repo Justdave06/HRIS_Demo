@@ -499,7 +499,8 @@ function exportExcel(): void {
                     Goals — {{ periodLabel(currentPeriod) }}
                 </h2>
                 <span
-                    class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                    v-if="employeeGoals.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
                 >
                     {{ employeeGoals.length }} goal{{
                         employeeGoals.length === 1 ? '' : 's'

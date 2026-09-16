@@ -153,13 +153,14 @@ const statusFilter = ref(initialStatus());
 const typeFilter = ref(initialType());
 const search = ref('');
 
+// Individual statuses for the filter dropdown. The combined "open"
+// (Logged + Under Review) option is rendered separately above these.
 const statusOptions = [
-    'open',
     'Logged',
     'Under Review',
     'Resolved',
     'Escalated',
-];
+] as const;
 
 const filtered = computed(() => {
     const term = search.value.trim().toLowerCase();
@@ -534,14 +535,14 @@ function exportExcel(): void {
                     class="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4"
                 >
                     <h2 class="font-semibold text-slate-900">Case log</h2>
-                    <div class="flex items-center gap-3">
-                        <span
-                            class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                        >
-                            {{ filtered.length }} record{{
-                                filtered.length === 1 ? '' : 's'
-                            }}
-                        </span>
+                    <div class="flex items-center gap-3">                            <span
+                                v-if="filtered.length > 0"
+                                class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                            >
+                                {{ filtered.length }} record{{
+                                    filtered.length === 1 ? '' : 's'
+                                }}
+                            </span>
                         <Button
                             class="bg-blue-600 hover:bg-blue-700"
                             size="sm"
@@ -741,14 +742,14 @@ function exportExcel(): void {
                     <div class="flex items-center gap-3">
                         <h2 class="font-semibold text-slate-900">
                             Repeat offenders
-                        </h2>
-                        <span
-                            class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
-                        >
-                            {{ offendersFiltered.length }} employee{{
-                                offendersFiltered.length === 1 ? '' : 's'
-                            }}
-                        </span>
+                        </h2>                            <span
+                                v-if="offendersFiltered.length > 0"
+                                class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                            >
+                                {{ offendersFiltered.length }} employee{{
+                                    offendersFiltered.length === 1 ? '' : 's'
+                                }}
+                            </span>
                     </div>
                     <div class="relative w-64">
                         <Search
