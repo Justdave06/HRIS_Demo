@@ -121,7 +121,9 @@ Route::prefix('demo')->name('demo.')->group(function () {
     Route::get('/projects/dashboard', [ProjectController::class, 'dashboard'])->name('projects.dashboard');
     Route::get('/projects/registry', [ProjectController::class, 'projects'])->name('projects.registry');
     Route::get('/projects/registry/session/{project}', [ProjectController::class, 'sessionProject'])->whereNumber('project')->name('projects.registry.session');
+    Route::get('/projects/registry/session/{project}/budget', [ProjectController::class, 'sessionBudgetBreakdown'])->whereNumber('project')->name('projects.registry.session.budget');
     Route::get('/projects/registry/{project}', [ProjectController::class, 'project'])->whereNumber('project')->name('projects.registry.show');
+    Route::get('/projects/registry/{project}/budget', [ProjectController::class, 'budgetBreakdown'])->whereNumber('project')->name('projects.registry.show.budget');
     Route::get('/projects/reports', [ProjectController::class, 'reports'])->name('projects.reports');
 
     // Employee Portal — employees log in with the email + temporary password

@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../wayfinder'
 import registry3bcd45 from './registry'
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::index
@@ -43,6 +43,41 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Hris\ProjectController::index
+ * @see app/Http/Controllers/Hris/ProjectController.php:16
+ * @route '/demo/projects'
+ */
+    const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: index.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::index
+ * @see app/Http/Controllers/Hris/ProjectController.php:16
+ * @route '/demo/projects'
+ */
+        indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::index
+ * @see app/Http/Controllers/Hris/ProjectController.php:16
+ * @route '/demo/projects'
+ */
+        indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: index.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    index.form = indexForm
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::dashboard
  * @see app/Http/Controllers/Hris/ProjectController.php:26
@@ -86,6 +121,41 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Hris\ProjectController::dashboard
+ * @see app/Http/Controllers/Hris/ProjectController.php:26
+ * @route '/demo/projects/dashboard'
+ */
+    const dashboardForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: dashboard.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::dashboard
+ * @see app/Http/Controllers/Hris/ProjectController.php:26
+ * @route '/demo/projects/dashboard'
+ */
+        dashboardForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: dashboard.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::dashboard
+ * @see app/Http/Controllers/Hris/ProjectController.php:26
+ * @route '/demo/projects/dashboard'
+ */
+        dashboardForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: dashboard.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    dashboard.form = dashboardForm
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::registry
  * @see app/Http/Controllers/Hris/ProjectController.php:35
@@ -129,9 +199,44 @@ registry.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Hris\ProjectController::registry
+ * @see app/Http/Controllers/Hris/ProjectController.php:35
+ * @route '/demo/projects/registry'
+ */
+    const registryForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: registry.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::registry
+ * @see app/Http/Controllers/Hris/ProjectController.php:35
+ * @route '/demo/projects/registry'
+ */
+        registryForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: registry.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::registry
+ * @see app/Http/Controllers/Hris/ProjectController.php:35
+ * @route '/demo/projects/registry'
+ */
+        registryForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: registry.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    registry.form = registryForm
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::reports
- * @see app/Http/Controllers/Hris/ProjectController.php:93
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
  * @route '/demo/projects/reports'
  */
 export const reports = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -146,7 +251,7 @@ reports.definition = {
 
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::reports
- * @see app/Http/Controllers/Hris/ProjectController.php:93
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
  * @route '/demo/projects/reports'
  */
 reports.url = (options?: RouteQueryOptions) => {
@@ -155,7 +260,7 @@ reports.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::reports
- * @see app/Http/Controllers/Hris/ProjectController.php:93
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
  * @route '/demo/projects/reports'
  */
 reports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -164,13 +269,49 @@ reports.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::reports
- * @see app/Http/Controllers/Hris/ProjectController.php:93
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
  * @route '/demo/projects/reports'
  */
 reports.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     url: reports.url(options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\Hris\ProjectController::reports
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
+ * @route '/demo/projects/reports'
+ */
+    const reportsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: reports.url(options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::reports
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
+ * @route '/demo/projects/reports'
+ */
+        reportsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: reports.url(options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::reports
+ * @see app/Http/Controllers/Hris/ProjectController.php:140
+ * @route '/demo/projects/reports'
+ */
+        reportsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: reports.url({
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    reports.form = reportsForm
 const projects = {
     index: Object.assign(index, index),
 dashboard: Object.assign(dashboard, dashboard),

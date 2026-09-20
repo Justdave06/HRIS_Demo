@@ -1,4 +1,6 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition, applyUrlDefaults } from './../../../../wayfinder'
+import sessionB29d8e from './session'
+import showBac614 from './show'
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::session
  * @see app/Http/Controllers/Hris/ProjectController.php:63
@@ -61,6 +63,41 @@ session.head = (args: { project: string | number } | [project: string | number ]
     method: 'head',
 })
 
+    /**
+* @see \App\Http\Controllers\Hris\ProjectController::session
+ * @see app/Http/Controllers/Hris/ProjectController.php:63
+ * @route '/demo/projects/registry/session/{project}'
+ */
+    const sessionForm = (args: { project: string | number } | [project: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: session.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::session
+ * @see app/Http/Controllers/Hris/ProjectController.php:63
+ * @route '/demo/projects/registry/session/{project}'
+ */
+        sessionForm.get = (args: { project: string | number } | [project: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: session.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::session
+ * @see app/Http/Controllers/Hris/ProjectController.php:63
+ * @route '/demo/projects/registry/session/{project}'
+ */
+        sessionForm.head = (args: { project: string | number } | [project: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: session.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    session.form = sessionForm
 /**
 * @see \App\Http\Controllers\Hris\ProjectController::show
  * @see app/Http/Controllers/Hris/ProjectController.php:44
@@ -122,9 +159,45 @@ show.head = (args: { project: string | number } | [project: string | number ] | 
     url: show.url(args, options),
     method: 'head',
 })
+
+    /**
+* @see \App\Http\Controllers\Hris\ProjectController::show
+ * @see app/Http/Controllers/Hris/ProjectController.php:44
+ * @route '/demo/projects/registry/{project}'
+ */
+    const showForm = (args: { project: string | number } | [project: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+        action: show.url(args, options),
+        method: 'get',
+    })
+
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::show
+ * @see app/Http/Controllers/Hris/ProjectController.php:44
+ * @route '/demo/projects/registry/{project}'
+ */
+        showForm.get = (args: { project: string | number } | [project: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, options),
+            method: 'get',
+        })
+            /**
+* @see \App\Http\Controllers\Hris\ProjectController::show
+ * @see app/Http/Controllers/Hris/ProjectController.php:44
+ * @route '/demo/projects/registry/{project}'
+ */
+        showForm.head = (args: { project: string | number } | [project: string | number ] | string | number, options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
+            action: show.url(args, {
+                        [options?.mergeQuery ? 'mergeQuery' : 'query']: {
+                            _method: 'HEAD',
+                            ...(options?.query ?? options?.mergeQuery ?? {}),
+                        }
+                    }),
+            method: 'get',
+        })
+    
+    show.form = showForm
 const registry = {
-    session: Object.assign(session, session),
-show: Object.assign(show, show),
+    session: Object.assign(session, sessionB29d8e),
+show: Object.assign(show, showBac614),
 }
 
 export default registry

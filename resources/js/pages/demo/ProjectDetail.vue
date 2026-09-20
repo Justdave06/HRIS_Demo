@@ -72,6 +72,12 @@ const current = computed(
         } as (typeof rows.value)[number]),
 );
 
+const budgetBreakdownHref = computed(() =>
+    current.value.id >= 1001
+        ? `/demo/projects/registry/session/${current.value.id}/budget`
+        : `/demo/projects/registry/${current.value.id}/budget`,
+);
+
 const statusTone: Record<string, string> = {
     Active: 'bg-blue-50 text-blue-700 border-blue-200',
     Planning: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -281,6 +287,12 @@ function exportExcel(): void {
                 <p class="mt-1 text-xs text-slate-500">
                     Total approved budget
                 </p>
+                <Link
+                    :href="budgetBreakdownHref"
+                    class="mt-3 inline-flex items-center text-xs font-medium text-blue-600 transition-colors hover:text-blue-700"
+                >
+                    Budget Breakdown
+                </Link>
             </div>
         </div>
 

@@ -87,6 +87,53 @@ class ProjectController extends Controller
     }
 
     /**
+     * Detailed budget breakdown for one project, grouped by cost class and
+     * displayed in a filterable table with search and date controls.
+     */
+    public function budgetBreakdown(int $project)
+    {
+        $projectData = collect(DemoData::projects())->firstWhere('id', $project);
+
+        if (! $projectData) {
+            return redirect()->route('demo.projects.registry');
+        }
+
+        return Inertia::render('demo/ProjectBudgetBreakdown', array_merge(
+            $this->payload(),
+            ['project' => $projectData],
+        ));
+    }
+
+    /**
+     * Session-only budget breakdown page for demo projects created in-browser.
+     */
+    public function sessionBudgetBreakdown(int $project)
+    {
+        $projectData = collect(DemoData::projects())->firstWhere('id', $project);
+
+        if (! $projectData) {
+            return Inertia::render('demo/ProjectBudgetBreakdown', array_merge(
+                $this->payload(),
+                ['project' => [
+                    'id' => $project,
+                    'name' => 'Project',
+                    'description' => '',
+                    'start_date' => '',
+                    'end_date' => '',
+                    'status' => 'Planning',
+                    'department' => '',
+                    'lead_id' => null,
+                    'team_ids' => [],
+                    'milestones' => [],
+                    'budget' => 0,
+                ]],
+            ));
+        }
+
+        return redirect()->route('demo.projects.registry.show.budget', ['project' => $project]);
+    }
+
+    /**
      * Project reports — project summary, by department, by status and team
      * utilization, with generate + export.
      */
