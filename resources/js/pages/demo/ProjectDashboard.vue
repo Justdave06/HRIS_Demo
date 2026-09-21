@@ -168,7 +168,12 @@ const statusTone: Record<string, string> = {
         <!-- Chart + recent projects -->
         <div class="grid gap-6 lg:grid-cols-2">
             <!-- Vertical bars: projects by status -->
-            <div class="rounded-xl border border-slate-200 bg-white p-5">
+            <!-- self-start keeps this card at its own content height — a grid
+            row would otherwise stretch it to match the taller card beside
+            it, leaving the chart floating in empty space. -->
+            <div
+                class="self-start rounded-xl border border-slate-200 bg-white p-5"
+            >
                 <h2 class="font-semibold text-slate-900">Projects by status</h2>
                 <p class="mt-0.5 text-xs text-slate-500">
                     Registry breakdown by current project lifecycle stage

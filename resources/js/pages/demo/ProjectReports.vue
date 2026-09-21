@@ -14,6 +14,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    budgetItemsForProject,
+    lineTotal,
+} from '@/composables/useDemoBudgetSpending';
 import { useDemoEmployees } from '@/composables/useDemoEmployees';
 import { useDemoProjects } from '@/composables/useDemoProjects';
 import type { ProjectEmployee } from '@/composables/useDemoProjects';
@@ -46,6 +50,7 @@ const { rows } = useDemoProjects(allEmployees.value, props.projects);
 
 const reportTypes = [
     { value: 'summary', label: 'Project Summary' },
+    { value: 'budget', label: 'Budget and Expenses' },
     { value: 'department', label: 'By Department' },
     { value: 'status', label: 'By Status' },
     { value: 'utilization', label: 'Team Utilization' },
@@ -90,10 +95,53 @@ const summaryRows = computed(() =>
         })),
 );
 
+/*
+ * Approved budget against what was actually booked. Expenses are read from the
+ * shared spending store, so a receipt added in a project's budget tab lands
+ * here too — and the seeded slips are not duplicated.
+ */
+const budgetRows = computed(() =>
+    rows.value
+        .filter(
+            (row) =>
+                match(row.name) ||
+                match(row.lead_name) ||
+                match(row.department),
+        )
+        .map((row, index) => {
+            const expenses = budgetItemsForProject(row.id, row.budget).reduce(
+                (sum, item) => sum + lineTotal(item),
+                0,
+            );
+            const balance = row.budget - expenses;
+
+            return {
+                no: index + 1,
+                name: row.name,
+                department: row.department,
+                budget: row.budget,
+                expenses,
+                /** Signed balance — negative once a project runs past its budget. */
+                balance,
+                over: balance < 0,
+                used:
+                    row.budget > 0
+                        ? `${((expenses / row.budget) * 100).toFixed(1)}%`
+                        : '—',
+            };
+        }),
+);
+
 const departmentRows = computed(() => {
     const byDepartment = new Map<
         string,
-        { total: number; planning: number; active: number; completed: number; budget: number }
+        {
+            total: number;
+            planning: number;
+            active: number;
+            completed: number;
+            budget: number;
+        }
     >();
 
     for (const row of rows.value) {
@@ -185,6 +233,10 @@ const emptyMessage = computed(() => {
         return 'No projects match the selected filters.';
     }
 
+    if (reportType.value === 'budget') {
+        return 'No projects match the selected filters.';
+    }
+
     if (reportType.value === 'department') {
         return 'No departments match the search.';
     }
@@ -205,6 +257,18 @@ const showPreview = ref(false);
 const documentColumns = computed<
     { key: string; label: string; numeric?: boolean }[]
 >(() => {
+    if (reportType.value === 'budget') {
+        return [
+            { key: 'no', label: 'No.' },
+            { key: 'name', label: 'Project' },
+            { key: 'department', label: 'Department' },
+            { key: 'budget', label: 'Approved Budget (₱)', numeric: true },
+            { key: 'expenses', label: 'Expenses (₱)', numeric: true },
+            { key: 'balance', label: 'Remaining / Short (₱)', numeric: true },
+            { key: 'used', label: 'Used' },
+        ];
+    }
+
     if (reportType.value === 'department') {
         return [
             { key: 'no', label: 'No.' },
@@ -254,6 +318,18 @@ const documentRows = computed<Record<string, string | number>[]>(() => {
         return summaryRows.value;
     }
 
+    if (reportType.value === 'budget') {
+        return budgetRows.value.map((row) => ({
+            no: row.no,
+            name: row.name,
+            department: row.department,
+            budget: row.budget,
+            expenses: row.expenses,
+            balance: row.balance,
+            used: row.used,
+        }));
+    }
+
     if (reportType.value === 'department') {
         return departmentRows.value;
     }
@@ -272,6 +348,10 @@ const documentTitle = computed(
 );
 
 const documentNote = computed(() => {
+    if (reportType.value === 'budget') {
+        return 'Approved budget against booked expenses per project — the seeded slips plus every receipt added in this session. A negative balance means the project has run past its approved budget.';
+    }
+
     if (reportType.value === 'department') {
         return 'Project count and approved budget grouped by owning department.';
     }
@@ -292,8 +372,8 @@ function generate(): void {
 }
 
 function exportExcel(): void {
-    const headers = documentColumns.value.map(
-        (column) => column.label.replace(' (🛎)', ''),
+    const headers = documentColumns.value.map((column) =>
+        column.label.replace(' (🛎)', ''),
     );
     const payload = documentRows.value.map((row) =>
         documentColumns.value.map((column) => row[column.key] ?? ''),
@@ -641,6 +721,108 @@ function exportExcel(): void {
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- ================= BUDGET AND EXPENSES ================= -->
+        <div
+            v-else-if="reportType === 'budget'"
+            class="rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
+            <div class="flex items-center justify-between border-b px-5 py-4">
+                <h2 class="font-semibold text-slate-900">
+                    Budget and expenses
+                </h2>
+                <span
+                    v-if="budgetRows.length > 0"
+                    class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 tabular-nums dark:bg-blue-500/15 dark:text-blue-300"
+                >
+                    {{ budgetRows.length }}
+                    project{{ budgetRows.length === 1 ? '' : 's' }}
+                </span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1000px] text-sm">
+                    <thead>
+                        <tr
+                            class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+                        >
+                            <th class="px-4 py-3 font-medium">No.</th>
+                            <th class="px-4 py-3 font-medium">Project</th>
+                            <th class="px-4 py-3 font-medium">Department</th>
+                            <th class="px-4 py-3 text-right font-medium">
+                                Approved budget (₱)
+                            </th>
+                            <th class="px-4 py-3 text-right font-medium">
+                                Expenses (₱)
+                            </th>
+                            <th class="px-4 py-3 text-right font-medium">
+                                Remaining / Short (₱)
+                            </th>
+                            <th class="px-4 py-3 text-right font-medium">
+                                Used
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="row in paged(budgetRows)"
+                            :key="row.no"
+                            class="border-b transition-colors last:border-0 hover:bg-muted/40"
+                        >
+                            <td
+                                class="px-4 py-3 text-muted-foreground tabular-nums"
+                            >
+                                {{ row.no }}
+                            </td>
+                            <td class="px-4 py-3 font-medium text-slate-900">
+                                {{ row.name }}
+                            </td>
+                            <td class="px-4 py-3 text-muted-foreground">
+                                {{ row.department }}
+                            </td>
+                            <td
+                                class="px-4 py-3 text-right text-slate-700 tabular-nums"
+                            >
+                                {{ row.budget.toLocaleString() }}
+                            </td>
+                            <td
+                                class="px-4 py-3 text-right text-slate-700 tabular-nums"
+                            >
+                                {{ row.expenses.toLocaleString() }}
+                            </td>
+                            <td
+                                class="px-4 py-3 text-right tabular-nums"
+                                :class="
+                                    row.over
+                                        ? 'font-medium text-red-600'
+                                        : 'text-slate-700'
+                                "
+                            >
+                                {{ row.balance.toLocaleString() }}
+                            </td>
+                            <td
+                                class="px-4 py-3 text-right text-muted-foreground tabular-nums"
+                            >
+                                {{ row.used }}
+                            </td>
+                        </tr>
+                        <tr v-if="budgetRows.length === 0">
+                            <td
+                                colspan="7"
+                                class="px-4 py-10 text-center text-sm text-muted-foreground"
+                            >
+                                {{ emptyMessage }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <PaginationBar
+                :total="budgetRows.length"
+                :page-size="PAGE_SIZE"
+                v-model:page="reportPage"
+            />
         </div>
 
         <!-- ================= TEAM UTILIZATION ================= -->

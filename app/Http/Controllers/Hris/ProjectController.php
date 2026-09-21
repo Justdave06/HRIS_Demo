@@ -49,9 +49,9 @@ class ProjectController extends Controller
             return redirect()->route('demo.projects.registry');
         }
 
-        return Inertia::render('demo/ProjectDetail', array_merge(
+        return Inertia::render('demo/ProjectView', array_merge(
             $this->payload(),
-            ['project' => $projectData],
+            ['project' => $projectData, 'initialTab' => 'detail'],
         ));
     }
 
@@ -65,7 +65,7 @@ class ProjectController extends Controller
         $projectData = collect(DemoData::projects())->firstWhere('id', $project);
 
         if (! $projectData) {
-            return Inertia::render('demo/ProjectDetail', array_merge(
+            return Inertia::render('demo/ProjectView', array_merge(
                 $this->payload(),
                 ['project' => [
                     'id' => $project,
@@ -79,7 +79,7 @@ class ProjectController extends Controller
                     'team_ids' => [],
                     'milestones' => [],
                     'budget' => 0,
-                ]],
+                ], 'initialTab' => 'detail'],
             ));
         }
 
@@ -98,9 +98,9 @@ class ProjectController extends Controller
             return redirect()->route('demo.projects.registry');
         }
 
-        return Inertia::render('demo/ProjectBudgetBreakdown', array_merge(
+        return Inertia::render('demo/ProjectView', array_merge(
             $this->payload(),
-            ['project' => $projectData],
+            ['project' => $projectData, 'initialTab' => 'budget'],
         ));
     }
 
@@ -112,7 +112,7 @@ class ProjectController extends Controller
         $projectData = collect(DemoData::projects())->firstWhere('id', $project);
 
         if (! $projectData) {
-            return Inertia::render('demo/ProjectBudgetBreakdown', array_merge(
+            return Inertia::render('demo/ProjectView', array_merge(
                 $this->payload(),
                 ['project' => [
                     'id' => $project,
@@ -126,7 +126,7 @@ class ProjectController extends Controller
                     'team_ids' => [],
                     'milestones' => [],
                     'budget' => 0,
-                ]],
+                ], 'initialTab' => 'budget'],
             ));
         }
 
